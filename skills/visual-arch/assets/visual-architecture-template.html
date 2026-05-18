@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Visual Architecture</title>
+    <link rel="stylesheet" href="https://unpkg.com/@xyflow/react@12.10.2/dist/style.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        --canvas: #f7f6f2;
+        --surface: #fffefa;
+        --ink: #171717;
+        --muted: #625f58;
+        --quiet: #8a857c;
+        --line: #d8d4c8;
+        --panel: rgba(255, 254, 250, 0.92);
+        --shadow: 0 20px 58px rgba(34, 31, 24, 0.14);
+        --grid: rgba(93, 88, 76, 0.09);
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --canvas: #24231f;
+        --surface: #302f2a;
+        --ink: #f3eee4;
+        --muted: #c8c0b1;
+        --quiet: #a89f91;
+        --line: #565247;
+        --panel: rgba(48, 47, 42, 0.92);
+        --shadow: 0 22px 64px rgba(0, 0, 0, 0.34);
+        --grid: rgba(228, 220, 205, 0.08);
+      }
+      * { box-sizing: border-box; }
+      html, body, #root { width: 100%; height: 100%; margin: 0; }
+      body {
+        overflow: hidden;
+        background: var(--canvas);
+        color: var(--ink);
+        font: 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      button { font: inherit; }
+      .app {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        background:
+          radial-gradient(circle at 8% 8%, rgba(66, 99, 190, 0.10), transparent 28rem),
+          radial-gradient(circle at 88% 12%, rgba(18, 137, 112, 0.09), transparent 30rem),
+          var(--canvas);
+      }
+      .topbar {
+        position: absolute;
+        inset: 14px 14px auto 14px;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) minmax(280px, 1.5fr) auto;
+        gap: 12px;
+        align-items: center;
+        border: 1px solid rgba(120, 113, 100, 0.18);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 14px 34px rgba(34, 31, 24, 0.10);
+        padding: 10px 12px;
+        backdrop-filter: blur(14px);
+      }
+      .kicker {
+        display: block;
+        color: var(--quiet);
+        font-size: 0.68rem;
+        font-weight: 850;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .title {
+        display: block;
+        margin-top: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 1.05rem;
+        font-weight: 900;
+      }
+      .tabs, .actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+      .button {
+        min-height: 34px;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+        padding: 7px 10px;
+        font-size: 0.82rem;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+      .button:hover { border-color: rgba(120, 113, 100, 0.28); background: rgba(127, 127, 127, 0.08); }
+      .button.active { background: var(--ink); color: var(--surface); }
+      .button.icon { display: inline-grid; width: 34px; place-items: center; padding-inline: 0; }
+      .flow { width: 100%; height: 100%; }
+      .lane {
+        width: var(--lane-width);
+        height: var(--lane-height);
+        border-inline: 1px solid rgba(120, 113, 100, 0.18);
+        border-top: 4px solid var(--accent);
+        background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 68%);
+        pointer-events: none;
+      }
+      .lane-title {
+        padding: 14px 18px;
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 950;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+      .node {
+        width: 220px;
+        min-height: 86px;
+        border: 1px solid color-mix(in srgb, var(--accent) 42%, #afa99d);
+        border-top: 5px solid var(--accent);
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--soft) 38%, var(--surface));
+        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.10);
+        color: var(--ink);
+        overflow: hidden;
+      }
+      .node.selected { box-shadow: 0 22px 52px rgba(34, 31, 24, 0.20), 0 0 0 4px color-mix(in srgb, var(--accent) 19%, transparent); }
+      .node.dimmed { opacity: 0.34; filter: saturate(0.7); }
+      .node-domain {
+        padding: 10px 12px 0;
+        color: color-mix(in srgb, var(--accent) 78%, var(--ink));
+        font-size: 0.62rem;
+        font-weight: 950;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .node h3 { margin: 7px 12px 0; font-size: 1.14rem; line-height: 1.12; }
+      .node p { margin: 7px 12px 12px; color: var(--muted); font-size: 0.82rem; }
+      .drawer {
+        position: absolute;
+        z-index: 18;
+        top: 88px;
+        right: 14px;
+        width: min(500px, calc(100vw - 28px));
+        max-height: calc(100vh - 108px);
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(120, 113, 100, 0.18);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        backdrop-filter: blur(16px);
+      }
+      .drawer-head { border-top: 5px solid var(--accent); border-bottom: 1px solid rgba(120, 113, 100, 0.16); padding: 16px 18px; }
+      .drawer h2 { margin: 7px 0 0; font-size: 1.45rem; line-height: 1.05; }
+      .drawer p, .drawer li { color: var(--muted); }
+      .drawer-body { overflow: auto; padding: 6px 18px 18px; }
+      .section { border-bottom: 1px solid rgba(120, 113, 100, 0.14); padding: 13px 0; }
+      .section:last-child { border-bottom: 0; }
+      .section h3 { margin: 0; color: var(--quiet); font-size: 0.72rem; font-weight: 950; letter-spacing: 0.12em; text-transform: uppercase; }
+      .section ul { margin: 9px 0 0; padding-left: 18px; }
+      .sources { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+      .source { border: 1px solid rgba(120, 113, 100, 0.18); border-radius: 6px; padding: 6px 8px; font: 0.74rem ui-monospace, SFMono-Regular, Consolas, monospace; }
+      @media (max-width: 760px) {
+        .topbar { grid-template-columns: 1fr; }
+        .drawer { top: auto; bottom: 14px; max-height: 46vh; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/@xyflow/react@12.10.2/dist/umd/index.js"></script>
+    <script>
+      const ARCHITECTURE_MODEL = {
+        "title": "Project Architecture",
+        "subtitle": "Replace ARCHITECTURE_MODEL with project-specific data.",
+        "domains": {
+          "system": { "label": "System", "color": "#4263be", "soft": "#dfe6ff" },
+          "runtime": { "label": "Runtime", "color": "#128970", "soft": "#dff7ef" },
+          "external": { "label": "External", "color": "#9a6b21", "soft": "#f6ebcf" }
+        },
+        "owners": {
+          "project": { "label": "Project", "description": "Core project responsibility." },
+          "external": { "label": "External", "description": "External dependency or user-operated system." }
+        },
+        "lanes": [
+          { "id": "lane-system", "title": "System Boundary", "domain": "system", "x": 40, "y": 120, "width": 840, "height": 360 }
+        ],
+        "nodes": [
+          { "id": "entrypoint", "title": "Entrypoint", "domain": "system", "owner": "project", "x": 120, "y": 210, "purpose": "The first project-specific execution surface.", "details": { "summary": "Replace this placeholder node with a real entrypoint.", "inputs": ["User or automation request"], "outputs": ["Runtime action"], "why": "Shows where the system starts.", "failures": ["Check the entrypoint source"], "source": ["replace-with/source-path"], "related": ["runtime"] } },
+          { "id": "runtime", "title": "Runtime", "domain": "runtime", "owner": "project", "x": 390, "y": 210, "purpose": "The main execution path.", "details": { "summary": "Replace this placeholder node with real runtime behavior.", "inputs": ["Entrypoint call"], "outputs": ["Result or artifact"], "why": "Shows the central behavior.", "failures": ["Check runtime logs/tests"], "source": ["replace-with/source-path"], "related": ["output"] } },
+          { "id": "output", "title": "Output", "domain": "external", "owner": "external", "x": 660, "y": 210, "purpose": "The visible result or handoff.", "details": { "summary": "Replace this placeholder node with a real output.", "inputs": ["Runtime result"], "outputs": ["User-visible artifact"], "why": "Shows what the system produces.", "failures": ["Check output validation"], "source": ["replace-with/source-path"], "related": ["runtime"] } }
+        ],
+        "edges": [
+          { "id": "entrypoint-runtime", "source": "entrypoint", "target": "runtime", "label": "call", "kind": "control" },
+          { "id": "runtime-output", "source": "runtime", "target": "output", "label": "result", "kind": "data" }
+        ],
+        "views": {
+          "overview": { "label": "Overview", "focus": ["entrypoint", "runtime", "output"] }
+        }
+      };
+      const { createElement: h, useCallback, useMemo, useState } = React;
+      const { createRoot } = ReactDOM;
+      const { Background, BaseEdge, Controls, EdgeLabelRenderer, MarkerType, ReactFlow, ReactFlowProvider, getBezierPath, useReactFlow } = window.ReactFlow;
+      const byId = Object.fromEntries(ARCHITECTURE_MODEL.nodes.map(node => [node.id, node]));
+      function vars(domainKey) {
+        const domain = ARCHITECTURE_MODEL.domains[domainKey] || ARCHITECTURE_MODEL.domains.system;
+        return { "--accent": domain.color, "--soft": domain.soft };
+      }
+      function directRelations(id) {
+        return [...new Set(ARCHITECTURE_MODEL.edges.flatMap(edge => edge.source === id ? [edge.target] : edge.target === id ? [edge.source] : []))].filter(Boolean);
+      }
+      function LaneNode({ data }) {
+        return h("div", { className: "lane", style: { ...vars(data.domain), "--lane-width": `${data.width}px`, "--lane-height": `${data.height}px` } }, h("div", { className: "lane-title" }, data.title));
+      }
+      function ArchitectureNode({ data, selected }) {
+        const domain = ARCHITECTURE_MODEL.domains[data.domain] || ARCHITECTURE_MODEL.domains.system;
+        return h("div", { className: `node ${selected ? "selected" : ""} ${data.dimmed ? "dimmed" : ""}`, style: vars(data.domain) },
+          h("div", { className: "node-domain" }, domain.label),
+          h("h3", null, data.title),
+          h("p", null, data.purpose)
+        );
+      }
+      function ContractEdge(props) {
+        const [path, labelX, labelY] = getBezierPath(props);
+        const edge = props.data || {};
+        const color = edge.color || "#8f887d";
+        return h(React.Fragment, null,
+          h(BaseEdge, { path, markerEnd: props.markerEnd, style: { stroke: color, strokeWidth: edge.active ? 2.8 : 1.8, strokeDasharray: edge.kind === "data" || edge.kind === "dependency" ? "7 7" : undefined, opacity: edge.dimmed ? 0.18 : 0.75 } }),
+          h(EdgeLabelRenderer, null, h("div", { style: { position: "absolute", transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`, border: "1px solid rgba(120,113,100,.18)", borderRadius: "999px", background: "var(--panel)", padding: "4px 8px", fontSize: ".72rem", fontWeight: 850, opacity: edge.dimmed ? 0 : 1 } }, edge.label))
+        );
+      }
+      const nodeTypes = { architecture: ArchitectureNode, lane: LaneNode };
+      const edgeTypes = { contract: ContractEdge };
+      function buildNodes(selectedId, viewKey) {
+        const focus = new Set((ARCHITECTURE_MODEL.views[viewKey] || ARCHITECTURE_MODEL.views.overview).focus);
+        const related = new Set(selectedId ? [selectedId, ...directRelations(selectedId)] : focus);
+        return [
+          ...ARCHITECTURE_MODEL.lanes.map(lane => ({ id: lane.id, type: "lane", position: { x: lane.x, y: lane.y }, data: lane, selectable: false, draggable: false })),
+          ...ARCHITECTURE_MODEL.nodes.map(node => ({ id: node.id, type: "architecture", position: { x: node.x, y: node.y }, data: { ...node, dimmed: selectedId ? !related.has(node.id) : !focus.has(node.id) }, draggable: false }))
+        ];
+      }
+      function buildEdges(selectedId) {
+        const related = new Set(selectedId ? [selectedId, ...directRelations(selectedId)] : []);
+        return ARCHITECTURE_MODEL.edges.map(edge => ({ id: edge.id, source: edge.source, target: edge.target, type: "contract", markerEnd: { type: MarkerType.ArrowClosed }, data: { ...edge, active: selectedId && (edge.source === selectedId || edge.target === selectedId), dimmed: selectedId && !(related.has(edge.source) && related.has(edge.target)) } }));
+      }
+      function Drawer({ selectedId }) {
+        const node = byId[selectedId] || ARCHITECTURE_MODEL.nodes[0];
+        const domain = ARCHITECTURE_MODEL.domains[node.domain] || ARCHITECTURE_MODEL.domains.system;
+        const owner = ARCHITECTURE_MODEL.owners[node.owner] || { label: node.owner, description: "" };
+        const details = node.details;
+        return h("aside", { className: "drawer", style: vars(node.domain) },
+          h("div", { className: "drawer-head" }, h("span", { className: "kicker" }, `${owner.label} / ${domain.label}`), h("h2", null, node.title), h("p", null, node.purpose)),
+          h("div", { className: "drawer-body" },
+            h("section", { className: "section" }, h("h3", null, "What it does"), h("p", null, details.summary)),
+            h("section", { className: "section" }, h("h3", null, "Reads"), h("ul", null, details.inputs.map(item => h("li", { key: item }, item)))),
+            h("section", { className: "section" }, h("h3", null, "Writes"), h("ul", null, details.outputs.map(item => h("li", { key: item }, item)))),
+            h("section", { className: "section" }, h("h3", null, "Why it exists"), h("p", null, details.why)),
+            h("section", { className: "section" }, h("h3", null, "Check first if it fails"), h("ul", null, details.failures.map(item => h("li", { key: item }, item)))),
+            h("section", { className: "section" }, h("h3", null, "Where to look"), h("div", { className: "sources" }, details.source.map(item => h("span", { key: item, className: "source" }, item))))
+          )
+        );
+      }
+      function Board() {
+        const [view, setView] = useState("overview");
+        const [selectedId, setSelectedId] = useState(ARCHITECTURE_MODEL.nodes[0]?.id);
+        const reactFlow = useReactFlow();
+        const nodes = useMemo(() => buildNodes(selectedId, view), [selectedId, view]);
+        const edges = useMemo(() => buildEdges(selectedId), [selectedId]);
+        const fit = useCallback(() => reactFlow.fitView({ padding: 0.18, duration: 260 }), [reactFlow]);
+        const theme = useCallback(() => {
+          document.documentElement.dataset.theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        }, []);
+        return h("div", { className: "app" },
+          h("div", { className: "topbar" },
+            h("div", null, h("span", { className: "kicker" }, "Visual architecture"), h("span", { className: "title" }, ARCHITECTURE_MODEL.title)),
+            h("div", { className: "tabs" }, Object.entries(ARCHITECTURE_MODEL.views).map(([key, value]) => h("button", { key, className: `button ${view === key ? "active" : ""}`, onClick: () => { setView(key); setSelectedId(value.focus[0]); setTimeout(fit, 0); } }, value.label))),
+            h("div", { className: "actions" }, h("button", { className: "button icon", title: "Fit all", onClick: fit }, "□"), h("button", { className: "button icon", title: "Toggle theme", onClick: theme }, "◐"))
+          ),
+          h("div", { className: "flow" }, h(ReactFlow, { nodes, edges, nodeTypes, edgeTypes, fitView: true, minZoom: 0.25, maxZoom: 1.5, nodesDraggable: false, nodesConnectable: false, onNodeClick: (_event, node) => byId[node.id] && setSelectedId(node.id), defaultEdgeOptions: { type: "contract" }, proOptions: { hideAttribution: true } }, h(Background, { variant: "lines", gap: 34, size: 0.75, color: "var(--grid)" }), h(Controls, { position: "bottom-left", showInteractive: false }))),
+          h(Drawer, { selectedId })
+        );
+      }
+      function App() { return h(ReactFlowProvider, null, h(Board)); }
+      createRoot(document.getElementById("root")).render(h(App));
+    </script>
+  </body>
+</html>

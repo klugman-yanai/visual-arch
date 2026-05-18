@@ -1,0 +1,4 @@
+interface:
+  display_name: "Visual Arch"
+  short_description: "Create interactive architecture HTML docs"
+  default_prompt: "Use $visual-arch to create an interactive visual architecture document for this project."
