@@ -27,6 +27,8 @@ OWNERS_RE = re.compile(
     re.DOTALL,
 )
 CONFIDENCE_VALUES = {"source-backed", "inferred", "external", "unknown"}
+EDGE_KIND_VALUES = {"control", "artifact", "data", "signal", "decision", "dependency"}
+NODE_TIER_VALUES = {"primary", "support", "detail"}
 
 
 def fail(message: str) -> None:
@@ -114,6 +116,15 @@ def validate(path: Path) -> None:
             fail(f"node {node_id} references unknown domain {node['domain']!r}")
         if node["owner"] not in owners:
             fail(f"node {node_id} references unknown owner {node['owner']!r}")
+        if node.get("tier", "primary") not in NODE_TIER_VALUES:
+            fail(f"node {node_id} has invalid tier {node['tier']!r}")
+        if "hidden" in node and not isinstance(node["hidden"], bool):
+            fail(f"node {node_id} hidden must be a boolean")
+
+    for node in nodes:
+        unknown_reveal = [node_id for node_id in node.get("revealFor", []) if node_id not in node_ids]
+        if unknown_reveal:
+            fail(f"node {node['id']} revealFor references unknown nodes: {', '.join(unknown_reveal)}")
 
     for index, lane in enumerate(model["lanes"]):
         require_keys(lane, {"id", "title", "domain", "position"}, f"lane[{index}]")
@@ -130,6 +141,8 @@ def validate(path: Path) -> None:
             fail(f"edge[{index}] has unknown source {source}")
         if target not in node_ids:
             fail(f"edge[{index}] has unknown target {target}")
+        if len(edge) >= 4 and edge[3] not in EDGE_KIND_VALUES:
+            fail(f"edge[{index}] has invalid kind {edge[3]!r}")
 
     for key, view in model["views"].items():
         require_keys(view, {"label", "focus"}, f"view[{key}]")

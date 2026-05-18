@@ -125,10 +125,7 @@
         display: grid;
         place-items: center;
         padding: 28px;
-        background:
-          radial-gradient(circle at 20% 15%, rgba(92, 95, 184, 0.12), transparent 30rem),
-          radial-gradient(circle at 80% 12%, rgba(15, 139, 114, 0.12), transparent 28rem),
-          var(--canvas);
+        background: var(--canvas);
         color: var(--ink);
         z-index: 50;
       }
@@ -163,10 +160,7 @@
         position: relative;
         width: 100vw;
         height: 100vh;
-        background:
-          radial-gradient(circle at 8% 8%, rgba(92, 95, 184, 0.1), transparent 28rem),
-          radial-gradient(circle at 88% 12%, rgba(15, 139, 114, 0.09), transparent 30rem),
-          linear-gradient(180deg, #fbfaf6 0%, var(--canvas) 100%);
+        background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 72%, var(--canvas)) 0%, var(--canvas) 100%);
       }
 
       .topbar {
@@ -749,10 +743,7 @@
         }
 
         #boot-fallback {
-          background:
-            radial-gradient(circle at 20% 15%, rgba(154, 141, 255, 0.12), transparent 30rem),
-            radial-gradient(circle at 80% 12%, rgba(76, 199, 170, 0.1), transparent 28rem),
-            var(--canvas);
+          background: var(--canvas);
         }
 
         .fallback-card,
@@ -882,10 +873,7 @@
       }
 
       :root[data-theme] .app-shell {
-        background:
-          radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--github) 10%, transparent), transparent 28rem),
-          radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--runtime) 8%, transparent), transparent 30rem),
-          linear-gradient(180deg, color-mix(in srgb, var(--canvas) 82%, var(--surface)) 0%, var(--canvas) 100%);
+        background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 72%, var(--canvas)) 0%, var(--canvas) 100%);
       }
 
       :root[data-theme] .toolbar-button {
@@ -1118,14 +1106,6 @@
         return h(IconSvg, props, h("path", { d: "M20.6 14.5A8.5 8.5 0 0 1 9.5 3.4 7 7 0 1 0 20.6 14.5Z" }));
       }
 
-      function Minus(props) {
-        return h(IconSvg, props, h("path", { d: "M5 12h14" }));
-      }
-
-      function Plus(props) {
-        return h(IconSvg, props, h("path", { d: "M12 5v14" }), h("path", { d: "M5 12h14" }));
-      }
-
       function X(props) {
         return h(IconSvg, props, h("path", { d: "M18 6 6 18" }), h("path", { d: "m6 6 12 12" }));
       }
@@ -1218,8 +1198,32 @@
         return new Set(BOARD.views[mode]?.focus || []);
       }
 
-      function visibleEdgeIds(mode, selectedId, context) {
+      function isDetailNode(node) {
+        return node.hidden === true || node.tier === "detail";
+      }
+
+      function shouldShowNode(node, mode, selectedId, showDetails, context) {
+        if (!isDetailNode(node)) return true;
+        if (showDetails) return true;
+        const focus = modeFocus(mode);
+        if (mode !== "overview" && focus.has(node.id)) return true;
+        if (!selectedId) return false;
+        if (context.related.has(node.id)) return true;
+        return (node.revealFor || []).includes(selectedId);
+      }
+
+      function visibleNodeIds(mode, selectedId, showDetails) {
+        const context = selectionContext(selectedId);
+        return new Set(
+          BOARD.nodes
+            .filter(node => shouldShowNode(node, mode, selectedId, showDetails, context))
+            .map(node => node.id)
+        );
+      }
+
+      function visibleEdgeIds(mode, selectedId, showDetails, context) {
         if (selectedId) return context.activeEdges;
+        if (showDetails) return MAIN_EDGE_IDS;
         return VIEW_EDGE_IDS[mode] || MAIN_EDGE_IDS;
       }
 
@@ -1227,9 +1231,11 @@
       const PANEL_RESERVE = 560;
       const TOPBAR_RESERVE = 96;
 
-      function boundsForIds(ids) {
-        const selected = ids.map(id => NODE_BY_ID[id]).filter(Boolean);
-        const nodes = selected.length ? selected : BOARD.nodes;
+      function boundsForIds(ids, options = {}) {
+        const includeDetails = options.includeDetails ?? false;
+        const selected = ids.map(id => NODE_BY_ID[id]).filter(node => node && (includeDetails || !isDetailNode(node)));
+        const fallbackNodes = BOARD.nodes.filter(node => includeDetails || !isDetailNode(node));
+        const nodes = selected.length ? selected : fallbackNodes;
         const minX = Math.min(...nodes.map(node => node.position.x));
         const minY = Math.min(...nodes.map(node => node.position.y));
         const maxX = Math.max(...nodes.map(node => node.position.x + NODE_SIZE.width));
@@ -1238,7 +1244,7 @@
       }
 
       function viewportForIds(ids, options = {}) {
-        const bounds = boundsForIds(ids);
+        const bounds = boundsForIds(ids, options);
         const reservePanel = options.reservePanel ?? window.innerWidth >= 980;
         const availableWidth = Math.max(360, window.innerWidth - (reservePanel ? PANEL_RESERVE : 32) - 48);
         const availableHeight = Math.max(300, window.innerHeight - TOPBAR_RESERVE - 30);
@@ -1258,9 +1264,10 @@
         };
       }
 
-      function buildNodes(mode, selectedId) {
+      function buildNodes(mode, selectedId, showDetails) {
         const context = selectionContext(selectedId);
         const focus = modeFocus(mode);
+        const visibleIds = visibleNodeIds(mode, selectedId, showDetails);
         const hasModeFocus = focus.size > 0;
         const hasSelection = Boolean(selectedId);
 
@@ -1268,21 +1275,21 @@
           id: lane.id,
           type: "lane",
           position: lane.position,
-            data: {
-              title: lane.title,
-              subtitle: lane.subtitle,
-              domain: lane.domain,
-              width: lane.width,
-              height: lane.height,
-              dimmed: hasSelection
-            },
+          data: {
+            title: lane.title,
+            subtitle: lane.subtitle,
+            domain: lane.domain,
+            width: lane.width,
+            height: lane.height,
+            dimmed: hasSelection
+          },
           draggable: false,
           selectable: false,
           focusable: false,
           zIndex: -2
         }));
 
-        const nodes = BOARD.nodes.map(node => {
+        const nodes = BOARD.nodes.filter(node => visibleIds.has(node.id)).map(node => {
           const isSelected = node.id === selectedId;
           const isRelated = context.related.has(node.id);
           const modeDimmed = hasModeFocus && !focus.has(node.id);
@@ -1311,12 +1318,13 @@
         return [...lanes, ...nodes];
       }
 
-      function buildEdges(mode, selectedId) {
+      function buildEdges(mode, selectedId, showDetails) {
         const context = selectionContext(selectedId);
         const hasSelection = Boolean(selectedId);
-        const visible = visibleEdgeIds(mode, selectedId, context);
+        const visible = visibleEdgeIds(mode, selectedId, showDetails, context);
+        const nodeIds = visibleNodeIds(mode, selectedId, showDetails);
 
-        return BOARD.edges.filter(([source, target]) => visible.has(`${source}->${target}`)).map(([source, target, label, kind]) => {
+        return BOARD.edges.filter(([source, target]) => visible.has(`${source}->${target}`) && nodeIds.has(source) && nodeIds.has(target)).map(([source, target, label, kind]) => {
           const id = `${source}->${target}`;
           const [sourceHandle, targetHandle] = EDGE_HANDLES[id] || ["out-right", "in-left"];
           const primary = MAIN_EDGE_IDS.has(id);
@@ -1348,9 +1356,10 @@
       }
 
       function edgeColor(kind) {
-        if (kind === "artifact") return (DOMAINS.storage || DOMAINS.data || DOMAINS.runtime).accent;
+        if (kind === "artifact" || kind === "data") return (DOMAINS.storage || DOMAINS.data || DOMAINS.runtime).accent;
         if (kind === "signal") return (DOMAINS.signal || DOMAINS.runtime).accent;
         if (kind === "decision") return (DOMAINS.decision || DOMAINS.delivery || DOMAINS.runtime).accent;
+        if (kind === "dependency") return (DOMAINS.infra || DOMAINS.runtime).accent;
         return (DOMAINS.runtime || DOMAINS.infra).accent;
       }
 
@@ -1661,17 +1670,16 @@
       function Toolbar({
         mode,
         selectedId,
+        showDetails,
         theme,
         onModeChange,
         onFitAll,
         onResetLayout,
         onClearSelection,
+        onDetailsToggle,
         onThemeToggle
       }) {
-        const reactFlow = useReactFlow();
         const modes = Object.entries(BOARD.views);
-        const zoomIn = useCallback(() => reactFlow.zoomIn({ duration: 180 }), [reactFlow]);
-        const zoomOut = useCallback(() => reactFlow.zoomOut({ duration: 180 }), [reactFlow]);
 
         return h(
           "div",
@@ -1685,10 +1693,10 @@
           h(
             "div",
             { className: "toolbar-cluster" },
-            h("span", { className: "toolbar-label" }, "Highlight"),
+            h("span", { className: "toolbar-label" }, "View"),
             h(
               "div",
-              { className: "mode-tabs", role: "group", "aria-label": "Highlight a pipeline group" },
+              { className: "mode-tabs", role: "group", "aria-label": "Choose architecture view" },
               modes.map(([key, value]) =>
                 h(
                   "button",
@@ -1721,6 +1729,17 @@
               "button",
               {
                 type: "button",
+                className: `toolbar-button ${showDetails ? "is-active" : ""}`,
+                onClick: onDetailsToggle,
+                "aria-pressed": String(showDetails),
+                title: showDetails ? "Hide detail nodes" : "Show detail nodes"
+              },
+              "Details"
+            ),
+            h(
+              "button",
+              {
+                type: "button",
                 className: "toolbar-button is-icon",
                 onClick: onThemeToggle,
                 "aria-label": theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
@@ -1728,8 +1747,6 @@
               },
               theme === "dark" ? h(Sun, { "aria-hidden": true }) : h(Moon, { "aria-hidden": true })
             ),
-            h("button", { type: "button", className: "toolbar-button is-icon", onClick: zoomOut, "aria-label": "Zoom out", title: "Zoom out" }, h(Minus, { "aria-hidden": true })),
-            h("button", { type: "button", className: "toolbar-button is-icon", onClick: zoomIn, "aria-label": "Zoom in", title: "Zoom in" }, h(Plus, { "aria-hidden": true })),
             selectedId
               ? h(
                   "button",
@@ -1774,6 +1791,7 @@
       function FlowBoard() {
         const [mode, setMode] = useState("overview");
         const [selectedId, setSelectedId] = useState(null);
+        const [showDetails, setShowDetails] = useState(false);
         const [resetNonce, setResetNonce] = useState(0);
         const [theme, setTheme] = useState(initialTheme);
         const [isNavigating, setIsNavigating] = useState(false);
@@ -1781,8 +1799,8 @@
         const didInitialFit = useRef(false);
         const reactFlow = useReactFlow();
 
-        const nodes = useMemo(() => buildNodes(mode, selectedId), [mode, selectedId, resetNonce]);
-        const edges = useMemo(() => buildEdges(mode, selectedId), [mode, selectedId]);
+        const nodes = useMemo(() => buildNodes(mode, selectedId, showDetails), [mode, selectedId, showDetails, resetNonce]);
+        const edges = useMemo(() => buildEdges(mode, selectedId, showDetails), [mode, selectedId, showDetails]);
 
         const setViewportForIds = useCallback(
           (ids, options = {}) => {
@@ -1795,7 +1813,7 @@
 
         const centerNode = useCallback(id => {
           if (!NODE_BY_ID[id]) return;
-          setViewportForIds([id], { padding: 0.95, maxZoom: 1.05, duration: 420 });
+          setViewportForIds([id], { padding: 0.95, maxZoom: 1.05, duration: 420, includeDetails: true });
         }, [setViewportForIds]);
 
         const selectNode = useCallback(
@@ -1817,7 +1835,7 @@
             if (nextMode === "overview") {
               setViewportForIds(view.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false });
             } else {
-              setViewportForIds(view.focus, { padding: 0.34, maxZoom: 1.05 });
+              setViewportForIds(view.focus, { padding: 0.34, maxZoom: 1.05, includeDetails: true });
             }
           },
           [setViewportForIds]
@@ -1833,7 +1851,7 @@
           if (mode === "overview") {
             setViewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false });
           } else {
-            setViewportForIds((BOARD.views[mode] || BOARD.views.overview).focus, { padding: 0.34, maxZoom: 1.05 });
+            setViewportForIds((BOARD.views[mode] || BOARD.views.overview).focus, { padding: 0.34, maxZoom: 1.05, includeDetails: true });
           }
         }, [mode, setViewportForIds]);
 
@@ -1844,6 +1862,10 @@
 
         const toggleTheme = useCallback(() => {
           setTheme(value => (value === "dark" ? "light" : "dark"));
+        }, []);
+
+        const toggleDetails = useCallback(() => {
+          setShowDetails(value => !value);
         }, []);
 
         const beginCanvasNavigation = useCallback(event => {
@@ -1907,11 +1929,13 @@
           h(Toolbar, {
             mode,
             selectedId,
+            showDetails,
             theme,
             onModeChange: focusMode,
             onFitAll: fitAll,
             onResetLayout: resetLayout,
             onClearSelection: clearSelection,
+            onDetailsToggle: toggleDetails,
             onThemeToggle: toggleTheme
           }),
           h(

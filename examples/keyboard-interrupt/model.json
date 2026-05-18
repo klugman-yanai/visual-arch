@@ -1,0 +1,324 @@
+{
+  "domains": {
+    "interface": { "label": "Human + Terminal", "accent": "#5c5fb8", "soft": "#ececfe" },
+    "runtime": { "label": "OS Runtime", "accent": "#0f8b72", "soft": "#e2f5ef" },
+    "signal": { "label": "Signal Boundary", "accent": "#bf3b5f", "soft": "#fae5ec" },
+    "data": { "label": "Process State", "accent": "#b77b1b", "soft": "#f8efd9" },
+    "delivery": { "label": "Application Outcome", "accent": "#7a5a25", "soft": "#f4ead9" },
+    "external": { "label": "External", "accent": "#59636f", "soft": "#eceff2" },
+    "infra": { "label": "Infrastructure", "accent": "#59636f", "soft": "#eceff2" }
+  },
+  "owners": {
+    "product": { "label": "User", "description": "The person interacting with a foreground terminal job." },
+    "runtime": { "label": "Kernel + Runtime", "description": "Terminal driver, job control, process groups, and language runtime behavior." },
+    "signal": { "label": "Signal Handling", "description": "Asynchronous notification, handlers, masks, default actions, and delivery constraints." },
+    "data": { "label": "Process State", "description": "Foreground process group, pending signals, child processes, locks, and partial output." },
+    "delivery": { "label": "Program", "description": "Application cleanup, cancellation semantics, and shell-visible status." },
+    "suite": { "label": "Keyboard Interrupt Example", "description": "Deep visual architecture example for terminal Ctrl+C behavior." }
+  },
+  "board": {
+    "lanes": [
+      { "id": "lane-user", "title": "User + Terminal", "subtitle": "Keystroke, line discipline, and session foreground state.", "domain": "interface", "position": { "x": 40, "y": 150 }, "width": 270, "height": 1320 },
+      { "id": "lane-kernel", "title": "Kernel Runtime", "subtitle": "TTY driver, process groups, signal queues, and scheduling.", "domain": "runtime", "position": { "x": 340, "y": 150 }, "width": 270, "height": 1320 },
+      { "id": "lane-process", "title": "Process Boundary", "subtitle": "Handlers, masks, language runtimes, and child processes.", "domain": "signal", "position": { "x": 640, "y": 150 }, "width": 270, "height": 1320 },
+      { "id": "lane-outcome", "title": "Outcome", "subtitle": "Cleanup, exit status, shells, and debugging evidence.", "domain": "delivery", "position": { "x": 940, "y": 150 }, "width": 270, "height": 1320 }
+    ],
+    "nodes": [
+      {
+        "id": "active-terminal",
+        "step": "01",
+        "domain": "interface",
+        "owner": "product",
+        "title": "Active Terminal",
+        "purpose": "A terminal session owns the keyboard input stream for a foreground job.",
+        "chips": ["tty", "session"],
+        "position": { "x": 90, "y": 245 },
+        "details": {
+          "summary": "The user is attached to a terminal or pseudo-terminal that has a foreground process group.",
+          "what": ["Interactive shells put jobs into foreground and background process groups.", "Only the foreground process group normally receives terminal-generated interrupt signals."],
+          "why": ["This prevents Ctrl+C in one terminal from interrupting unrelated processes."],
+          "inputs": ["Keyboard input", "Terminal session state", "Foreground process group ID"],
+          "outputs": ["Input bytes or line-discipline events"],
+          "failures": ["Detached processes, background jobs, multiplexers, containers, and SSH sessions can change which process group is foreground."],
+          "source": ["external: POSIX job control", "external: Unix terminal session model"],
+          "source_confidence": "source-backed",
+          "related": ["interrupt-character"]
+        }
+      },
+      {
+        "id": "interrupt-character",
+        "step": "02",
+        "domain": "interface",
+        "owner": "runtime",
+        "title": "Interrupt Character",
+        "purpose": "Ctrl+C is interpreted as the terminal interrupt character in canonical mode.",
+        "chips": ["Ctrl+C", "VINTR"],
+        "position": { "x": 90, "y": 395 },
+        "details": {
+          "summary": "The terminal line discipline maps the configured VINTR character, commonly Ctrl+C, to an interrupt event.",
+          "what": ["The mapping is configurable with terminal settings such as stty.", "Programs that enter raw mode may receive Ctrl+C as ordinary input instead."],
+          "why": ["The terminal can provide common job-control behavior even when applications do not parse keyboard shortcuts themselves."],
+          "inputs": ["Ctrl+C key chord", "termios control-character settings", "canonical or raw terminal mode"],
+          "outputs": ["Terminal-generated interrupt event or literal byte input"],
+          "failures": ["Raw-mode full-screen applications must restore terminal settings or Ctrl+C behavior can remain surprising after exit."],
+          "source": ["external: termios VINTR", "external: stty settings"],
+          "source_confidence": "source-backed",
+          "related": ["tty-line-discipline"]
+        }
+      },
+      {
+        "id": "tty-line-discipline",
+        "step": "03",
+        "domain": "runtime",
+        "owner": "runtime",
+        "title": "TTY Line Discipline",
+        "purpose": "The kernel terminal driver converts the interrupt event into SIGINT.",
+        "chips": ["kernel", "line discipline"],
+        "position": { "x": 390, "y": 395 },
+        "details": {
+          "summary": "The terminal driver handles the interrupt character before normal input delivery and prepares a SIGINT for the foreground process group.",
+          "what": ["Input already buffered for the line may be discarded depending on terminal flags.", "The driver does not need cooperation from the target program to send the signal."],
+          "why": ["Kernel-owned terminal semantics provide consistent cancellation behavior across command-line programs."],
+          "inputs": ["Interrupt event from the terminal input stream", "Foreground process group ID"],
+          "outputs": ["SIGINT targeted to the foreground process group"],
+          "failures": ["Terminal flags, pseudo-terminal implementations, and remote shells can affect buffering and delivery details."],
+          "source": ["external: POSIX terminal interface", "external: Linux tty behavior"],
+          "source_confidence": "source-backed",
+          "related": ["foreground-process-group"]
+        }
+      },
+      {
+        "id": "foreground-process-group",
+        "step": "04",
+        "domain": "data",
+        "owner": "data",
+        "title": "Foreground Group",
+        "purpose": "Identifies every process that should receive the terminal interrupt.",
+        "chips": ["pgid", "job control"],
+        "position": { "x": 390, "y": 545 },
+        "details": {
+          "summary": "The signal targets the foreground process group, which may include a shell pipeline rather than a single process.",
+          "what": ["A pipeline like `cmd1 | cmd2` is usually one foreground process group.", "Shells manage process groups when launching and resuming jobs."],
+          "why": ["Whole-job targeting lets Ctrl+C cancel every stage of a pipeline together."],
+          "inputs": ["Session job-control state", "Process group membership"],
+          "outputs": ["Set of target process IDs"],
+          "failures": ["Programs that spawn children into separate process groups may require explicit cleanup or signal forwarding."],
+          "source": ["external: POSIX process groups", "external: shell job control behavior"],
+          "source_confidence": "source-backed",
+          "related": ["sigint-delivery", "child-processes"]
+        }
+      },
+      {
+        "id": "sigint-delivery",
+        "step": "05",
+        "domain": "signal",
+        "owner": "signal",
+        "title": "SIGINT Delivery",
+        "purpose": "The kernel marks SIGINT pending or invokes signal handling when the process can observe it.",
+        "chips": ["async", "pending"],
+        "position": { "x": 690, "y": 545 },
+        "details": {
+          "summary": "Each target process receives SIGINT according to its signal disposition, mask, and current execution state.",
+          "what": ["If SIGINT is blocked, it remains pending until unblocked.", "If the default disposition is active, the process terminates.", "If a handler is installed, the process runs that handler at a safe delivery point."],
+          "why": ["Signal masks and dispositions let programs control how asynchronous events interact with critical sections."],
+          "inputs": ["Target process list", "Signal dispositions", "Thread signal masks"],
+          "outputs": ["Default termination, pending signal, ignored signal, or handler dispatch"],
+          "failures": ["A process that ignores SIGINT can make Ctrl+C appear broken; a process stuck in uninterruptible kernel sleep may not stop immediately."],
+          "source": ["external: POSIX signal delivery", "external: signal masks and dispositions"],
+          "source_confidence": "source-backed",
+          "related": ["default-action", "custom-handler"]
+        }
+      },
+      {
+        "id": "default-action",
+        "step": "06",
+        "domain": "delivery",
+        "owner": "delivery",
+        "title": "Default Termination",
+        "purpose": "Processes without a custom SIGINT handler terminate.",
+        "chips": ["default", "terminate"],
+        "position": { "x": 990, "y": 545 },
+        "details": {
+          "summary": "The default SIGINT action terminates the process and makes signal termination visible to the parent.",
+          "what": ["The shell waits for the foreground job and observes that it ended because of SIGINT.", "Many shells expose a status convention equivalent to 128 plus the signal number."],
+          "why": ["Parents and scripts need a machine-readable indication that cancellation occurred."],
+          "inputs": ["Unhandled SIGINT"],
+          "outputs": ["Process termination", "Wait status for parent shell"],
+          "failures": ["Immediate termination can leave partial files or child processes unless the program or parent handles cleanup."],
+          "source": ["external: POSIX wait status", "external: shell exit status conventions"],
+          "source_confidence": "source-backed",
+          "related": ["shell-status"]
+        }
+      },
+      {
+        "id": "custom-handler",
+        "step": "07",
+        "domain": "signal",
+        "owner": "signal",
+        "title": "Custom Handler",
+        "purpose": "Programs can intercept SIGINT to start orderly cancellation.",
+        "chips": ["handler", "cancel"],
+        "position": { "x": 690, "y": 695 },
+        "details": {
+          "summary": "A custom handler can set a flag, request shutdown, forward signals to children, or let a runtime raise an exception.",
+          "what": ["Native signal handlers must avoid unsafe work and usually set minimal state.", "High-level runtimes often defer user-visible handling to their event loop or interpreter checkpoints."],
+          "why": ["Graceful cancellation needs coordination with files, locks, network requests, and child processes."],
+          "inputs": ["Delivered SIGINT", "Registered handler or runtime signal hook"],
+          "outputs": ["Cancellation flag", "Runtime exception", "Shutdown callback", "Forwarded signal"],
+          "failures": ["Doing complex work directly inside a native signal handler can deadlock or corrupt state."],
+          "source": ["external: async-signal-safe restrictions", "external: runtime signal handling docs"],
+          "source_confidence": "source-backed",
+          "related": ["runtime-checkpoint", "child-processes"]
+        }
+      },
+      {
+        "id": "runtime-checkpoint",
+        "step": "08",
+        "domain": "runtime",
+        "owner": "runtime",
+        "title": "Runtime Checkpoint",
+        "purpose": "Language runtimes translate SIGINT at controlled execution points.",
+        "chips": ["Python", "event loop"],
+        "position": { "x": 390, "y": 845 },
+        "details": {
+          "summary": "Runtimes such as Python record the signal and raise KeyboardInterrupt in the main thread at a safe point.",
+          "what": ["The runtime avoids running arbitrary language code in the low-level signal context.", "Async runtimes may convert interruption into task cancellation or loop shutdown."],
+          "why": ["Language-level interruption integrates with exceptions, finally blocks, and structured cleanup."],
+          "inputs": ["Pending signal flag", "Interpreter or event-loop checkpoint"],
+          "outputs": ["KeyboardInterrupt, task cancellation, or runtime shutdown path"],
+          "failures": ["C extensions, blocking system calls, and broad exception handlers can delay or hide KeyboardInterrupt."],
+          "source": ["external: Python signal module", "external: Python KeyboardInterrupt behavior"],
+          "source_confidence": "source-backed",
+          "related": ["cleanup-path"]
+        }
+      },
+      {
+        "id": "child-processes",
+        "step": "09",
+        "domain": "data",
+        "owner": "data",
+        "title": "Children + Pipelines",
+        "purpose": "Child processes may receive SIGINT directly or need explicit forwarding.",
+        "chips": ["pipeline", "subprocess"],
+        "position": { "x": 690, "y": 845 },
+        "details": {
+          "summary": "Process group membership determines whether children are interrupted with the parent or survive as separate work.",
+          "what": ["Shell pipelines usually receive the same SIGINT together.", "Supervisors and applications that create new sessions may need to forward cancellation."],
+          "why": ["A user expects cancellation to stop the whole command, not only the visible parent process."],
+          "inputs": ["Process tree", "Process groups", "Signal-forwarding policy"],
+          "outputs": ["Stopped children, surviving children, or propagated shutdown request"],
+          "failures": ["Orphaned children, stuck subprocesses, and partial output often come from mismatched process-group handling."],
+          "source": ["external: POSIX process groups", "external: subprocess/session behavior"],
+          "source_confidence": "source-backed",
+          "related": ["cleanup-path"]
+        }
+      },
+      {
+        "id": "cleanup-path",
+        "step": "10",
+        "domain": "delivery",
+        "owner": "delivery",
+        "title": "Cleanup Path",
+        "purpose": "The program unwinds and releases resources before exiting.",
+        "chips": ["finally", "defer"],
+        "position": { "x": 990, "y": 845 },
+        "details": {
+          "summary": "Graceful interruption runs cleanup code for files, locks, temporary directories, terminal modes, network connections, and child processes.",
+          "what": ["High-level `finally` or defer blocks can run during exception unwinding.", "Programs may restore terminal mode and flush logs before returning status."],
+          "why": ["Cancellation should preserve system integrity even when work does not complete."],
+          "inputs": ["Runtime exception or cancellation flag", "Open resources", "Partial work state"],
+          "outputs": ["Closed resources", "Restored terminal state", "Consistent cancellation result"],
+          "failures": ["Catching KeyboardInterrupt without re-raising or exiting can make scripts continue after the user asked them to stop."],
+          "source": ["external: language cleanup semantics", "external: application signal handling patterns"],
+          "source_confidence": "source-backed",
+          "related": ["shell-status"]
+        }
+      },
+      {
+        "id": "shell-status",
+        "step": "11",
+        "domain": "interface",
+        "owner": "product",
+        "title": "Shell Observes Status",
+        "purpose": "The parent shell reports cancellation and decides the next prompt state.",
+        "chips": ["wait", "status"],
+        "position": { "x": 90, "y": 1045 },
+        "details": {
+          "summary": "The shell waits for the foreground job, records status, updates job-control state, and returns control to the user.",
+          "what": ["Interactive shells may print a new prompt or job status message.", "Scripts can branch based on the command's non-zero status."],
+          "why": ["The cancellation result must become visible to both humans and automation."],
+          "inputs": ["Child wait status", "Shell job table"],
+          "outputs": ["Prompt return", "Exit status variable", "Optional job notification"],
+          "failures": ["If the foreground job leaves the terminal in raw mode, the prompt can appear broken until terminal settings are reset."],
+          "source": ["external: shell wait behavior", "external: job-control shells"],
+          "source_confidence": "source-backed",
+          "related": ["debugging-evidence"]
+        }
+      },
+      {
+        "id": "debugging-evidence",
+        "step": "12",
+        "domain": "signal",
+        "owner": "signal",
+        "title": "Debugging Evidence",
+        "purpose": "Shows where to inspect when Ctrl+C does not behave as expected.",
+        "chips": ["stty", "ps", "logs"],
+        "position": { "x": 690, "y": 1045 },
+        "details": {
+          "summary": "Terminal settings, process groups, signal handlers, blocked system calls, and child-process policy explain most surprising interrupt behavior.",
+          "what": ["Check terminal mode and VINTR mapping.", "Inspect process group membership and foreground job state.", "Look for broad exception handlers, ignored SIGINT, or child processes outside the foreground group."],
+          "why": ["Interrupt bugs are boundary bugs: terminal configuration, OS state, runtime behavior, and application cleanup all matter."],
+          "inputs": ["Observed Ctrl+C behavior", "Terminal and process metadata", "Application logs"],
+          "outputs": ["Likely boundary where cancellation is stuck or suppressed"],
+          "failures": ["Assuming Ctrl+C is a direct application callback hides the OS and runtime layers that may be responsible."],
+          "source": ["external: stty", "external: ps/jobs diagnostics", "generated example guidance"],
+          "source_confidence": "inferred",
+          "related": []
+        }
+      }
+    ],
+    "edges": [
+      ["active-terminal", "interrupt-character", "keystroke", "control"],
+      ["interrupt-character", "tty-line-discipline", "VINTR", "control"],
+      ["tty-line-discipline", "foreground-process-group", "target lookup", "artifact"],
+      ["foreground-process-group", "sigint-delivery", "target set", "signal"],
+      ["sigint-delivery", "default-action", "default disposition", "decision"],
+      ["sigint-delivery", "custom-handler", "handler disposition", "decision"],
+      ["custom-handler", "runtime-checkpoint", "deferred handling", "signal"],
+      ["foreground-process-group", "child-processes", "group membership", "artifact"],
+      ["runtime-checkpoint", "cleanup-path", "exception/cancel", "control"],
+      ["child-processes", "cleanup-path", "propagate", "signal"],
+      ["default-action", "shell-status", "wait status", "artifact"],
+      ["cleanup-path", "shell-status", "exit code", "artifact"],
+      ["shell-status", "debugging-evidence", "surprise case", "signal"]
+    ],
+    "views": {
+      "overview": { "label": "Overview", "focus": ["active-terminal", "interrupt-character", "tty-line-discipline", "foreground-process-group", "sigint-delivery", "default-action", "custom-handler", "runtime-checkpoint", "child-processes", "cleanup-path", "shell-status", "debugging-evidence"] },
+      "kernel": { "label": "Kernel Path", "focus": ["active-terminal", "interrupt-character", "tty-line-discipline", "foreground-process-group", "sigint-delivery", "default-action", "shell-status"] },
+      "runtime": { "label": "Runtime Handling", "focus": ["sigint-delivery", "custom-handler", "runtime-checkpoint", "child-processes", "cleanup-path", "shell-status"] },
+      "debugging": { "label": "Debugging", "focus": ["interrupt-character", "foreground-process-group", "sigint-delivery", "runtime-checkpoint", "child-processes", "cleanup-path", "debugging-evidence"] }
+    },
+    "layout": { "orientation": "vertical", "reading_path": "top-to-bottom interrupt flow from terminal input to shell-visible outcome" },
+    "edgeHandles": {
+      "active-terminal->interrupt-character": ["out-bottom", "in-top"],
+      "interrupt-character->tty-line-discipline": ["out-right", "in-left"],
+      "tty-line-discipline->foreground-process-group": ["out-bottom", "in-top"],
+      "foreground-process-group->sigint-delivery": ["out-right", "in-left"],
+      "sigint-delivery->default-action": ["out-right", "in-left"],
+      "sigint-delivery->custom-handler": ["out-bottom", "in-top"],
+      "custom-handler->runtime-checkpoint": ["out-left", "in-right"],
+      "foreground-process-group->child-processes": ["out-right", "in-left"],
+      "runtime-checkpoint->cleanup-path": ["out-right", "in-left"],
+      "child-processes->cleanup-path": ["out-right", "in-left"],
+      "default-action->shell-status": ["out-left", "in-right"],
+      "cleanup-path->shell-status": ["out-left", "in-right"],
+      "shell-status->debugging-evidence": ["out-right", "in-left"]
+    }
+  },
+  "groupDetails": {
+    "overview": { "title": "What Happens When A Keyboard Interrupt Occurs", "purpose": "A deep example architecture map for Ctrl+C in a terminal.", "domain": "signal", "summary": "Ctrl+C is not a direct application callback. The terminal line discipline maps a configured interrupt character to SIGINT, the kernel targets the foreground process group, and each process responds according to its signal disposition, runtime integration, and cleanup policy.", "why": "The flow demonstrates how visual architecture docs expose hidden responsibility boundaries across human input, kernel behavior, language runtimes, and application cleanup.", "points": ["Foreground process group targeting is the central routing rule.", "SIGINT can terminate, be ignored, remain pending, or become a language-level exception.", "Most confusing cases come from raw terminal mode, child process groups, broad exception handlers, or incomplete cleanup."], "focus": ["active-terminal", "interrupt-character", "tty-line-discipline", "foreground-process-group", "sigint-delivery", "default-action", "custom-handler", "runtime-checkpoint", "child-processes", "cleanup-path", "shell-status", "debugging-evidence"] },
+    "kernel": { "title": "Kernel Path", "purpose": "Follow the path owned by the terminal driver, process groups, and signal delivery.", "domain": "runtime", "summary": "The kernel transforms terminal input into a signal targeted at the foreground process group.", "why": "This explains why Ctrl+C affects whole jobs and pipelines rather than a single visible process.", "points": ["VINTR controls which character means interrupt.", "The foreground process group determines recipients.", "Default disposition terminates unless the program changed it."], "focus": ["active-terminal", "interrupt-character", "tty-line-discipline", "foreground-process-group", "sigint-delivery", "default-action", "shell-status"] },
+    "runtime": { "title": "Runtime Handling", "purpose": "Show how a program turns SIGINT into cancellation, exceptions, and cleanup.", "domain": "signal", "summary": "Custom handlers and high-level runtimes defer or translate SIGINT so application cleanup can run.", "why": "This is where graceful cancellation either works cleanly or gets accidentally swallowed.", "points": ["Native handlers should do minimal async-signal-safe work.", "Language runtimes often raise exceptions at safe checkpoints.", "Subprocesses need process-group-aware cleanup."], "focus": ["sigint-delivery", "custom-handler", "runtime-checkpoint", "child-processes", "cleanup-path", "shell-status"] },
+    "debugging": { "title": "Debugging Ctrl+C", "purpose": "Identify the first evidence to inspect when interruption behaves oddly.", "domain": "signal", "summary": "Surprises usually come from terminal mode, foreground process group state, signal disposition, runtime checkpoints, or child process ownership.", "why": "A visual map should shorten incident orientation, not merely decorate the happy path.", "points": ["Use terminal settings to verify VINTR and raw/canonical mode.", "Use process inspection to verify foreground group membership.", "Audit signal handlers and broad exception handling before blaming the shell."], "focus": ["interrupt-character", "foreground-process-group", "sigint-delivery", "runtime-checkpoint", "child-processes", "cleanup-path", "debugging-evidence"] }
+  }
+}

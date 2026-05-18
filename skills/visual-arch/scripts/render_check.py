@@ -5,7 +5,10 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -19,7 +22,7 @@ async def check(path: Path) -> None:
     try:
         from playwright.async_api import async_playwright
     except ImportError:
-        print("SKIP: playwright is not installed; run structural validation instead")
+        check_with_playwright_cli(path)
         return
 
     async with async_playwright() as playwright:
@@ -46,6 +49,34 @@ async def check(path: Path) -> None:
                 await page.close()
         finally:
             await browser.close()
+
+
+def check_with_playwright_cli(path: Path) -> None:
+    cli = shutil.which("playwright")
+    if not cli:
+        print("SKIP: playwright is not installed; run structural validation instead")
+        return
+
+    with tempfile.TemporaryDirectory(prefix="visual-arch-render-") as tmpdir:
+        for name, viewport in VIEWPORTS.items():
+            screenshot = Path(tmpdir) / f"{name}.png"
+            command = [
+                cli,
+                "screenshot",
+                "--browser=chromium",
+                f"--viewport-size={viewport['width']}, {viewport['height']}",
+                "--wait-for-selector=.react-flow__node",
+                "--timeout=15000",
+                path.resolve().as_uri(),
+                str(screenshot),
+            ]
+            result = subprocess.run(command, text=True, capture_output=True, timeout=30)
+            if result.returncode != 0:
+                message = (result.stderr or result.stdout).strip()
+                raise AssertionError(f"{name}: Playwright CLI screenshot failed: {message}")
+            if not screenshot.exists() or screenshot.stat().st_size < 10_000:
+                raise AssertionError(f"{name}: screenshot was not created or looked empty")
+            print(f"OK: {name} render screenshot created with global Playwright CLI")
 
 
 def main() -> None:

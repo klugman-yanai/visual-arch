@@ -1,0 +1,3220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Visual Architecture</title>
+    <link rel="stylesheet" href="https://unpkg.com/@xyflow/react@12.10.2/dist/style.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        --canvas: #f7f6f2;
+        --canvas-strong: #ece9df;
+        --surface: #fffefa;
+        --surface-2: #f2f0e8;
+        --ink: #171717;
+        --muted: #65625c;
+        --quiet: #918d84;
+        --line: #d8d4c8;
+        --grid: rgba(93, 88, 76, 0.09);
+        --swim-line: rgba(93, 88, 76, 0.16);
+        --shadow: 0 22px 60px rgba(34, 31, 24, 0.13);
+        --github: #5c5fb8;
+        --package: #2f6f91;
+        --runtime: #0f8b72;
+        --storage: #b77b1b;
+        --signal: #bf3b5f;
+        --decision: #7a5a25;
+        --infra: #59636f;
+        --panel-bg: rgba(255, 254, 250, 0.9);
+        --panel-border: rgba(78, 74, 65, 0.16);
+        --button-hover-bg: rgba(23, 23, 23, 0.04);
+        --button-active-bg: #171717;
+        --button-active-fg: #fffefa;
+        --card-bg: #f7f4ed;
+        --chip-bg: #f6f3eb;
+      }
+
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --canvas: #24231f;
+        --canvas-strong: #302e29;
+        --surface: #302f2a;
+        --surface-2: #3a3832;
+        --ink: #f3eee4;
+        --muted: #c8c0b1;
+        --quiet: #a89f91;
+        --line: #565247;
+        --grid: rgba(228, 220, 205, 0.08);
+        --swim-line: rgba(228, 220, 205, 0.13);
+        --shadow: 0 22px 64px rgba(0, 0, 0, 0.32);
+        --github: #9a8dff;
+        --package: #63a8ca;
+        --runtime: #4cc7aa;
+        --storage: #e1b85a;
+        --signal: #f08aa3;
+        --decision: #d0aa70;
+        --infra: #a8b0b8;
+        --panel-bg: rgba(48, 47, 42, 0.9);
+        --panel-border: rgba(243, 238, 228, 0.13);
+        --button-hover-bg: rgba(243, 238, 228, 0.07);
+        --button-active-bg: #f3eee4;
+        --button-active-fg: #24231f;
+        --card-bg: #38362f;
+        --chip-bg: #38362f;
+      }
+
+      :root[data-theme="light"] {
+        color-scheme: light;
+        --canvas: #f7f6f2;
+        --canvas-strong: #ece9df;
+        --surface: #fffefa;
+        --surface-2: #f2f0e8;
+        --ink: #171717;
+        --muted: #65625c;
+        --quiet: #918d84;
+        --line: #d8d4c8;
+        --grid: rgba(93, 88, 76, 0.09);
+        --swim-line: rgba(93, 88, 76, 0.16);
+        --shadow: 0 22px 60px rgba(34, 31, 24, 0.13);
+        --github: #5c5fb8;
+        --package: #2f6f91;
+        --runtime: #0f8b72;
+        --storage: #b77b1b;
+        --signal: #bf3b5f;
+        --decision: #7a5a25;
+        --infra: #59636f;
+        --panel-bg: rgba(255, 254, 250, 0.9);
+        --panel-border: rgba(78, 74, 65, 0.16);
+        --button-hover-bg: rgba(23, 23, 23, 0.04);
+        --button-active-bg: #171717;
+        --button-active-fg: #fffefa;
+        --card-bg: #f7f4ed;
+        --chip-bg: #f6f3eb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: var(--canvas);
+        color: var(--ink);
+        font:
+          14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+      }
+
+      button {
+        font: inherit;
+      }
+
+      #root {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #boot-fallback {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+        background: var(--canvas);
+        color: var(--ink);
+        z-index: 50;
+      }
+
+      body.app-ready #boot-fallback {
+        display: none;
+      }
+
+      .fallback-card {
+        max-width: 720px;
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        background: var(--panel-bg);
+        box-shadow: var(--shadow);
+        padding: 28px;
+      }
+
+      .fallback-card h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 5vw, 3.4rem);
+        line-height: 0.98;
+        letter-spacing: -0.04em;
+      }
+
+      .fallback-card p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      .app-shell {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 72%, var(--canvas)) 0%, var(--canvas) 100%);
+      }
+
+      .topbar {
+        position: absolute;
+        inset: 14px 14px auto 14px;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: minmax(220px, 0.9fr) minmax(360px, 1.5fr) auto;
+        gap: 12px;
+        align-items: center;
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        background: var(--panel-bg);
+        box-shadow: 0 14px 34px rgba(34, 31, 24, 0.1);
+        padding: 10px 12px;
+        backdrop-filter: blur(14px);
+      }
+
+      .brand {
+        min-width: 0;
+      }
+
+      .brand-kicker {
+        color: var(--quiet);
+        display: block;
+        font-size: 0.68rem;
+        font-weight: 850;
+        letter-spacing: 0.15em;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      .brand-title {
+        display: block;
+        margin-top: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 1.05rem;
+        font-weight: 900;
+        letter-spacing: -0.01em;
+      }
+
+      .toolbar-cluster {
+        min-width: 0;
+      }
+
+      .toolbar-label {
+        color: var(--quiet);
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.64rem;
+        font-weight: 950;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      .mode-tabs,
+      .view-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .mode-tabs {
+        flex-wrap: wrap;
+      }
+
+      .toolbar-button {
+        border: 1px solid transparent;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+        min-height: 34px;
+        padding: 7px 10px;
+        font-size: 0.82rem;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .toolbar-button:hover {
+        border-color: rgba(23, 23, 23, 0.14);
+        background: var(--button-hover-bg);
+      }
+
+      .toolbar-button.is-active {
+        border-color: rgba(23, 23, 23, 0.2);
+        background: var(--button-active-bg);
+        color: var(--button-active-fg);
+      }
+
+      .toolbar-button.is-icon {
+        display: inline-grid;
+        place-items: center;
+        width: 34px;
+        padding-inline: 0;
+        line-height: 1;
+      }
+
+      .toolbar-button svg,
+      .drawer-close svg {
+        display: block;
+        width: 16px;
+        height: 16px;
+        stroke-width: 2.25;
+      }
+
+      .flow-wrap {
+        position: relative;
+        z-index: 4;
+        width: 100%;
+        height: 100%;
+      }
+
+      .react-flow {
+        background: transparent;
+      }
+
+      .react-flow__pane {
+        cursor: grab;
+      }
+
+      .react-flow__pane:active {
+        cursor: grabbing;
+      }
+
+      .react-flow__controls {
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.12);
+        overflow: hidden;
+      }
+
+      .react-flow__controls button {
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        border-bottom-color: rgba(78, 74, 65, 0.12);
+        color: var(--ink);
+      }
+
+      .react-flow__minimap {
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        background: var(--panel-bg);
+        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.1);
+        overflow: hidden;
+      }
+
+      .lane-node {
+        width: var(--lane-width, 300px);
+        height: var(--lane-height, 2600px);
+        border-inline: 1px solid var(--swim-line);
+        border-top: 4px solid var(--accent);
+        background: linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--accent) 8%, transparent) 0%,
+          color-mix(in srgb, var(--accent) 4%, transparent) 18%,
+          transparent 72%
+        );
+        pointer-events: none;
+      }
+
+      .lane-title {
+        padding: 14px 0 0 18px;
+        color: #37322c;
+        font-size: 0.74rem;
+        font-weight: 950;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .lane-subtitle {
+        display: none;
+        max-width: 230px;
+        padding: 5px 0 0 18px;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .arch-node {
+        width: 220px;
+        min-height: 74px;
+        border: 1px solid color-mix(in srgb, var(--accent) 42%, #afa99d);
+        border-top: 5px solid var(--accent);
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--soft) 38%, #fffefa);
+        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.1);
+        color: var(--ink);
+        overflow: hidden;
+        transition:
+          opacity 160ms ease,
+          filter 160ms ease,
+          box-shadow 160ms ease,
+          transform 160ms ease,
+          border-color 160ms ease;
+      }
+
+      .arch-node.is-selected {
+        border-color: var(--accent);
+        box-shadow:
+          0 22px 52px rgba(34, 31, 24, 0.2),
+          0 0 0 4px color-mix(in srgb, var(--accent) 19%, transparent);
+      }
+
+      .arch-node.is-related:not(.is-selected) {
+        box-shadow:
+          0 16px 38px rgba(34, 31, 24, 0.13),
+          0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+      }
+
+      .arch-node.is-dimmed {
+        filter: saturate(0.68);
+        opacity: 0.34;
+      }
+
+      .node-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px 0;
+      }
+
+      .node-domain {
+        color: color-mix(in srgb, var(--accent) 78%, #171717);
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.62rem;
+        font-weight: 950;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .node-step {
+        display: none;
+        border-radius: 7px;
+        background: color-mix(in srgb, var(--accent) 86%, #171717);
+        color: #fffefa;
+        font-size: 0.7rem;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        padding: 4px 8px;
+      }
+
+      .node-body {
+        padding: 8px 12px 12px;
+      }
+
+      .node-title {
+        margin: 0;
+        font-size: 1.24rem;
+        font-weight: 950;
+        letter-spacing: -0.015em;
+        line-height: 1.12;
+      }
+
+      .node-start {
+        display: none;
+        margin-bottom: 6px;
+        border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--accent) 12%, transparent);
+        color: color-mix(in srgb, var(--accent) 78%, var(--ink));
+        padding: 2px 7px;
+        font-size: 0.62rem;
+        font-weight: 950;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .node-purpose {
+        display: none;
+        margin: 6px 0 0;
+        color: #514d46;
+        font-size: 0.84rem;
+        line-height: 1.28;
+      }
+
+      .node-chips {
+        display: none;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 12px;
+      }
+
+      .chip {
+        max-width: 100%;
+        border: 1px solid rgba(78, 74, 65, 0.13);
+        border-radius: 999px;
+        background: rgba(255, 254, 250, 0.66);
+        color: #444039;
+        overflow: hidden;
+        padding: 5px 8px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.74rem;
+        font-weight: 800;
+      }
+
+      .react-flow__handle {
+        width: 10px;
+        height: 10px;
+        border: 2px solid rgba(255, 254, 250, 0.96);
+        background: var(--accent);
+        opacity: 0.28;
+        pointer-events: none;
+      }
+
+      .arch-node:hover .react-flow__handle,
+      .arch-node.is-selected .react-flow__handle {
+        opacity: 0.9;
+      }
+
+      .contract-edge {
+        transition:
+          opacity 160ms ease,
+          stroke 160ms ease,
+          stroke-width 160ms ease;
+      }
+
+      .edge-label {
+        position: absolute;
+        border: 1px solid rgba(78, 74, 65, 0.13);
+        border-radius: 999px;
+        background: rgba(255, 254, 250, 0.9);
+        box-shadow: 0 8px 20px rgba(34, 31, 24, 0.09);
+        color: #4a453d;
+        font-size: 0.72rem;
+        font-weight: 850;
+        padding: 4px 8px;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+
+      .detail-drawer {
+        position: absolute;
+        z-index: 18;
+        top: 88px;
+        right: 14px;
+        width: min(520px, calc(100vw - 28px));
+        max-height: calc(100vh - 108px);
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        backdrop-filter: blur(16px);
+        transition:
+          opacity 160ms ease,
+          transform 160ms ease,
+          filter 160ms ease,
+          z-index 0ms linear 120ms;
+      }
+
+      .app-shell.is-navigating .detail-drawer {
+        z-index: 1;
+        opacity: 0.08;
+        pointer-events: none;
+        transform: translateX(18px) scale(0.99);
+        filter: saturate(0.65);
+      }
+
+      .select-hint {
+        position: absolute;
+        right: 18px;
+        bottom: 118px;
+        z-index: 12;
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        background: var(--panel-bg);
+        box-shadow: 0 12px 28px rgba(34, 31, 24, 0.1);
+        color: var(--muted);
+        padding: 10px 12px;
+        font-size: 0.86rem;
+        font-weight: 800;
+        backdrop-filter: blur(12px);
+        transition:
+          opacity 160ms ease,
+          transform 160ms ease;
+      }
+
+      .app-shell.is-navigating .select-hint {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      .drawer-head {
+        border-top: 5px solid var(--accent, var(--infra));
+        border-bottom: 1px solid rgba(78, 74, 65, 0.12);
+        padding: 17px 18px 15px;
+      }
+
+      .drawer-head-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .drawer-close {
+        display: inline-grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        border: 1px solid rgba(78, 74, 65, 0.14);
+        border-radius: 6px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        line-height: 1;
+        padding: 0;
+      }
+
+      .drawer-close:hover {
+        border-color: rgba(23, 23, 23, 0.24);
+        color: var(--ink);
+      }
+
+      .drawer-kicker {
+        color: color-mix(in srgb, var(--accent, var(--infra)) 78%, #171717);
+        display: block;
+        font-size: 0.68rem;
+        font-weight: 950;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+
+      .drawer-title {
+        margin: 8px 0 0;
+        font-size: 1.5rem;
+        font-weight: 950;
+        letter-spacing: -0.035em;
+        line-height: 1.03;
+      }
+
+      .drawer-purpose {
+        margin: 9px 0 0;
+        color: #514d46;
+        font-size: 0.96rem;
+      }
+
+      .drawer-body {
+        overflow: auto;
+        padding: 6px 18px 18px;
+      }
+
+      .detail-section {
+        border-bottom: 1px solid rgba(78, 74, 65, 0.12);
+        padding: 14px 0;
+      }
+
+      .detail-section:last-child {
+        border-bottom: 0;
+      }
+
+      .detail-section h3 {
+        margin: 0;
+        color: var(--quiet);
+        font-size: 0.72rem;
+        font-weight: 950;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      .detail-section ul {
+        list-style: none;
+        margin: 10px 0 0;
+        padding: 0;
+      }
+
+      .detail-section li {
+        color: var(--muted);
+        margin-top: 8px;
+      }
+
+      .detail-section p {
+        margin: 9px 0 0;
+        color: var(--muted);
+      }
+
+      .io-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .io-card {
+        border: 1px solid rgba(78, 74, 65, 0.12);
+        border-radius: 8px;
+        background: var(--card-bg);
+        padding: 12px;
+      }
+
+      .io-card ul {
+        margin-top: 8px;
+      }
+
+      .source-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 10px;
+      }
+
+      .source-chip {
+        border: 1px solid rgba(78, 74, 65, 0.13);
+        border-radius: 6px;
+        background: var(--chip-bg);
+        color: var(--ink);
+        padding: 6px 8px;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.74rem;
+      }
+
+      .related-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 11px;
+      }
+
+      .related-pill {
+        border: 1px solid rgba(78, 74, 65, 0.13);
+        border-radius: 999px;
+        background: var(--chip-bg);
+        color: var(--ink);
+        cursor: pointer;
+        padding: 6px 9px;
+        font-size: 0.78rem;
+        font-weight: 850;
+      }
+
+      .related-pill:hover {
+        border-color: rgba(23, 23, 23, 0.24);
+        background: #fffefa;
+      }
+
+      .empty-detail {
+        color: var(--muted);
+        padding: 18px;
+      }
+
+      .empty-detail strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--ink);
+        font-size: 1.1rem;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --canvas: #24231f;
+          --canvas-strong: #302e29;
+          --surface: #302f2a;
+          --surface-2: #3a3832;
+          --ink: #f3eee4;
+          --muted: #c8c0b1;
+          --quiet: #a89f91;
+          --line: #565247;
+          --grid: rgba(228, 220, 205, 0.08);
+          --swim-line: rgba(228, 220, 205, 0.13);
+          --shadow: 0 22px 64px rgba(0, 0, 0, 0.32);
+          --github: #9a8dff;
+          --package: #63a8ca;
+          --runtime: #4cc7aa;
+          --storage: #e1b85a;
+          --signal: #f08aa3;
+          --decision: #d0aa70;
+          --infra: #a8b0b8;
+        }
+
+        body {
+          background: var(--canvas);
+        }
+
+        #boot-fallback {
+          background: var(--canvas);
+        }
+
+        .fallback-card,
+        .topbar,
+        .detail-drawer,
+        .select-hint {
+          border-color: rgba(243, 238, 228, 0.13);
+          background: rgba(48, 47, 42, 0.9);
+          box-shadow: var(--shadow);
+        }
+
+        .app-shell {
+          background:
+            radial-gradient(circle at 8% 8%, rgba(154, 141, 255, 0.1), transparent 28rem),
+            radial-gradient(circle at 88% 12%, rgba(76, 199, 170, 0.08), transparent 30rem),
+            linear-gradient(180deg, #292823 0%, var(--canvas) 100%);
+        }
+
+        .toolbar-button {
+          color: var(--ink);
+        }
+
+        .toolbar-button:hover {
+          border-color: rgba(243, 238, 228, 0.18);
+          background: rgba(243, 238, 228, 0.07);
+        }
+
+        .toolbar-button.is-active {
+          border-color: rgba(243, 238, 228, 0.3);
+          background: var(--ink);
+          color: #24231f;
+        }
+
+        .react-flow__controls {
+          border-color: rgba(243, 238, 228, 0.13);
+        }
+
+        .react-flow__controls button {
+          background: rgba(48, 47, 42, 0.94);
+          border-bottom-color: rgba(243, 238, 228, 0.11);
+          color: var(--ink);
+        }
+
+        .lane-title,
+        .brand-title {
+          color: var(--ink);
+        }
+
+        .arch-node {
+          border-color: color-mix(in srgb, var(--accent) 52%, #5f5a4f);
+          background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+        }
+
+        .arch-node.is-selected {
+          box-shadow:
+            0 22px 52px rgba(0, 0, 0, 0.35),
+            0 0 0 4px color-mix(in srgb, var(--accent) 24%, transparent);
+        }
+
+        .node-domain,
+        .drawer-kicker,
+        .node-start {
+          color: color-mix(in srgb, var(--accent) 78%, #f3eee4);
+        }
+
+        .node-step {
+          background: color-mix(in srgb, var(--accent) 72%, #f3eee4);
+          color: #24231f;
+        }
+
+        .node-purpose,
+        .drawer-purpose,
+        .detail-section li,
+        .detail-section p,
+        .lane-subtitle {
+          color: var(--muted);
+        }
+
+        .react-flow__handle {
+          border-color: rgba(36, 35, 31, 0.96);
+        }
+
+        .edge-label,
+        .io-card,
+        .source-chip,
+        .related-pill {
+          border-color: rgba(243, 238, 228, 0.12);
+          background: #38362f;
+          color: var(--ink);
+        }
+
+        .drawer-head,
+        .detail-section {
+          border-bottom-color: rgba(243, 238, 228, 0.12);
+        }
+
+        .drawer-close {
+          border-color: rgba(243, 238, 228, 0.14);
+          color: var(--muted);
+        }
+
+        .drawer-close:hover,
+        .related-pill:hover {
+          border-color: rgba(243, 238, 228, 0.28);
+          background: #403e37;
+          color: var(--ink);
+        }
+      }
+
+      :root[data-theme] body {
+        background: var(--canvas);
+      }
+
+      :root[data-theme] .fallback-card,
+      :root[data-theme] .topbar,
+      :root[data-theme] .select-hint {
+        border-color: var(--panel-border);
+        background: var(--panel-bg);
+        box-shadow: var(--shadow);
+      }
+
+      :root[data-theme] .detail-drawer {
+        border-color: var(--panel-border);
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        box-shadow: var(--shadow);
+      }
+
+      :root[data-theme] .app-shell {
+        background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 72%, var(--canvas)) 0%, var(--canvas) 100%);
+      }
+
+      :root[data-theme] .toolbar-button {
+        color: var(--ink);
+      }
+
+      :root[data-theme] .toolbar-button:hover {
+        border-color: color-mix(in srgb, var(--ink) 18%, transparent);
+        background: var(--button-hover-bg);
+      }
+
+      :root[data-theme] .toolbar-button.is-active {
+        border-color: color-mix(in srgb, var(--ink) 28%, transparent);
+        background: var(--button-active-bg);
+        color: var(--button-active-fg);
+      }
+
+      :root[data-theme] .react-flow__controls {
+        border-color: var(--panel-border);
+      }
+
+      :root[data-theme] .react-flow__controls button {
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        color: var(--ink);
+      }
+
+      :root[data-theme] .lane-title,
+      :root[data-theme] .brand-title {
+        color: var(--ink);
+      }
+
+      :root[data-theme] .arch-node {
+        background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+        box-shadow: 0 12px 30px color-mix(in srgb, #000 18%, transparent);
+      }
+
+      :root[data-theme] .node-purpose,
+      :root[data-theme] .drawer-purpose,
+      :root[data-theme] .detail-section li,
+      :root[data-theme] .detail-section p,
+      :root[data-theme] .lane-subtitle {
+        color: var(--muted);
+      }
+
+      :root[data-theme] .edge-label,
+      :root[data-theme] .io-card,
+      :root[data-theme] .source-chip,
+      :root[data-theme] .related-pill {
+        border-color: color-mix(in srgb, var(--ink) 12%, transparent);
+        background: var(--card-bg);
+        color: var(--ink);
+      }
+
+      :root[data-theme] .drawer-head,
+      :root[data-theme] .detail-section {
+        border-bottom-color: color-mix(in srgb, var(--ink) 12%, transparent);
+      }
+
+      @media (max-width: 760px) {
+        .topbar {
+          grid-template-columns: 1fr;
+          align-items: stretch;
+        }
+
+        .mode-tabs,
+        .view-actions {
+          overflow: auto;
+          padding-bottom: 2px;
+        }
+
+        .detail-drawer {
+          top: auto;
+          right: 10px;
+          bottom: 10px;
+          left: 10px;
+          width: auto;
+          max-height: 52vh;
+        }
+
+        .select-hint {
+          right: 10px;
+          bottom: 74px;
+          left: 10px;
+          text-align: center;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .topbar {
+          inset: 8px 8px auto 8px;
+          padding: 9px;
+        }
+
+        .toolbar-button {
+          min-height: 32px;
+          padding: 6px 9px;
+          font-size: 0.78rem;
+        }
+
+        .brand-title {
+          font-size: 0.98rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="boot-fallback">
+      <div class="fallback-card">
+        <h1>Visual Architecture</h1>
+        <p>This portable architecture board loads React Flow from a CDN. If you are offline or the CDN is blocked, the interactive canvas cannot start.</p><p>Replace the bundled model with source-backed architecture data from the target project.</p>
+      </div>
+    </div>
+    <div id="root"></div>
+
+    <script>
+      function showBootError(error) {
+        document.body.classList.remove("app-ready");
+        const fallback = document.querySelector("#boot-fallback .fallback-card");
+        if (!fallback || fallback.dataset.enhanced) return;
+        fallback.dataset.enhanced = "true";
+        const message = error?.reason?.message || error?.message || String(error || "The interactive module failed to load.");
+        const detail = document.createElement("p");
+        detail.textContent = `Load error: ${message}`;
+        fallback.append(detail);
+      }
+
+      window.addEventListener("error", showBootError);
+      window.addEventListener("unhandledrejection", showBootError);
+      window.setTimeout(() => {
+        if (!document.body.classList.contains("app-ready")) {
+          showBootError(new Error("React Flow did not finish loading. Check CDN/network access."));
+        }
+      }, 12000);
+    </script>
+    <script type="module">
+      async function importFirst(label, urls) {
+        const errors = [];
+        for (const url of urls) {
+          try {
+            return await import(url);
+          } catch (error) {
+            errors.push(`${url}: ${error?.message || error}`);
+          }
+        }
+        throw new Error(`${label} failed to load from all CDNs. ${errors.join(" | ")}`);
+      }
+
+      const React = await importFirst("React", [
+        "https://esm.sh/react@18.3.1",
+        "https://cdn.jsdelivr.net/npm/react@18.3.1/+esm"
+      ]);
+      const { createRoot } = await importFirst("React DOM", [
+        "https://esm.sh/react-dom@18.3.1/client",
+        "https://cdn.jsdelivr.net/npm/react-dom@18.3.1/client/+esm"
+      ]);
+      const {
+        Background,
+        BaseEdge,
+        Controls,
+        EdgeLabelRenderer,
+        Handle,
+        MarkerType,
+        Position,
+        ReactFlow,
+        ReactFlowProvider,
+        getSmoothStepPath,
+        useReactFlow
+      } = await importFirst("React Flow", [
+        "https://esm.sh/@xyflow/react@12.10.2?deps=react@18.3.1,react-dom@18.3.1",
+        "https://cdn.jsdelivr.net/npm/@xyflow/react@12.10.2/+esm"
+      ]);
+
+      const { useCallback, useEffect, useMemo, useRef, useState } = React;
+      const h = React.createElement;
+
+      function IconSvg({ children, ...props }) {
+        return h(
+          "svg",
+          {
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: 2.25,
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+            focusable: "false",
+            ...props
+          },
+          children
+        );
+      }
+
+      function Maximize2(props) {
+        return h(
+          IconSvg,
+          props,
+          h("path", { d: "M15 3h6v6" }),
+          h("path", { d: "m21 3-7 7" }),
+          h("path", { d: "M9 21H3v-6" }),
+          h("path", { d: "m3 21 7-7" })
+        );
+      }
+
+      function RotateCcw(props) {
+        return h(
+          IconSvg,
+          props,
+          h("path", { d: "M3 12a9 9 0 1 0 3-6.7" }),
+          h("path", { d: "M3 4v6h6" })
+        );
+      }
+
+      function Sun(props) {
+        return h(
+          IconSvg,
+          props,
+          h("circle", { cx: "12", cy: "12", r: "4" }),
+          h("path", { d: "M12 2v2" }),
+          h("path", { d: "M12 20v2" }),
+          h("path", { d: "m4.93 4.93 1.41 1.41" }),
+          h("path", { d: "m17.66 17.66 1.41 1.41" }),
+          h("path", { d: "M2 12h2" }),
+          h("path", { d: "M20 12h2" }),
+          h("path", { d: "m6.34 17.66-1.41 1.41" }),
+          h("path", { d: "m19.07 4.93-1.41 1.41" })
+        );
+      }
+
+      function Moon(props) {
+        return h(IconSvg, props, h("path", { d: "M20.6 14.5A8.5 8.5 0 0 1 9.5 3.4 7 7 0 1 0 20.6 14.5Z" }));
+      }
+
+      function X(props) {
+        return h(IconSvg, props, h("path", { d: "M18 6 6 18" }), h("path", { d: "m6 6 12 12" }));
+      }
+
+      const VISUAL_ARCH_DATA = {
+        "domains": {
+                "interface": {
+                        "label": "Application",
+                        "accent": "#5c5fb8",
+                        "soft": "#ececfe"
+                },
+                "runtime": {
+                        "label": "Local Resolver",
+                        "accent": "#0f8b72",
+                        "soft": "#e2f5ef"
+                },
+                "data": {
+                        "label": "Cache + Records",
+                        "accent": "#b77b1b",
+                        "soft": "#f8efd9"
+                },
+                "delivery": {
+                        "label": "DNS Hierarchy",
+                        "accent": "#7a5a25",
+                        "soft": "#f4ead9"
+                },
+                "signal": {
+                        "label": "Network + Validation",
+                        "accent": "#bf3b5f",
+                        "soft": "#fae5ec"
+                },
+                "external": {
+                        "label": "External Authority",
+                        "accent": "#59636f",
+                        "soft": "#eceff2"
+                },
+                "infra": {
+                        "label": "Infrastructure",
+                        "accent": "#59636f",
+                        "soft": "#eceff2"
+                }
+        },
+        "owners": {
+                "product": {
+                        "label": "Application",
+                        "description": "Browser, CLI, service, or library that needs an address for a name."
+                },
+                "runtime": {
+                        "label": "Client Resolver",
+                        "description": "Operating system resolver, hosts policy, local cache, and configured recursive resolver."
+                },
+                "data": {
+                        "label": "DNS Data",
+                        "description": "Resource records, TTLs, aliases, negative answers, and cache entries."
+                },
+                "delivery": {
+                        "label": "DNS Authority",
+                        "description": "Recursive, root, TLD, and authoritative name servers."
+                },
+                "signal": {
+                        "label": "Network + Trust",
+                        "description": "UDP/TCP transport, retries, DNSSEC, errors, and observability."
+                },
+                "suite": {
+                        "label": "DNS Example",
+                        "description": "Deep visual architecture example for DNS name resolution."
+                }
+        },
+        "board": {
+                "lanes": [
+                        {
+                                "id": "lane-app",
+                                "title": "Application",
+                                "subtitle": "The caller, resolver API, and connection attempt.",
+                                "domain": "interface",
+                                "position": {
+                                        "x": 40,
+                                        "y": 150
+                                },
+                                "width": 270,
+                                "height": 1530
+                        },
+                        {
+                                "id": "lane-local",
+                                "title": "Local Resolution",
+                                "subtitle": "Hosts files, search domains, stub resolver, and cache.",
+                                "domain": "runtime",
+                                "position": {
+                                        "x": 340,
+                                        "y": 150
+                                },
+                                "width": 270,
+                                "height": 1530
+                        },
+                        {
+                                "id": "lane-recursive",
+                                "title": "Recursive Service",
+                                "subtitle": "Cache lookup, iterative traversal, validation, and retry policy.",
+                                "domain": "signal",
+                                "position": {
+                                        "x": 640,
+                                        "y": 150
+                                },
+                                "width": 270,
+                                "height": 1530
+                        },
+                        {
+                                "id": "lane-authority",
+                                "title": "Authority",
+                                "subtitle": "Root, TLD, authoritative zones, records, and TTLs.",
+                                "domain": "delivery",
+                                "position": {
+                                        "x": 940,
+                                        "y": 150
+                                },
+                                "width": 270,
+                                "height": 1530
+                        }
+                ],
+                "nodes": [
+                        {
+                                "id": "name-needed",
+                                "step": "01",
+                                "domain": "interface",
+                                "owner": "product",
+                                "title": "Name Needed",
+                                "purpose": "An application needs network endpoints for a human-readable host name.",
+                                "chips": [
+                                        "hostname",
+                                        "A/AAAA"
+                                ],
+                                "position": {
+                                        "x": 90,
+                                        "y": 245
+                                },
+                                "details": {
+                                        "summary": "A browser, CLI, or service starts with a host name and asks for records that can lead to an address.",
+                                        "what": [
+                                                "The caller may request A, AAAA, HTTPS, SRV, MX, TXT, or other record types depending on protocol.",
+                                                "Modern clients often race IPv6 and IPv4 connection attempts after resolution."
+                                        ],
+                                        "why": [
+                                                "DNS decouples service names from changing network addresses and hosting providers."
+                                        ],
+                                        "inputs": [
+                                                "Host name",
+                                                "Record type",
+                                                "Network family preference",
+                                                "Application timeout budget"
+                                        ],
+                                        "outputs": [
+                                                "Resolver API request"
+                                        ],
+                                        "failures": [
+                                                "Literal IPs bypass most DNS behavior; malformed names, IDNA conversion, or search-suffix rules can change the queried name."
+                                        ],
+                                        "source": [
+                                                "external: DNS resource record model",
+                                                "external: application resolver APIs"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "resolver-api"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "resolver-api",
+                                "step": "02",
+                                "domain": "interface",
+                                "owner": "runtime",
+                                "title": "Resolver API",
+                                "purpose": "The application delegates name lookup to the OS or language resolver.",
+                                "chips": [
+                                        "getaddrinfo",
+                                        "library"
+                                ],
+                                "position": {
+                                        "x": 90,
+                                        "y": 395
+                                },
+                                "details": {
+                                        "summary": "Most applications call a resolver API rather than constructing DNS packets themselves.",
+                                        "what": [
+                                                "The API may combine DNS with local host databases and policy.",
+                                                "It can return multiple candidate addresses ordered by local preference."
+                                        ],
+                                        "why": [
+                                                "Centralizing resolution lets the OS enforce local policy, enterprise configuration, VPN rules, and address-family preferences."
+                                        ],
+                                        "inputs": [
+                                                "Host name",
+                                                "Service or port",
+                                                "Address family hints",
+                                                "Resolver configuration"
+                                        ],
+                                        "outputs": [
+                                                "Canonical query name or local answer"
+                                        ],
+                                        "failures": [
+                                                "Language runtimes and containers may use different resolver stacks than the host, so observed behavior can differ from system tools."
+                                        ],
+                                        "source": [
+                                                "external: getaddrinfo behavior",
+                                                "external: OS resolver configuration"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "local-policy"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "local-policy",
+                                "step": "03",
+                                "domain": "runtime",
+                                "owner": "runtime",
+                                "title": "Local Policy",
+                                "purpose": "Hosts files, search suffixes, split DNS, and caches may answer before public DNS.",
+                                "chips": [
+                                        "hosts",
+                                        "search"
+                                ],
+                                "position": {
+                                        "x": 390,
+                                        "y": 395
+                                },
+                                "details": {
+                                        "summary": "The local resolver applies host mappings, name-service order, search domains, VPN or enterprise policy, and local cache.",
+                                        "what": [
+                                                "Short names may expand through search domains.",
+                                                "Hosts files can override DNS.",
+                                                "VPNs and containers can route specific zones to different resolvers."
+                                        ],
+                                        "why": [
+                                                "Local policy supports private networks, development overrides, and operational control."
+                                        ],
+                                        "inputs": [
+                                                "Resolver API request",
+                                                "Hosts database",
+                                                "Search domains",
+                                                "Name-service switch or platform equivalent",
+                                                "Local cache"
+                                        ],
+                                        "outputs": [
+                                                "Local answer or DNS question for a recursive resolver"
+                                        ],
+                                        "failures": [
+                                                "A stale local override can make one machine disagree with everyone else."
+                                        ],
+                                        "source": [
+                                                "external: hosts file behavior",
+                                                "external: resolver search domain behavior",
+                                                "external: split DNS concepts"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "stub-query",
+                                                "negative-cache"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "stub-query",
+                                "step": "04",
+                                "domain": "runtime",
+                                "owner": "runtime",
+                                "title": "Stub Query",
+                                "purpose": "The client resolver sends a compact DNS question to a recursive resolver.",
+                                "chips": [
+                                        "stub",
+                                        "UDP/TCP"
+                                ],
+                                "position": {
+                                        "x": 390,
+                                        "y": 545
+                                },
+                                "details": {
+                                        "summary": "The stub resolver asks a configured recursive resolver to resolve the name on its behalf.",
+                                        "what": [
+                                                "Queries usually use UDP first, with TCP for truncation or policy.",
+                                                "Encrypted transports such as DoT or DoH may be used depending on the client and network."
+                                        ],
+                                        "why": [
+                                                "Stub resolvers keep clients simple and let recursive resolvers provide shared caching and policy."
+                                        ],
+                                        "inputs": [
+                                                "Question name",
+                                                "Record type",
+                                                "Recursive resolver address",
+                                                "Timeout and retry policy"
+                                        ],
+                                        "outputs": [
+                                                "DNS packet or encrypted DNS request"
+                                        ],
+                                        "failures": [
+                                                "Blocked UDP, captive portals, DNS interception, or misconfigured resolvers can fail before the DNS hierarchy is reached."
+                                        ],
+                                        "source": [
+                                                "external: DNS transport behavior",
+                                                "external: recursive resolver configuration"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "recursive-cache"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "recursive-cache",
+                                "step": "05",
+                                "domain": "signal",
+                                "owner": "delivery",
+                                "title": "Recursive Cache",
+                                "purpose": "The recursive resolver answers immediately when it has a valid cached result.",
+                                "chips": [
+                                        "cache",
+                                        "TTL"
+                                ],
+                                "position": {
+                                        "x": 690,
+                                        "y": 545
+                                },
+                                "details": {
+                                        "summary": "Recursive resolvers cache positive and negative answers until TTL or negative-cache policy expires.",
+                                        "what": [
+                                                "A cache hit avoids root, TLD, and authoritative queries.",
+                                                "A cache miss starts iterative resolution through the DNS hierarchy."
+                                        ],
+                                        "why": [
+                                                "Shared caching makes DNS fast and dramatically reduces authoritative server load."
+                                        ],
+                                        "inputs": [
+                                                "DNS question",
+                                                "Cache entries",
+                                                "TTL remaining",
+                                                "Validation state"
+                                        ],
+                                        "outputs": [
+                                                "Cached response or iterative lookup plan"
+                                        ],
+                                        "failures": [
+                                                "Stale caches, poisoned responses, or aggressive negative caching can make DNS changes appear delayed."
+                                        ],
+                                        "source": [
+                                                "external: DNS TTL caching",
+                                                "external: recursive resolver behavior"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "root-referral",
+                                                "answer-package",
+                                                "negative-cache"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "root-referral",
+                                "step": "06",
+                                "domain": "delivery",
+                                "owner": "delivery",
+                                "title": "Root Referral",
+                                "purpose": "Root name servers point the resolver toward the relevant top-level domain.",
+                                "chips": [
+                                        "root",
+                                        "referral"
+                                ],
+                                "position": {
+                                        "x": 990,
+                                        "y": 545
+                                },
+                                "details": {
+                                        "summary": "On a cache miss, the recursive resolver starts from known root hints and receives a referral to the TLD servers.",
+                                        "what": [
+                                                "Root servers do not know every host record.",
+                                                "They delegate responsibility to TLD name servers such as .com, .org, or country-code TLDs."
+                                        ],
+                                        "why": [
+                                                "Delegation lets DNS scale globally without a single database answering all names."
+                                        ],
+                                        "inputs": [
+                                                "Question for a fully qualified domain name",
+                                                "Root hints or cached root NS set"
+                                        ],
+                                        "outputs": [
+                                                "NS records and glue addresses for the TLD"
+                                        ],
+                                        "failures": [
+                                                "Root reachability issues are rare, but broken local networks or blocked DNS can prevent this first referral."
+                                        ],
+                                        "source": [
+                                                "external: DNS root zone delegation",
+                                                "external: root hints"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "tld-referral"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "tld-referral",
+                                "step": "07",
+                                "domain": "delivery",
+                                "owner": "delivery",
+                                "title": "TLD Referral",
+                                "purpose": "The TLD points the resolver to the domain's authoritative name servers.",
+                                "chips": [
+                                        "TLD",
+                                        "NS"
+                                ],
+                                "position": {
+                                        "x": 990,
+                                        "y": 695
+                                },
+                                "details": {
+                                        "summary": "The TLD zone delegates a registered domain to its authoritative name servers.",
+                                        "what": [
+                                                "The response commonly includes NS records and glue for in-bailiwick name servers.",
+                                                "The resolver follows the delegation to the zone authority."
+                                        ],
+                                        "why": [
+                                                "Registries can delegate each domain while domain owners control their own zone records."
+                                        ],
+                                        "inputs": [
+                                                "Query from recursive resolver",
+                                                "TLD zone delegation data"
+                                        ],
+                                        "outputs": [
+                                                "Authoritative name server referral"
+                                        ],
+                                        "failures": [
+                                                "Bad delegation, missing glue, or mismatched registrar and zone settings can break resolution before the authoritative zone answers."
+                                        ],
+                                        "source": [
+                                                "external: DNS delegation",
+                                                "external: NS and glue record behavior"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "authoritative-answer"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "authoritative-answer",
+                                "step": "08",
+                                "domain": "delivery",
+                                "owner": "delivery",
+                                "title": "Authoritative Answer",
+                                "purpose": "The zone's authoritative server returns the requested records or a negative answer.",
+                                "chips": [
+                                        "zone",
+                                        "record"
+                                ],
+                                "position": {
+                                        "x": 990,
+                                        "y": 845
+                                },
+                                "details": {
+                                        "summary": "The authoritative server for the zone answers with records such as A, AAAA, CNAME, MX, TXT, or NXDOMAIN/NODATA.",
+                                        "what": [
+                                                "CNAME responses may require additional lookups for the target name.",
+                                                "Responses include TTLs that guide cache lifetime."
+                                        ],
+                                        "why": [
+                                                "The authoritative zone is the source of truth for names delegated to that domain."
+                                        ],
+                                        "inputs": [
+                                                "Question name",
+                                                "Record type",
+                                                "Zone data"
+                                        ],
+                                        "outputs": [
+                                                "Resource records, CNAME chain, delegation, or negative response"
+                                        ],
+                                        "failures": [
+                                                "Incorrect zone records, expired DNSSEC signatures, or missing CNAME targets can make authoritative data unusable."
+                                        ],
+                                        "source": [
+                                                "external: RFC 1034 and RFC 1035 concepts",
+                                                "external: authoritative DNS server behavior"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "cname-chain",
+                                                "dnssec-validation",
+                                                "answer-package"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "cname-chain",
+                                "step": "09",
+                                "domain": "data",
+                                "owner": "data",
+                                "title": "Alias Chain",
+                                "purpose": "CNAME records may redirect the resolver to another canonical name.",
+                                "chips": [
+                                        "CNAME",
+                                        "alias"
+                                ],
+                                "position": {
+                                        "x": 690,
+                                        "y": 845
+                                },
+                                "details": {
+                                        "summary": "A CNAME response says the requested name is an alias, so the resolver must resolve the canonical target.",
+                                        "what": [
+                                                "The final answer may include both the alias chain and address records.",
+                                                "Long or looping alias chains can cause failures."
+                                        ],
+                                        "why": [
+                                                "Aliases let services move between providers or consolidate naming without changing callers."
+                                        ],
+                                        "inputs": [
+                                                "CNAME record",
+                                                "Target canonical name"
+                                        ],
+                                        "outputs": [
+                                                "Follow-up DNS question or completed answer chain"
+                                        ],
+                                        "failures": [
+                                                "CNAME loops, excessive chain length, and missing target records prevent usable resolution."
+                                        ],
+                                        "source": [
+                                                "external: CNAME record behavior",
+                                                "external: resolver alias handling"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "authoritative-answer",
+                                                "answer-package"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "dnssec-validation",
+                                "step": "10",
+                                "domain": "signal",
+                                "owner": "signal",
+                                "title": "DNSSEC Validation",
+                                "purpose": "Validating resolvers check cryptographic proof for signed zones.",
+                                "chips": [
+                                        "DNSSEC",
+                                        "trust"
+                                ],
+                                "position": {
+                                        "x": 690,
+                                        "y": 995
+                                },
+                                "details": {
+                                        "summary": "When enabled, DNSSEC validation verifies that signed responses chain back to trusted keys.",
+                                        "what": [
+                                                "The resolver checks signatures and denial-of-existence proofs.",
+                                                "Validation failure converts a seemingly present answer into an error for clients."
+                                        ],
+                                        "why": [
+                                                "DNSSEC defends against forged DNS data for signed zones."
+                                        ],
+                                        "inputs": [
+                                                "Signed DNS records",
+                                                "Delegation signer data",
+                                                "Trust anchors"
+                                        ],
+                                        "outputs": [
+                                                "Validated answer or validation failure"
+                                        ],
+                                        "failures": [
+                                                "Clock skew, expired signatures, bad DS records, and middleboxes can cause validation failures."
+                                        ],
+                                        "source": [
+                                                "external: DNSSEC validation model",
+                                                "external: signed denial of existence"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "answer-package",
+                                                "transport-retry"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "answer-package",
+                                "step": "11",
+                                "domain": "data",
+                                "owner": "data",
+                                "title": "Answer Package",
+                                "purpose": "The recursive resolver assembles the response returned to the client.",
+                                "chips": [
+                                        "records",
+                                        "TTL"
+                                ],
+                                "position": {
+                                        "x": 690,
+                                        "y": 1145
+                                },
+                                "details": {
+                                        "summary": "The response includes the requested records, aliases, TTLs, response code, and sometimes additional records.",
+                                        "what": [
+                                                "Positive answers carry record TTLs.",
+                                                "Negative answers may be cached according to SOA-derived policy.",
+                                                "The resolver may set flags indicating recursion and validation status."
+                                        ],
+                                        "why": [
+                                                "The client needs both the data and the metadata that controls reuse and trust."
+                                        ],
+                                        "inputs": [
+                                                "Authoritative response",
+                                                "Alias resolution results",
+                                                "Validation result",
+                                                "Cache policy"
+                                        ],
+                                        "outputs": [
+                                                "Client-facing DNS response",
+                                                "Recursive cache update"
+                                        ],
+                                        "failures": [
+                                                "Large responses may be truncated over UDP and retried over TCP."
+                                        ],
+                                        "source": [
+                                                "external: DNS message format",
+                                                "external: TTL and negative caching behavior"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "negative-cache",
+                                                "client-cache"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "negative-cache",
+                                "step": "12",
+                                "domain": "data",
+                                "owner": "data",
+                                "title": "Negative Cache",
+                                "purpose": "NXDOMAIN and no-data results can be cached too.",
+                                "chips": [
+                                        "NXDOMAIN",
+                                        "NODATA"
+                                ],
+                                "position": {
+                                        "x": 390,
+                                        "y": 1145
+                                },
+                                "details": {
+                                        "summary": "Resolvers cache some negative answers so repeated lookups for missing names do not hammer authoritative servers.",
+                                        "what": [
+                                                "NXDOMAIN means the name does not exist.",
+                                                "NODATA means the name exists but lacks the requested record type."
+                                        ],
+                                        "why": [
+                                                "Negative caching protects DNS infrastructure and speeds repeated failed lookups."
+                                        ],
+                                        "inputs": [
+                                                "Negative authoritative response",
+                                                "SOA-derived cache timing"
+                                        ],
+                                        "outputs": [
+                                                "Cached negative answer"
+                                        ],
+                                        "failures": [
+                                                "After adding a missing record, clients may still see failure until negative cache state expires."
+                                        ],
+                                        "source": [
+                                                "external: DNS negative caching",
+                                                "external: NXDOMAIN and NODATA semantics"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "client-cache"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "client-cache",
+                                "step": "13",
+                                "domain": "runtime",
+                                "owner": "runtime",
+                                "title": "Client Cache",
+                                "purpose": "The OS, browser, or application may reuse the answer locally.",
+                                "chips": [
+                                        "browser",
+                                        "OS cache"
+                                ],
+                                "position": {
+                                        "x": 390,
+                                        "y": 1295
+                                },
+                                "details": {
+                                        "summary": "After the recursive response returns, local layers may cache the answer according to TTL or their own policy.",
+                                        "what": [
+                                                "Browsers and runtimes may maintain separate caches from the OS.",
+                                                "Some applications pin resolved addresses for connection pools."
+                                        ],
+                                        "why": [
+                                                "Local caching reduces latency for repeated connections and smooths short network interruptions."
+                                        ],
+                                        "inputs": [
+                                                "DNS response",
+                                                "TTL",
+                                                "Local cache policy"
+                                        ],
+                                        "outputs": [
+                                                "Address list for the application",
+                                                "Local cache entry"
+                                        ],
+                                        "failures": [
+                                                "Multiple cache layers explain why flushing one cache may not change application behavior."
+                                        ],
+                                        "source": [
+                                                "external: browser and OS DNS cache behavior",
+                                                "external: application connection pooling concepts"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "connect-endpoint",
+                                                "debugging-dns"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "connect-endpoint",
+                                "step": "14",
+                                "domain": "interface",
+                                "owner": "product",
+                                "title": "Connect To Address",
+                                "purpose": "The application uses resolved endpoints to start the actual protocol connection.",
+                                "chips": [
+                                        "TCP",
+                                        "TLS"
+                                ],
+                                "position": {
+                                        "x": 90,
+                                        "y": 1295
+                                },
+                                "details": {
+                                        "summary": "DNS resolution ends by handing candidate addresses back to the application, which then connects using its application protocol.",
+                                        "what": [
+                                                "The client may try IPv6 and IPv4 candidates in parallel or sequence.",
+                                                "TLS and HTTP still validate host names even after DNS returns an address."
+                                        ],
+                                        "why": [
+                                                "DNS only finds candidate network locations; it does not prove the application service is healthy or authorized."
+                                        ],
+                                        "inputs": [
+                                                "Address records",
+                                                "Port and protocol",
+                                                "Connection policy"
+                                        ],
+                                        "outputs": [
+                                                "Network connection attempt"
+                                        ],
+                                        "failures": [
+                                                "Successful DNS can still lead to connection refusal, TLS mismatch, routing failure, or application-level errors."
+                                        ],
+                                        "source": [
+                                                "external: Happy Eyeballs concepts",
+                                                "external: TLS hostname validation"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "debugging-dns"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "transport-retry",
+                                "step": "15",
+                                "domain": "signal",
+                                "owner": "signal",
+                                "title": "Transport Retry",
+                                "purpose": "DNS transport handles packet loss, truncation, and alternate resolver attempts.",
+                                "chips": [
+                                        "timeout",
+                                        "TCP fallback"
+                                ],
+                                "position": {
+                                        "x": 690,
+                                        "y": 395
+                                },
+                                "details": {
+                                        "summary": "Resolvers retry queries, switch servers, or fall back to TCP when responses are lost or too large.",
+                                        "what": [
+                                                "UDP responses can be truncated.",
+                                                "Clients may try multiple configured recursive resolvers.",
+                                                "DoH and DoT use different connection failure modes."
+                                        ],
+                                        "why": [
+                                                "DNS must work across unreliable networks without making applications own every retry detail."
+                                        ],
+                                        "inputs": [
+                                                "Timeouts",
+                                                "Truncated responses",
+                                                "Resolver server list",
+                                                "Transport policy"
+                                        ],
+                                        "outputs": [
+                                                "Retry, alternate resolver query, TCP fallback, or failure"
+                                        ],
+                                        "failures": [
+                                                "Firewalls and middleboxes can make one transport fail while another succeeds."
+                                        ],
+                                        "source": [
+                                                "external: DNS UDP/TCP behavior",
+                                                "external: encrypted DNS transport concepts"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "stub-query",
+                                                "debugging-dns"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "debugging-dns",
+                                "step": "16",
+                                "domain": "signal",
+                                "owner": "signal",
+                                "title": "Debugging DNS",
+                                "purpose": "Separates naming failures from resolver, authority, cache, transport, and application failures.",
+                                "chips": [
+                                        "dig",
+                                        "cache",
+                                        "trace"
+                                ],
+                                "position": {
+                                        "x": 990,
+                                        "y": 1295
+                                },
+                                "details": {
+                                        "summary": "Good DNS debugging identifies which layer answered, whether the result was cached, and whether the failure is DNS or post-DNS connection behavior.",
+                                        "what": [
+                                                "Compare local resolver results with direct authoritative or public recursive queries.",
+                                                "Check TTLs, CNAME chains, DNSSEC validation, split DNS, and negative cache state.",
+                                                "Confirm that a resolved address actually accepts the intended protocol."
+                                        ],
+                                        "why": [
+                                                "Many outages blamed on DNS are really cache, delegation, validation, network, or application endpoint problems."
+                                        ],
+                                        "inputs": [
+                                                "Observed error",
+                                                "Resolver used",
+                                                "Trace output",
+                                                "Authoritative records",
+                                                "Application connection logs"
+                                        ],
+                                        "outputs": [
+                                                "Likely failing layer and next diagnostic step"
+                                        ],
+                                        "failures": [
+                                                "Using only one lookup tool can hide differences between OS resolver behavior and raw DNS queries."
+                                        ],
+                                        "source": [
+                                                "external: dig/drill/nslookup diagnostics",
+                                                "generated example guidance"
+                                        ],
+                                        "source_confidence": "inferred",
+                                        "related": []
+                                }
+                        }
+                ],
+                "edges": [
+                        [
+                                "name-needed",
+                                "resolver-api",
+                                "lookup request",
+                                "control"
+                        ],
+                        [
+                                "resolver-api",
+                                "local-policy",
+                                "policy check",
+                                "control"
+                        ],
+                        [
+                                "local-policy",
+                                "stub-query",
+                                "cache miss",
+                                "signal"
+                        ],
+                        [
+                                "stub-query",
+                                "transport-retry",
+                                "network send",
+                                "signal"
+                        ],
+                        [
+                                "transport-retry",
+                                "recursive-cache",
+                                "query",
+                                "signal"
+                        ],
+                        [
+                                "recursive-cache",
+                                "root-referral",
+                                "miss",
+                                "signal"
+                        ],
+                        [
+                                "root-referral",
+                                "tld-referral",
+                                "TLD NS",
+                                "signal"
+                        ],
+                        [
+                                "tld-referral",
+                                "authoritative-answer",
+                                "zone NS",
+                                "signal"
+                        ],
+                        [
+                                "authoritative-answer",
+                                "cname-chain",
+                                "alias",
+                                "artifact"
+                        ],
+                        [
+                                "cname-chain",
+                                "authoritative-answer",
+                                "follow target",
+                                "control"
+                        ],
+                        [
+                                "authoritative-answer",
+                                "dnssec-validation",
+                                "signed data",
+                                "decision"
+                        ],
+                        [
+                                "dnssec-validation",
+                                "answer-package",
+                                "validated",
+                                "artifact"
+                        ],
+                        [
+                                "authoritative-answer",
+                                "answer-package",
+                                "unsigned/accepted",
+                                "artifact"
+                        ],
+                        [
+                                "answer-package",
+                                "negative-cache",
+                                "negative result",
+                                "artifact"
+                        ],
+                        [
+                                "answer-package",
+                                "client-cache",
+                                "positive result",
+                                "artifact"
+                        ],
+                        [
+                                "negative-cache",
+                                "client-cache",
+                                "cached miss",
+                                "artifact"
+                        ],
+                        [
+                                "client-cache",
+                                "connect-endpoint",
+                                "addresses",
+                                "artifact"
+                        ],
+                        [
+                                "connect-endpoint",
+                                "debugging-dns",
+                                "post-DNS outcome",
+                                "signal"
+                        ],
+                        [
+                                "transport-retry",
+                                "debugging-dns",
+                                "timeout evidence",
+                                "signal"
+                        ]
+                ],
+                "views": {
+                        "overview": {
+                                "label": "Overview",
+                                "focus": [
+                                        "name-needed",
+                                        "resolver-api",
+                                        "local-policy",
+                                        "stub-query",
+                                        "transport-retry",
+                                        "recursive-cache",
+                                        "root-referral",
+                                        "tld-referral",
+                                        "authoritative-answer",
+                                        "cname-chain",
+                                        "dnssec-validation",
+                                        "answer-package",
+                                        "negative-cache",
+                                        "client-cache",
+                                        "connect-endpoint",
+                                        "debugging-dns"
+                                ]
+                        },
+                        "client": {
+                                "label": "Client Side",
+                                "focus": [
+                                        "name-needed",
+                                        "resolver-api",
+                                        "local-policy",
+                                        "stub-query",
+                                        "client-cache",
+                                        "connect-endpoint"
+                                ]
+                        },
+                        "authority": {
+                                "label": "Authority Walk",
+                                "focus": [
+                                        "recursive-cache",
+                                        "root-referral",
+                                        "tld-referral",
+                                        "authoritative-answer",
+                                        "cname-chain",
+                                        "answer-package"
+                                ]
+                        },
+                        "debugging": {
+                                "label": "Debugging",
+                                "focus": [
+                                        "local-policy",
+                                        "stub-query",
+                                        "transport-retry",
+                                        "recursive-cache",
+                                        "authoritative-answer",
+                                        "dnssec-validation",
+                                        "negative-cache",
+                                        "client-cache",
+                                        "debugging-dns"
+                                ]
+                        }
+                },
+                "layout": {
+                        "orientation": "vertical",
+                        "reading_path": "top-to-bottom DNS lookup flow from application request to endpoint connection"
+                },
+                "edgeHandles": {
+                        "name-needed->resolver-api": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "resolver-api->local-policy": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "local-policy->stub-query": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "stub-query->transport-retry": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "transport-retry->recursive-cache": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "recursive-cache->root-referral": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "root-referral->tld-referral": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "tld-referral->authoritative-answer": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "authoritative-answer->cname-chain": [
+                                "out-left",
+                                "in-right"
+                        ],
+                        "cname-chain->authoritative-answer": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "authoritative-answer->dnssec-validation": [
+                                "out-left",
+                                "in-right"
+                        ],
+                        "dnssec-validation->answer-package": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "authoritative-answer->answer-package": [
+                                "out-left",
+                                "in-right"
+                        ],
+                        "answer-package->negative-cache": [
+                                "out-left",
+                                "in-right"
+                        ],
+                        "answer-package->client-cache": [
+                                "out-left",
+                                "in-right"
+                        ],
+                        "negative-cache->client-cache": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "client-cache->connect-endpoint": [
+                                "out-left",
+                                "in-right"
+                        ],
+                        "connect-endpoint->debugging-dns": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "transport-retry->debugging-dns": [
+                                "out-right",
+                                "in-left"
+                        ]
+                }
+        },
+        "groupDetails": {
+                "overview": {
+                        "title": "How DNS Works",
+                        "purpose": "A deep visual map of name resolution from application request to network connection.",
+                        "domain": "delivery",
+                        "summary": "DNS resolution starts with an application asking a local resolver for a name, passes through local policy and recursive caching, walks DNS delegation from root to TLD to authoritative servers when needed, validates and packages the answer, then returns records that the application uses to connect.",
+                        "why": "DNS is familiar but layered; this example shows how visual architecture docs make protocol boundaries, caches, and failure modes visible.",
+                        "points": [
+                                "Local policy and cache may answer before public DNS is involved.",
+                                "Recursive resolvers hide iterative root-to-TLD-to-authority traversal from clients.",
+                                "TTL, CNAMEs, DNSSEC, negative caching, and transport retries explain many surprising behaviors."
+                        ],
+                        "focus": [
+                                "name-needed",
+                                "resolver-api",
+                                "local-policy",
+                                "stub-query",
+                                "transport-retry",
+                                "recursive-cache",
+                                "root-referral",
+                                "tld-referral",
+                                "authoritative-answer",
+                                "cname-chain",
+                                "dnssec-validation",
+                                "answer-package",
+                                "negative-cache",
+                                "client-cache",
+                                "connect-endpoint",
+                                "debugging-dns"
+                        ]
+                },
+                "client": {
+                        "title": "Client-Side Resolution",
+                        "purpose": "Show what happens before a recursive resolver walks the public DNS hierarchy.",
+                        "domain": "runtime",
+                        "summary": "Applications usually call an OS or runtime resolver, which applies local policy, host overrides, search suffixes, cache state, and recursive resolver configuration.",
+                        "why": "Many DNS surprises are local: the public authoritative record can be correct while one client still sees a different answer.",
+                        "points": [
+                                "Hosts files and split DNS can override public records.",
+                                "Language and container resolver behavior may differ from host tools.",
+                                "Local cache and connection pools can outlive record changes."
+                        ],
+                        "focus": [
+                                "name-needed",
+                                "resolver-api",
+                                "local-policy",
+                                "stub-query",
+                                "client-cache",
+                                "connect-endpoint"
+                        ]
+                },
+                "authority": {
+                        "title": "Authority Walk",
+                        "purpose": "Trace the recursive resolver's path to the source of truth.",
+                        "domain": "delivery",
+                        "summary": "On a cache miss, the recursive resolver follows delegation from root to TLD to authoritative zone, resolving aliases and collecting records with TTL metadata.",
+                        "why": "The hierarchy explains both DNS scalability and where domain configuration errors enter the flow.",
+                        "points": [
+                                "Root servers delegate to TLDs.",
+                                "TLDs delegate registered domains to authoritative name servers.",
+                                "Authoritative zones return records, aliases, or negative answers."
+                        ],
+                        "focus": [
+                                "recursive-cache",
+                                "root-referral",
+                                "tld-referral",
+                                "authoritative-answer",
+                                "cname-chain",
+                                "answer-package"
+                        ]
+                },
+                "debugging": {
+                        "title": "Debugging DNS",
+                        "purpose": "Identify whether failure belongs to local policy, cache, transport, authority, validation, or the application connection.",
+                        "domain": "signal",
+                        "summary": "DNS debugging works best when each lookup is tied to the resolver used, cache state, TTLs, authority data, validation status, and the post-DNS connection attempt.",
+                        "why": "A correct DNS answer can still lead to a failed service connection, while an incorrect client answer may come from a cache or split-DNS rule.",
+                        "points": [
+                                "Compare OS resolver behavior with direct DNS queries.",
+                                "Check CNAME chains, TTLs, negative caches, and DNSSEC validation.",
+                                "Separate DNS resolution success from TCP, TLS, and application-layer success."
+                        ],
+                        "focus": [
+                                "local-policy",
+                                "stub-query",
+                                "transport-retry",
+                                "recursive-cache",
+                                "authoritative-answer",
+                                "dnssec-validation",
+                                "negative-cache",
+                                "client-cache",
+                                "debugging-dns"
+                        ]
+                }
+        }
+};
+      const DOMAINS = VISUAL_ARCH_DATA.domains;
+      const OWNERS = VISUAL_ARCH_DATA.owners;
+      const BOARD = VISUAL_ARCH_DATA.board;
+      const GROUP_DETAILS = VISUAL_ARCH_DATA.groupDetails;
+
+      const EDGE_HANDLES = Object.freeze(BOARD.edgeHandles || {});
+
+      const NODE_BY_ID = Object.fromEntries(BOARD.nodes.map(node => [node.id, node]));
+      const INCOMING = new Map();
+      const OUTGOING = new Map();
+      BOARD.edges.forEach(([source, target]) => {
+        if (!OUTGOING.has(source)) OUTGOING.set(source, []);
+        if (!INCOMING.has(target)) INCOMING.set(target, []);
+        OUTGOING.get(source).push(target);
+        INCOMING.get(target).push(source);
+      });
+
+      function edgeSet(edges) {
+        return new Set(edges.map(([source, target]) => `${source}->${target}`));
+      }
+
+      const MAIN_EDGE_IDS = edgeSet(BOARD.edges);
+      const VIEW_EDGE_IDS = Object.fromEntries(
+        Object.entries(BOARD.views).map(([viewKey, view]) => {
+          const focus = new Set(view.focus || []);
+          return [
+            viewKey,
+            new Set(
+              BOARD.edges
+                .filter(([source, target]) => focus.has(source) && focus.has(target))
+                .map(([source, target]) => `${source}->${target}`)
+            )
+          ];
+        })
+      );
+
+      const VIEWPORTS = {
+        overview: { x: 38, y: 160, zoom: 0.7 },
+        runtime: { x: -1220, y: 160, zoom: 0.76 },
+        artifacts: { x: -2660, y: 160, zoom: 0.76 },
+        signal: { x: -3440, y: 160, zoom: 0.76 },
+        decisions: { x: -920, y: 108, zoom: 0.68 }
+      };
+
+      Object.assign(VIEWPORTS, {
+        overview: { x: 18, y: 86, zoom: 0.76 },
+        runtime: { x: -805, y: -640, zoom: 0.82 },
+        artifacts: { x: -820, y: -1280, zoom: 0.82 },
+        signal: { x: 18, y: -1960, zoom: 0.84 },
+        decisions: { x: -470, y: 74, zoom: 0.74 }
+      });
+
+      Object.assign(VIEWPORTS, {
+        overview: { x: 10, y: 78, zoom: 0.56 },
+        runtime: { x: -560, y: -280, zoom: 0.78 },
+        artifacts: { x: -360, y: -560, zoom: 0.78 },
+        signal: { x: 8, y: -700, zoom: 0.78 },
+        decisions: { x: -250, y: 60, zoom: 0.66 }
+      });
+
+      function domainVars(domainKey) {
+        const domain = DOMAINS[domainKey] || DOMAINS.infra;
+        return {
+          "--accent": domain.accent,
+          "--soft": domain.soft
+        };
+      }
+
+      function selectionContext(selectedId) {
+        if (!selectedId || !NODE_BY_ID[selectedId]) {
+          return { related: new Set(), upstream: new Set(), downstream: new Set(), activeEdges: new Set() };
+        }
+        const upstream = new Set(INCOMING.get(selectedId) || []);
+        const downstream = new Set(OUTGOING.get(selectedId) || []);
+        const explicit = new Set((NODE_BY_ID[selectedId]?.details.related || []).filter(id => NODE_BY_ID[id]));
+        const related = new Set([selectedId, ...upstream, ...downstream, ...explicit]);
+        const activeEdges = new Set();
+        BOARD.edges.forEach(([source, target]) => {
+          if (source === selectedId || target === selectedId) activeEdges.add(`${source}->${target}`);
+        });
+        return { related, upstream, downstream, activeEdges };
+      }
+
+      function modeFocus(mode) {
+        return new Set(BOARD.views[mode]?.focus || []);
+      }
+
+      function isDetailNode(node) {
+        return node.hidden === true || node.tier === "detail";
+      }
+
+      function shouldShowNode(node, mode, selectedId, showDetails, context) {
+        if (!isDetailNode(node)) return true;
+        if (showDetails) return true;
+        const focus = modeFocus(mode);
+        if (mode !== "overview" && focus.has(node.id)) return true;
+        if (!selectedId) return false;
+        if (context.related.has(node.id)) return true;
+        return (node.revealFor || []).includes(selectedId);
+      }
+
+      function visibleNodeIds(mode, selectedId, showDetails) {
+        const context = selectionContext(selectedId);
+        return new Set(
+          BOARD.nodes
+            .filter(node => shouldShowNode(node, mode, selectedId, showDetails, context))
+            .map(node => node.id)
+        );
+      }
+
+      function visibleEdgeIds(mode, selectedId, showDetails, context) {
+        if (selectedId) return context.activeEdges;
+        if (showDetails) return MAIN_EDGE_IDS;
+        return VIEW_EDGE_IDS[mode] || MAIN_EDGE_IDS;
+      }
+
+      const NODE_SIZE = { width: 220, height: 100 };
+      const PANEL_RESERVE = 560;
+      const TOPBAR_RESERVE = 96;
+
+      function boundsForIds(ids, options = {}) {
+        const includeDetails = options.includeDetails ?? false;
+        const selected = ids.map(id => NODE_BY_ID[id]).filter(node => node && (includeDetails || !isDetailNode(node)));
+        const fallbackNodes = BOARD.nodes.filter(node => includeDetails || !isDetailNode(node));
+        const nodes = selected.length ? selected : fallbackNodes;
+        const minX = Math.min(...nodes.map(node => node.position.x));
+        const minY = Math.min(...nodes.map(node => node.position.y));
+        const maxX = Math.max(...nodes.map(node => node.position.x + NODE_SIZE.width));
+        const maxY = Math.max(...nodes.map(node => node.position.y + NODE_SIZE.height));
+        return { minX, minY, width: maxX - minX, height: maxY - minY };
+      }
+
+      function viewportForIds(ids, options = {}) {
+        const bounds = boundsForIds(ids, options);
+        const reservePanel = options.reservePanel ?? window.innerWidth >= 980;
+        const availableWidth = Math.max(360, window.innerWidth - (reservePanel ? PANEL_RESERVE : 32) - 48);
+        const availableHeight = Math.max(300, window.innerHeight - TOPBAR_RESERVE - 30);
+        const padding = options.padding ?? 0.28;
+        const paddedWidth = Math.max(1, bounds.width * (1 + padding));
+        const paddedHeight = Math.max(1, bounds.height * (1 + padding));
+        const zoom = Math.max(
+          options.minZoom ?? 0.26,
+          Math.min(options.maxZoom ?? 1.08, availableWidth / paddedWidth, availableHeight / paddedHeight)
+        );
+        const left = 24;
+        const top = TOPBAR_RESERVE;
+        return {
+          x: left + (availableWidth - bounds.width * zoom) / 2 - bounds.minX * zoom,
+          y: top + (availableHeight - bounds.height * zoom) / 2 - bounds.minY * zoom,
+          zoom
+        };
+      }
+
+      function buildNodes(mode, selectedId, showDetails) {
+        const context = selectionContext(selectedId);
+        const focus = modeFocus(mode);
+        const visibleIds = visibleNodeIds(mode, selectedId, showDetails);
+        const hasModeFocus = focus.size > 0;
+        const hasSelection = Boolean(selectedId);
+
+        const lanes = BOARD.lanes.map(lane => ({
+          id: lane.id,
+          type: "lane",
+          position: lane.position,
+          data: {
+            title: lane.title,
+            subtitle: lane.subtitle,
+            domain: lane.domain,
+            width: lane.width,
+            height: lane.height,
+            dimmed: hasSelection
+          },
+          draggable: false,
+          selectable: false,
+          focusable: false,
+          zIndex: -2
+        }));
+
+        const nodes = BOARD.nodes.filter(node => visibleIds.has(node.id)).map(node => {
+          const isSelected = node.id === selectedId;
+          const isRelated = context.related.has(node.id);
+          const modeDimmed = hasModeFocus && !focus.has(node.id);
+          const selectionDimmed = hasSelection && !isSelected && !isRelated;
+          return {
+            id: node.id,
+            type: "arch",
+            position: node.position,
+            data: {
+              ...node,
+              domainLabel: DOMAINS[node.domain].label,
+              ownerLabel: OWNERS[node.owner]?.label || OWNERS.suite.label,
+              starter: !INCOMING.has(node.id),
+              selected: isSelected,
+              related: isRelated && !isSelected,
+              dimmed: selectionDimmed || (!hasSelection && modeDimmed),
+              modeDimmed
+            },
+            draggable: false,
+            selectable: true,
+            connectable: false,
+            zIndex: isSelected ? 8 : isRelated ? 6 : 2
+          };
+        });
+
+        return [...lanes, ...nodes];
+      }
+
+      function buildEdges(mode, selectedId, showDetails) {
+        const context = selectionContext(selectedId);
+        const hasSelection = Boolean(selectedId);
+        const visible = visibleEdgeIds(mode, selectedId, showDetails, context);
+        const nodeIds = visibleNodeIds(mode, selectedId, showDetails);
+
+        return BOARD.edges.filter(([source, target]) => visible.has(`${source}->${target}`) && nodeIds.has(source) && nodeIds.has(target)).map(([source, target, label, kind]) => {
+          const id = `${source}->${target}`;
+          const [sourceHandle, targetHandle] = EDGE_HANDLES[id] || ["out-right", "in-left"];
+          const primary = MAIN_EDGE_IDS.has(id);
+          const color = selectedId
+            ? DOMAINS[NODE_BY_ID[selectedId]?.domain || "infra"].accent
+            : edgeColor(kind);
+          return {
+            id,
+            source,
+            target,
+            sourceHandle,
+            targetHandle,
+            type: "contract",
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color
+            },
+            data: {
+              label,
+              kind,
+              showLabel: hasSelection || mode !== "overview",
+              dimmed: false,
+              active: true,
+              primary,
+              color
+            }
+          };
+        });
+      }
+
+      function edgeColor(kind) {
+        if (kind === "artifact" || kind === "data") return (DOMAINS.storage || DOMAINS.data || DOMAINS.runtime).accent;
+        if (kind === "signal") return (DOMAINS.signal || DOMAINS.runtime).accent;
+        if (kind === "decision") return (DOMAINS.decision || DOMAINS.delivery || DOMAINS.runtime).accent;
+        if (kind === "dependency") return (DOMAINS.infra || DOMAINS.runtime).accent;
+        return (DOMAINS.runtime || DOMAINS.infra).accent;
+      }
+
+      function BmtNode(props) {
+        const data = props.data;
+        const className = [
+          "arch-node",
+          data.selected ? "is-selected" : "",
+          data.related ? "is-related" : "",
+          data.dimmed ? "is-dimmed" : ""
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        return h(
+          "div",
+          {
+            className,
+            style: domainVars(data.domain)
+          },
+          h(Handle, { id: "in-left", type: "target", position: Position.Left }),
+          h(Handle, { id: "out-left", type: "source", position: Position.Left }),
+          h(Handle, { id: "in-right", type: "target", position: Position.Right }),
+          h(Handle, { id: "out-right", type: "source", position: Position.Right }),
+          h(Handle, { id: "in-top", type: "target", position: Position.Top }),
+          h(Handle, { id: "out-top", type: "source", position: Position.Top }),
+          h(Handle, { id: "in-bottom", type: "target", position: Position.Bottom }),
+          h(Handle, { id: "out-bottom", type: "source", position: Position.Bottom }),
+          h(
+            "div",
+            { className: "node-head" },
+            h("span", { className: "node-domain" }, data.ownerLabel),
+            h("span", { className: "node-step" }, data.step)
+          ),
+          h(
+            "div",
+            { className: "node-body" },
+            data.starter ? h("span", { className: "node-start" }, "starts here") : null,
+            h("h2", { className: "node-title" }, data.title),
+            h("p", { className: "node-purpose" }, data.purpose)
+          )
+        );
+      }
+
+      function LaneNode(props) {
+        const data = props.data;
+        return h(
+          "div",
+          {
+            className: "lane-node",
+            style: {
+              ...domainVars(data.domain),
+              "--lane-width": data.width ? `${data.width}px` : undefined,
+              "--lane-height": data.height ? `${data.height}px` : undefined,
+              opacity: data.dimmed ? 0.45 : 1
+            }
+          },
+          h("div", { className: "lane-title" }, data.title),
+          h("div", { className: "lane-subtitle" }, data.subtitle)
+        );
+      }
+
+      function ContractEdge(props) {
+        const [edgePath, labelX, labelY] = getSmoothStepPath({
+          ...props,
+          borderRadius: 18,
+          offset: 28
+        });
+        const dimmed = props.data?.dimmed;
+        const active = props.data?.active;
+        const kind = props.data?.kind;
+        const color = props.data?.color || "#9b9589";
+        const label = props.data?.showLabel ? props.data?.label : null;
+        const style = {
+          stroke: color,
+          strokeWidth: active ? 2.8 : 1.8,
+          strokeDasharray: kind === "control" || kind === "signal" ? undefined : "7 7",
+          opacity: dimmed ? 0.18 : kind === "control" || kind === "signal" ? 0.82 : 0.48
+        };
+
+        return h(
+          React.Fragment,
+          null,
+          h(BaseEdge, {
+            id: props.id,
+            path: edgePath,
+            markerEnd: props.markerEnd,
+            className: "contract-edge",
+            style
+          }),
+          label
+            ? h(
+                EdgeLabelRenderer,
+                null,
+                h(
+                  "div",
+                  {
+                    className: "edge-label",
+                    style: {
+                      opacity: dimmed ? 0 : 1,
+                      transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`
+                    }
+                  },
+                  label
+                )
+              )
+            : null
+        );
+      }
+
+      const nodeTypes = { arch: BmtNode, lane: LaneNode };
+      const edgeTypes = { contract: ContractEdge };
+
+      function GroupDetailDrawer({ mode, onSelect }) {
+        const group = GROUP_DETAILS[mode] || GROUP_DETAILS.overview;
+        const domain = DOMAINS[group.domain] || DOMAINS.runtime;
+        const focus = group.focus || [];
+
+        return h(
+          "aside",
+          {
+            className: "detail-drawer",
+            "aria-live": "polite",
+            style: domainVars(group.domain)
+          },
+          h(
+            "div",
+            { className: "drawer-head" },
+            h("span", { className: "drawer-kicker" }, `Group overview / ${domain.label}`),
+            h("h2", { className: "drawer-title" }, group.title),
+            h("p", { className: "drawer-purpose" }, group.purpose)
+          ),
+          h(
+            "div",
+            { className: "drawer-body" },
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "What this shows"),
+              h("p", null, group.summary)
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Why it matters"),
+              h("p", null, group.why)
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Good to know"),
+              h("ul", null, group.points.map(item => h("li", { key: item }, item)))
+            ),
+            mode === "overview"
+              ? null
+              : h(
+                  "section",
+                  { className: "detail-section" },
+                  h("h3", null, "Highlighted nodes"),
+                  h(
+                    "div",
+                    { className: "related-list" },
+                    focus
+                      .filter(id => NODE_BY_ID[id])
+                      .map(id =>
+                        h(
+                          "button",
+                          {
+                            key: id,
+                            type: "button",
+                            className: "related-pill",
+                            onClick: () => onSelect(id)
+                          },
+                          NODE_BY_ID[id].title
+                        )
+                      )
+                  )
+                )
+          )
+        );
+      }
+
+      function DetailDrawer({ mode, selectedId, onSelect, onClose }) {
+        const node = selectedId ? NODE_BY_ID[selectedId] : null;
+        if (!node) {
+          return mode === "overview" ? null : h(GroupDetailDrawer, { mode, onSelect });
+        }
+
+        const domain = DOMAINS[node.domain];
+        const owner = OWNERS[node.owner] || OWNERS.suite;
+        const summary = node.details.summary || node.details.what?.[0] || node.purpose;
+        const why = Array.isArray(node.details.why) ? node.details.why.join(" ") : node.details.why;
+        const directRelated = directRelations(node.id);
+
+        return h(
+          "aside",
+          {
+            className: "detail-drawer",
+            "aria-live": "polite",
+            style: domainVars(node.domain)
+          },
+          h(
+            "div",
+            { className: "drawer-head" },
+            h(
+              "div",
+              { className: "drawer-head-top" },
+              h("span", { className: "drawer-kicker" }, `${owner.label} / ${domain.label}`),
+              h(
+                "button",
+                { type: "button", className: "drawer-close", onClick: onClose, "aria-label": "Close details", title: "Close details" },
+                h(X, { "aria-hidden": true })
+              )
+            ),
+            h("h2", { className: "drawer-title" }, node.title),
+            h("p", { className: "drawer-purpose" }, node.purpose)
+          ),
+          h(
+            "div",
+            { className: "drawer-body" },
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "What it does"),
+              h("p", null, summary)
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Owned by"),
+              h("p", null, owner.description)
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Source confidence"),
+              h("p", null, node.details.source_confidence || "unknown")
+            ),
+            h(
+              "section",
+              { className: "detail-section io-grid" },
+              h(
+                "div",
+                { className: "io-card" },
+                h("h3", null, "Reads"),
+                h("ul", null, node.details.inputs.map(item => h("li", { key: item }, item)))
+              ),
+              h(
+                "div",
+                { className: "io-card" },
+                h("h3", null, "Writes"),
+                h("ul", null, node.details.outputs.map(item => h("li", { key: item }, item)))
+              )
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Why it exists"),
+              h("p", null, why)
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Check first if it fails"),
+              h("ul", null, node.details.failures.map(item => h("li", { key: item }, item)))
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Where to look"),
+              h(
+                "div",
+                { className: "source-list" },
+                node.details.source.map(item => h("span", { key: item, className: "source-chip" }, item))
+              )
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Connected steps"),
+              h(
+                "div",
+                { className: "related-list" },
+                directRelated.map(id =>
+                  h(
+                    "button",
+                    {
+                      key: id,
+                      type: "button",
+                      className: "related-pill",
+                      onClick: () => onSelect(id)
+                    },
+                    NODE_BY_ID[id].title
+                  )
+                )
+              )
+            )
+          )
+        );
+      }
+
+      function directRelations(id) {
+        return [...new Set([...(INCOMING.get(id) || []), ...(OUTGOING.get(id) || []), ...(NODE_BY_ID[id]?.details.related || [])])].filter(
+          relatedId => NODE_BY_ID[relatedId]
+        );
+      }
+
+      function Toolbar({
+        mode,
+        selectedId,
+        showDetails,
+        theme,
+        onModeChange,
+        onFitAll,
+        onResetLayout,
+        onClearSelection,
+        onDetailsToggle,
+        onThemeToggle
+      }) {
+        const modes = Object.entries(BOARD.views);
+
+        return h(
+          "div",
+          { className: "topbar" },
+          h(
+            "div",
+            { className: "brand" },
+            h("span", { className: "brand-kicker" }, "Visual architecture"),
+            h("span", { className: "brand-title" }, "Project Architecture")
+          ),
+          h(
+            "div",
+            { className: "toolbar-cluster" },
+            h("span", { className: "toolbar-label" }, "View"),
+            h(
+              "div",
+              { className: "mode-tabs", role: "group", "aria-label": "Choose architecture view" },
+              modes.map(([key, value]) =>
+                h(
+                  "button",
+                  {
+                    key,
+                    type: "button",
+                    className: `toolbar-button ${mode === key && !selectedId ? "is-active" : ""}`,
+                    "aria-pressed": String(mode === key && !selectedId),
+                    onClick: () => onModeChange(key)
+                  },
+                  value.label
+                )
+              )
+            )
+          ),
+          h(
+            "div",
+            { className: "view-actions" },
+            h(
+              "button",
+              { type: "button", className: "toolbar-button is-icon", onClick: onFitAll, "aria-label": "Fit all", title: "Fit all" },
+              h(Maximize2, { "aria-hidden": true })
+            ),
+            h(
+              "button",
+              { type: "button", className: "toolbar-button is-icon", onClick: onResetLayout, "aria-label": "Reset view", title: "Reset view" },
+              h(RotateCcw, { "aria-hidden": true })
+            ),
+            h(
+              "button",
+              {
+                type: "button",
+                className: `toolbar-button ${showDetails ? "is-active" : ""}`,
+                onClick: onDetailsToggle,
+                "aria-pressed": String(showDetails),
+                title: showDetails ? "Hide detail nodes" : "Show detail nodes"
+              },
+              "Details"
+            ),
+            h(
+              "button",
+              {
+                type: "button",
+                className: "toolbar-button is-icon",
+                onClick: onThemeToggle,
+                "aria-label": theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
+                title: theme === "dark" ? "Light mode" : "Dark mode"
+              },
+              theme === "dark" ? h(Sun, { "aria-hidden": true }) : h(Moon, { "aria-hidden": true })
+            ),
+            selectedId
+              ? h(
+                  "button",
+                  { type: "button", className: "toolbar-button is-icon", onClick: onClearSelection, "aria-label": "Clear selection", title: "Clear selection" },
+                  h(X, { "aria-hidden": true })
+                )
+              : null
+          )
+        );
+      }
+
+      function initialTheme() {
+        try {
+          const saved = window.localStorage.getItem("visual-arch-theme");
+          if (saved === "light" || saved === "dark") return saved;
+        } catch (_error) {
+          // Ignore storage failures; the system preference is a fine fallback.
+        }
+        return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+
+      function replaceUrlHash(id) {
+        try {
+          if (!window.history?.replaceState) return;
+          const baseUrl = window.location.href.replace(/#.*$/, "");
+          const nextUrl = id ? `${baseUrl}#${encodeURIComponent(id)}` : baseUrl;
+          window.history.replaceState(null, "", nextUrl);
+        } catch (_error) {
+          // Some browsers block history mutation for local files. The board works without URL state.
+        }
+      }
+
+      function hashSelectionId() {
+        try {
+          const id = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+          return NODE_BY_ID[id] ? id : null;
+        } catch (_error) {
+          return null;
+        }
+      }
+
+      function FlowBoard() {
+        const [mode, setMode] = useState("overview");
+        const [selectedId, setSelectedId] = useState(null);
+        const [showDetails, setShowDetails] = useState(false);
+        const [resetNonce, setResetNonce] = useState(0);
+        const [theme, setTheme] = useState(initialTheme);
+        const [isNavigating, setIsNavigating] = useState(false);
+        const navigationTimer = useRef(null);
+        const didInitialFit = useRef(false);
+        const reactFlow = useReactFlow();
+
+        const nodes = useMemo(() => buildNodes(mode, selectedId, showDetails), [mode, selectedId, showDetails, resetNonce]);
+        const edges = useMemo(() => buildEdges(mode, selectedId, showDetails), [mode, selectedId, showDetails]);
+
+        const setViewportForIds = useCallback(
+          (ids, options = {}) => {
+            requestAnimationFrame(() => {
+              reactFlow.setViewport(viewportForIds(ids, options), { duration: options.duration ?? 450 });
+            });
+          },
+          [reactFlow]
+        );
+
+        const centerNode = useCallback(id => {
+          if (!NODE_BY_ID[id]) return;
+          setViewportForIds([id], { padding: 0.95, maxZoom: 1.05, duration: 420, includeDetails: true });
+        }, [setViewportForIds]);
+
+        const selectNode = useCallback(
+          id => {
+            if (!NODE_BY_ID[id]) return;
+            setSelectedId(id);
+            replaceUrlHash(id);
+            centerNode(id);
+          },
+          [centerNode]
+        );
+
+        const focusMode = useCallback(
+          nextMode => {
+            const view = BOARD.views[nextMode] || BOARD.views.overview;
+            setMode(nextMode);
+            setSelectedId(null);
+            replaceUrlHash(null);
+            if (nextMode === "overview") {
+              setViewportForIds(view.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false });
+            } else {
+              setViewportForIds(view.focus, { padding: 0.34, maxZoom: 1.05, includeDetails: true });
+            }
+          },
+          [setViewportForIds]
+        );
+
+        const fitAll = useCallback(() => {
+          focusMode("overview");
+        }, [focusMode]);
+
+        const clearSelection = useCallback(() => {
+          setSelectedId(null);
+          replaceUrlHash(null);
+          if (mode === "overview") {
+            setViewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false });
+          } else {
+            setViewportForIds((BOARD.views[mode] || BOARD.views.overview).focus, { padding: 0.34, maxZoom: 1.05, includeDetails: true });
+          }
+        }, [mode, setViewportForIds]);
+
+        const resetLayout = useCallback(() => {
+          setResetNonce(value => value + 1);
+          focusMode("overview");
+        }, [focusMode]);
+
+        const toggleTheme = useCallback(() => {
+          setTheme(value => (value === "dark" ? "light" : "dark"));
+        }, []);
+
+        const toggleDetails = useCallback(() => {
+          setShowDetails(value => !value);
+        }, []);
+
+        const beginCanvasNavigation = useCallback(event => {
+          if (event?.target?.closest?.(".react-flow__controls")) return;
+          if (navigationTimer.current) window.clearTimeout(navigationTimer.current);
+          setIsNavigating(true);
+        }, []);
+
+        const endCanvasNavigation = useCallback(() => {
+          if (navigationTimer.current) window.clearTimeout(navigationTimer.current);
+          navigationTimer.current = window.setTimeout(() => setIsNavigating(false), 180);
+        }, []);
+
+        useEffect(() => {
+          document.body.classList.add("app-ready");
+          return () => document.body.classList.remove("app-ready");
+        }, []);
+
+        useEffect(() => {
+          document.documentElement.dataset.theme = theme;
+          try {
+            window.localStorage.setItem("visual-arch-theme", theme);
+          } catch (_error) {
+            // Storage is optional for a static document.
+          }
+        }, [theme]);
+
+        useEffect(() => {
+          return () => {
+            if (navigationTimer.current) window.clearTimeout(navigationTimer.current);
+          };
+        }, []);
+
+        useEffect(() => {
+          const onHashChange = () => {
+            const id = hashSelectionId();
+            if (NODE_BY_ID[id]) {
+              setSelectedId(id);
+              centerNode(id);
+            } else {
+              setSelectedId(null);
+            }
+          };
+          window.addEventListener("hashchange", onHashChange);
+          return () => window.removeEventListener("hashchange", onHashChange);
+        }, [centerNode]);
+
+        useEffect(() => {
+          if (didInitialFit.current) return;
+          didInitialFit.current = true;
+          replaceUrlHash(null);
+          window.setTimeout(
+            () => setViewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false, duration: 0 }),
+            0
+          );
+        }, [setViewportForIds]);
+
+        return h(
+          "div",
+          { className: `app-shell ${isNavigating ? "is-navigating" : ""}` },
+          h(Toolbar, {
+            mode,
+            selectedId,
+            showDetails,
+            theme,
+            onModeChange: focusMode,
+            onFitAll: fitAll,
+            onResetLayout: resetLayout,
+            onClearSelection: clearSelection,
+            onDetailsToggle: toggleDetails,
+            onThemeToggle: toggleTheme
+          }),
+          h(
+            "div",
+            {
+              className: "flow-wrap",
+              onPointerDown: beginCanvasNavigation,
+              onPointerUp: endCanvasNavigation,
+              onPointerLeave: endCanvasNavigation,
+              onPointerCancel: endCanvasNavigation
+            },
+            h(
+              ReactFlow,
+              {
+                nodes,
+                edges,
+                nodeTypes,
+                edgeTypes,
+                defaultViewport: viewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false }),
+                minZoom: 0.28,
+                maxZoom: 1.45,
+                nodesDraggable: false,
+                nodesConnectable: false,
+                nodesFocusable: true,
+                edgesFocusable: false,
+                elementsSelectable: true,
+                panOnDrag: true,
+                panOnScroll: false,
+                zoomOnScroll: true,
+                zoomOnPinch: true,
+                zoomOnDoubleClick: false,
+                preventScrolling: true,
+                selectionOnDrag: false,
+                deleteKeyCode: null,
+                connectOnClick: false,
+                onNodeClick: (_event, node) => {
+                  if (NODE_BY_ID[node.id]) selectNode(node.id);
+                },
+                onInit: instance => {
+                  window.setTimeout(() => {
+                    instance.setViewport(
+                      viewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false }),
+                      { duration: 0 }
+                    );
+                  }, 0);
+                },
+                onPaneClick: clearSelection,
+                onMoveEnd: endCanvasNavigation,
+                defaultEdgeOptions: {
+                  type: "contract",
+                  markerEnd: { type: MarkerType.ArrowClosed }
+                },
+                proOptions: { hideAttribution: true }
+              },
+              h(Background, { variant: "lines", gap: 34, size: 0.75, color: "var(--grid)" }),
+              h(Controls, { position: "bottom-left", showInteractive: false })
+            )
+          ),
+          h(DetailDrawer, { mode, selectedId, onSelect: selectNode, onClose: clearSelection })
+        );
+      }
+
+      function App() {
+        return h(ReactFlowProvider, null, h(FlowBoard));
+      }
+
+      createRoot(document.getElementById("root")).render(h(App));
+    </script>
+  </body>
+</html>

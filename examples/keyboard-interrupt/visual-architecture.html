@@ -125,10 +125,7 @@
         display: grid;
         place-items: center;
         padding: 28px;
-        background:
-          radial-gradient(circle at 20% 15%, rgba(92, 95, 184, 0.12), transparent 30rem),
-          radial-gradient(circle at 80% 12%, rgba(15, 139, 114, 0.12), transparent 28rem),
-          var(--canvas);
+        background: var(--canvas);
         color: var(--ink);
         z-index: 50;
       }
@@ -163,10 +160,7 @@
         position: relative;
         width: 100vw;
         height: 100vh;
-        background:
-          radial-gradient(circle at 8% 8%, rgba(92, 95, 184, 0.1), transparent 28rem),
-          radial-gradient(circle at 88% 12%, rgba(15, 139, 114, 0.09), transparent 30rem),
-          linear-gradient(180deg, #fbfaf6 0%, var(--canvas) 100%);
+        background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 72%, var(--canvas)) 0%, var(--canvas) 100%);
       }
 
       .topbar {
@@ -749,10 +743,7 @@
         }
 
         #boot-fallback {
-          background:
-            radial-gradient(circle at 20% 15%, rgba(154, 141, 255, 0.12), transparent 30rem),
-            radial-gradient(circle at 80% 12%, rgba(76, 199, 170, 0.1), transparent 28rem),
-            var(--canvas);
+          background: var(--canvas);
         }
 
         .fallback-card,
@@ -882,10 +873,7 @@
       }
 
       :root[data-theme] .app-shell {
-        background:
-          radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--github) 10%, transparent), transparent 28rem),
-          radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--runtime) 8%, transparent), transparent 30rem),
-          linear-gradient(180deg, color-mix(in srgb, var(--canvas) 82%, var(--surface)) 0%, var(--canvas) 100%);
+        background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 72%, var(--canvas)) 0%, var(--canvas) 100%);
       }
 
       :root[data-theme] .toolbar-button {
@@ -1118,14 +1106,6 @@
         return h(IconSvg, props, h("path", { d: "M20.6 14.5A8.5 8.5 0 0 1 9.5 3.4 7 7 0 1 0 20.6 14.5Z" }));
       }
 
-      function Minus(props) {
-        return h(IconSvg, props, h("path", { d: "M5 12h14" }));
-      }
-
-      function Plus(props) {
-        return h(IconSvg, props, h("path", { d: "M12 5v14" }), h("path", { d: "M5 12h14" }));
-      }
-
       function X(props) {
         return h(IconSvg, props, h("path", { d: "M18 6 6 18" }), h("path", { d: "m6 6 12 12" }));
       }
@@ -1133,29 +1113,29 @@
       const VISUAL_ARCH_DATA = {
         "domains": {
                 "interface": {
-                        "label": "Interface",
+                        "label": "Human + Terminal",
                         "accent": "#5c5fb8",
                         "soft": "#ececfe"
                 },
                 "runtime": {
-                        "label": "Runtime",
+                        "label": "OS Runtime",
                         "accent": "#0f8b72",
                         "soft": "#e2f5ef"
                 },
+                "signal": {
+                        "label": "Signal Boundary",
+                        "accent": "#bf3b5f",
+                        "soft": "#fae5ec"
+                },
                 "data": {
-                        "label": "Data Boundary",
+                        "label": "Process State",
                         "accent": "#b77b1b",
                         "soft": "#f8efd9"
                 },
                 "delivery": {
-                        "label": "Delivery",
+                        "label": "Application Outcome",
                         "accent": "#7a5a25",
                         "soft": "#f4ead9"
-                },
-                "signal": {
-                        "label": "Signal",
-                        "accent": "#bf3b5f",
-                        "soft": "#fae5ec"
                 },
                 "external": {
                         "label": "External",
@@ -1170,521 +1150,706 @@
         },
         "owners": {
                 "product": {
-                        "label": "Product Surface",
-                        "description": "User-facing entrypoints and supported interaction contracts."
+                        "label": "User",
+                        "description": "The person interacting with a foreground terminal job."
                 },
                 "runtime": {
-                        "label": "Runtime Core",
-                        "description": "Application orchestration, domain behavior, and service boundaries."
-                },
-                "data": {
-                        "label": "Data Boundary",
-                        "description": "Persistence, artifacts, queues, external state, and read models."
-                },
-                "delivery": {
-                        "label": "Delivery System",
-                        "description": "Build, test, release, deployment, and operational quality gates."
+                        "label": "Kernel + Runtime",
+                        "description": "Terminal driver, job control, process groups, and language runtime behavior."
                 },
                 "signal": {
-                        "label": "Operations Signal",
-                        "description": "Logs, metrics, traces, status, and debugging entrypoints."
+                        "label": "Signal Handling",
+                        "description": "Asynchronous notification, handlers, masks, default actions, and delivery constraints."
                 },
-                "external": {
-                        "label": "External System",
-                        "description": "Users, vendors, and systems outside the project boundary."
+                "data": {
+                        "label": "Process State",
+                        "description": "Foreground process group, pending signals, child processes, locks, and partial output."
+                },
+                "delivery": {
+                        "label": "Program",
+                        "description": "Application cleanup, cancellation semantics, and shell-visible status."
                 },
                 "suite": {
-                        "label": "Project",
-                        "description": "Project-owned architecture responsibility."
+                        "label": "Keyboard Interrupt Example",
+                        "description": "Deep visual architecture example for terminal Ctrl+C behavior."
                 }
         },
         "board": {
                 "lanes": [
                         {
-                                "id": "lane-entry",
-                                "title": "Interaction",
-                                "subtitle": "Users, automations, and request shaping.",
+                                "id": "lane-user",
+                                "title": "User + Terminal",
+                                "subtitle": "Keystroke, line discipline, and session foreground state.",
                                 "domain": "interface",
                                 "position": {
                                         "x": 40,
                                         "y": 150
                                 },
                                 "width": 270,
-                                "height": 840
+                                "height": 1320
                         },
                         {
-                                "id": "lane-runtime",
-                                "title": "Runtime Core",
-                                "subtitle": "Policy, orchestration, and durable work.",
+                                "id": "lane-kernel",
+                                "title": "Kernel Runtime",
+                                "subtitle": "TTY driver, process groups, signal queues, and scheduling.",
                                 "domain": "runtime",
                                 "position": {
                                         "x": 340,
                                         "y": 150
                                 },
                                 "width": 270,
-                                "height": 840
+                                "height": 1320
                         },
                         {
-                                "id": "lane-state",
-                                "title": "State Boundary",
-                                "subtitle": "Persistence, reads, and surfaced results.",
-                                "domain": "data",
+                                "id": "lane-process",
+                                "title": "Process Boundary",
+                                "subtitle": "Handlers, masks, language runtimes, and child processes.",
+                                "domain": "signal",
                                 "position": {
                                         "x": 640,
                                         "y": 150
                                 },
                                 "width": 270,
-                                "height": 840
+                                "height": 1320
                         },
                         {
-                                "id": "lane-signal",
-                                "title": "Delivery + Signal",
-                                "subtitle": "Release gates and debugging evidence.",
-                                "domain": "signal",
+                                "id": "lane-outcome",
+                                "title": "Outcome",
+                                "subtitle": "Cleanup, exit status, shells, and debugging evidence.",
+                                "domain": "delivery",
                                 "position": {
                                         "x": 940,
                                         "y": 150
                                 },
                                 "width": 270,
-                                "height": 840
+                                "height": 1320
                         }
                 ],
                 "nodes": [
                         {
-                                "id": "user-entry",
+                                "id": "active-terminal",
                                 "step": "01",
                                 "domain": "interface",
                                 "owner": "product",
-                                "title": "User Entry",
-                                "purpose": "The supported way users or automations enter the system.",
+                                "title": "Active Terminal",
+                                "purpose": "A terminal session owns the keyboard input stream for a foreground job.",
                                 "chips": [
-                                        "external",
-                                        "source-backed"
+                                        "tty",
+                                        "session"
                                 ],
                                 "position": {
                                         "x": 90,
                                         "y": 245
                                 },
                                 "details": {
-                                        "summary": "The supported way users or automations enter the system.",
+                                        "summary": "The user is attached to a terminal or pseudo-terminal that has a foreground process group.",
                                         "what": [
-                                                "Project-specific details for User Entry should replace this example text."
+                                                "Interactive shells put jobs into foreground and background process groups.",
+                                                "Only the foreground process group normally receives terminal-generated interrupt signals."
                                         ],
                                         "why": [
-                                                "This node marks an architectural responsibility or contract."
+                                                "This prevents Ctrl+C in one terminal from interrupting unrelated processes."
                                         ],
                                         "inputs": [
-                                                "Replace with source-backed inputs"
+                                                "Keyboard input",
+                                                "Terminal session state",
+                                                "Foreground process group ID"
                                         ],
                                         "outputs": [
-                                                "Replace with source-backed outputs"
+                                                "Input bytes or line-discipline events"
                                         ],
                                         "failures": [
-                                                "Replace with the first files/logs/tests to inspect"
+                                                "Detached processes, background jobs, multiplexers, containers, and SSH sessions can change which process group is foreground."
                                         ],
                                         "source": [
-                                                "example: replace with project source path"
+                                                "external: POSIX job control",
+                                                "external: Unix terminal session model"
                                         ],
-                                        "source_confidence": "external",
+                                        "source_confidence": "source-backed",
                                         "related": [
-                                                "request-router"
+                                                "interrupt-character"
                                         ]
                                 }
                         },
                         {
-                                "id": "request-router",
+                                "id": "interrupt-character",
                                 "step": "02",
                                 "domain": "interface",
                                 "owner": "runtime",
-                                "title": "Request Router",
-                                "purpose": "Classifies requests and sends them to the right workflow.",
+                                "title": "Interrupt Character",
+                                "purpose": "Ctrl+C is interpreted as the terminal interrupt character in canonical mode.",
                                 "chips": [
-                                        "dispatch",
-                                        "inferred"
+                                        "Ctrl+C",
+                                        "VINTR"
                                 ],
                                 "position": {
                                         "x": 90,
-                                        "y": 420
+                                        "y": 395
                                 },
                                 "details": {
-                                        "summary": "Classifies requests and sends them to the right workflow.",
+                                        "summary": "The terminal line discipline maps the configured VINTR character, commonly Ctrl+C, to an interrupt event.",
                                         "what": [
-                                                "Project-specific details for Request Router should replace this example text."
+                                                "The mapping is configurable with terminal settings such as stty.",
+                                                "Programs that enter raw mode may receive Ctrl+C as ordinary input instead."
                                         ],
                                         "why": [
-                                                "This node marks an architectural responsibility or contract."
+                                                "The terminal can provide common job-control behavior even when applications do not parse keyboard shortcuts themselves."
                                         ],
                                         "inputs": [
-                                                "Replace with source-backed inputs"
+                                                "Ctrl+C key chord",
+                                                "termios control-character settings",
+                                                "canonical or raw terminal mode"
                                         ],
                                         "outputs": [
-                                                "Replace with source-backed outputs"
+                                                "Terminal-generated interrupt event or literal byte input"
                                         ],
                                         "failures": [
-                                                "Replace with the first files/logs/tests to inspect"
+                                                "Raw-mode full-screen applications must restore terminal settings or Ctrl+C behavior can remain surprising after exit."
                                         ],
                                         "source": [
-                                                "example: replace with project source path"
+                                                "external: termios VINTR",
+                                                "external: stty settings"
                                         ],
-                                        "source_confidence": "inferred",
+                                        "source_confidence": "source-backed",
                                         "related": [
-                                                "auth-policy",
-                                                "workflow-engine"
+                                                "tty-line-discipline"
                                         ]
                                 }
                         },
                         {
-                                "id": "auth-policy",
+                                "id": "tty-line-discipline",
                                 "step": "03",
                                 "domain": "runtime",
                                 "owner": "runtime",
-                                "title": "Auth And Policy",
-                                "purpose": "Guards privileged operations and user-specific data.",
+                                "title": "TTY Line Discipline",
+                                "purpose": "The kernel terminal driver converts the interrupt event into SIGINT.",
                                 "chips": [
-                                        "identity",
-                                        "policy"
+                                        "kernel",
+                                        "line discipline"
                                 ],
                                 "position": {
                                         "x": 390,
-                                        "y": 420
+                                        "y": 395
                                 },
                                 "details": {
-                                        "summary": "Guards privileged operations and user-specific data.",
+                                        "summary": "The terminal driver handles the interrupt character before normal input delivery and prepares a SIGINT for the foreground process group.",
                                         "what": [
-                                                "Project-specific details for Auth And Policy should replace this example text."
+                                                "Input already buffered for the line may be discarded depending on terminal flags.",
+                                                "The driver does not need cooperation from the target program to send the signal."
                                         ],
                                         "why": [
-                                                "This node marks an architectural responsibility or contract."
+                                                "Kernel-owned terminal semantics provide consistent cancellation behavior across command-line programs."
                                         ],
                                         "inputs": [
-                                                "Replace with source-backed inputs"
+                                                "Interrupt event from the terminal input stream",
+                                                "Foreground process group ID"
                                         ],
                                         "outputs": [
-                                                "Replace with source-backed outputs"
+                                                "SIGINT targeted to the foreground process group"
                                         ],
                                         "failures": [
-                                                "Replace with the first files/logs/tests to inspect"
+                                                "Terminal flags, pseudo-terminal implementations, and remote shells can affect buffering and delivery details."
                                         ],
                                         "source": [
-                                                "example: replace with project source path"
-                                        ],
-                                        "source_confidence": "inferred",
-                                        "related": [
-                                                "workflow-engine"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "workflow-engine",
-                                "step": "04",
-                                "domain": "runtime",
-                                "owner": "runtime",
-                                "title": "Workflow Engine",
-                                "purpose": "Runs the product operation from validated input to durable result.",
-                                "chips": [
-                                        "core",
-                                        "source-backed"
-                                ],
-                                "position": {
-                                        "x": 390,
-                                        "y": 595
-                                },
-                                "details": {
-                                        "summary": "Runs the product operation from validated input to durable result.",
-                                        "what": [
-                                                "Project-specific details for Workflow Engine should replace this example text."
-                                        ],
-                                        "why": [
-                                                "This node marks an architectural responsibility or contract."
-                                        ],
-                                        "inputs": [
-                                                "Replace with source-backed inputs"
-                                        ],
-                                        "outputs": [
-                                                "Replace with source-backed outputs"
-                                        ],
-                                        "failures": [
-                                                "Replace with the first files/logs/tests to inspect"
-                                        ],
-                                        "source": [
-                                                "example: replace with project source path"
+                                                "external: POSIX terminal interface",
+                                                "external: Linux tty behavior"
                                         ],
                                         "source_confidence": "source-backed",
                                         "related": [
-                                                "state-store",
-                                                "async-work",
-                                                "observability"
+                                                "foreground-process-group"
                                         ]
                                 }
                         },
                         {
-                                "id": "state-store",
-                                "step": "05",
+                                "id": "foreground-process-group",
+                                "step": "04",
                                 "domain": "data",
                                 "owner": "data",
-                                "title": "State Store",
-                                "purpose": "Persists canonical product state and read models.",
+                                "title": "Foreground Group",
+                                "purpose": "Identifies every process that should receive the terminal interrupt.",
                                 "chips": [
-                                        "database",
-                                        "artifact"
+                                        "pgid",
+                                        "job control"
+                                ],
+                                "position": {
+                                        "x": 390,
+                                        "y": 545
+                                },
+                                "details": {
+                                        "summary": "The signal targets the foreground process group, which may include a shell pipeline rather than a single process.",
+                                        "what": [
+                                                "A pipeline like `cmd1 | cmd2` is usually one foreground process group.",
+                                                "Shells manage process groups when launching and resuming jobs."
+                                        ],
+                                        "why": [
+                                                "Whole-job targeting lets Ctrl+C cancel every stage of a pipeline together."
+                                        ],
+                                        "inputs": [
+                                                "Session job-control state",
+                                                "Process group membership"
+                                        ],
+                                        "outputs": [
+                                                "Set of target process IDs"
+                                        ],
+                                        "failures": [
+                                                "Programs that spawn children into separate process groups may require explicit cleanup or signal forwarding."
+                                        ],
+                                        "source": [
+                                                "external: POSIX process groups",
+                                                "external: shell job control behavior"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "sigint-delivery",
+                                                "child-processes"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "sigint-delivery",
+                                "step": "05",
+                                "domain": "signal",
+                                "owner": "signal",
+                                "title": "SIGINT Delivery",
+                                "purpose": "The kernel marks SIGINT pending or invokes signal handling when the process can observe it.",
+                                "chips": [
+                                        "async",
+                                        "pending"
                                 ],
                                 "position": {
                                         "x": 690,
-                                        "y": 595
+                                        "y": 545
                                 },
                                 "details": {
-                                        "summary": "Persists canonical product state and read models.",
+                                        "summary": "Each target process receives SIGINT according to its signal disposition, mask, and current execution state.",
                                         "what": [
-                                                "Project-specific details for State Store should replace this example text."
+                                                "If SIGINT is blocked, it remains pending until unblocked.",
+                                                "If the default disposition is active, the process terminates.",
+                                                "If a handler is installed, the process runs that handler at a safe delivery point."
                                         ],
                                         "why": [
-                                                "This node marks an architectural responsibility or contract."
+                                                "Signal masks and dispositions let programs control how asynchronous events interact with critical sections."
                                         ],
                                         "inputs": [
-                                                "Replace with source-backed inputs"
+                                                "Target process list",
+                                                "Signal dispositions",
+                                                "Thread signal masks"
                                         ],
                                         "outputs": [
-                                                "Replace with source-backed outputs"
+                                                "Default termination, pending signal, ignored signal, or handler dispatch"
                                         ],
                                         "failures": [
-                                                "Replace with the first files/logs/tests to inspect"
+                                                "A process that ignores SIGINT can make Ctrl+C appear broken; a process stuck in uninterruptible kernel sleep may not stop immediately."
                                         ],
                                         "source": [
-                                                "example: replace with project source path"
+                                                "external: POSIX signal delivery",
+                                                "external: signal masks and dispositions"
                                         ],
                                         "source_confidence": "source-backed",
                                         "related": [
-                                                "reporting-surface"
+                                                "default-action",
+                                                "custom-handler"
                                         ]
                                 }
                         },
                         {
-                                "id": "async-work",
+                                "id": "default-action",
                                 "step": "06",
+                                "domain": "delivery",
+                                "owner": "delivery",
+                                "title": "Default Termination",
+                                "purpose": "Processes without a custom SIGINT handler terminate.",
+                                "chips": [
+                                        "default",
+                                        "terminate"
+                                ],
+                                "position": {
+                                        "x": 990,
+                                        "y": 545
+                                },
+                                "details": {
+                                        "summary": "The default SIGINT action terminates the process and makes signal termination visible to the parent.",
+                                        "what": [
+                                                "The shell waits for the foreground job and observes that it ended because of SIGINT.",
+                                                "Many shells expose a status convention equivalent to 128 plus the signal number."
+                                        ],
+                                        "why": [
+                                                "Parents and scripts need a machine-readable indication that cancellation occurred."
+                                        ],
+                                        "inputs": [
+                                                "Unhandled SIGINT"
+                                        ],
+                                        "outputs": [
+                                                "Process termination",
+                                                "Wait status for parent shell"
+                                        ],
+                                        "failures": [
+                                                "Immediate termination can leave partial files or child processes unless the program or parent handles cleanup."
+                                        ],
+                                        "source": [
+                                                "external: POSIX wait status",
+                                                "external: shell exit status conventions"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "shell-status"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "custom-handler",
+                                "step": "07",
+                                "domain": "signal",
+                                "owner": "signal",
+                                "title": "Custom Handler",
+                                "purpose": "Programs can intercept SIGINT to start orderly cancellation.",
+                                "chips": [
+                                        "handler",
+                                        "cancel"
+                                ],
+                                "position": {
+                                        "x": 690,
+                                        "y": 695
+                                },
+                                "details": {
+                                        "summary": "A custom handler can set a flag, request shutdown, forward signals to children, or let a runtime raise an exception.",
+                                        "what": [
+                                                "Native signal handlers must avoid unsafe work and usually set minimal state.",
+                                                "High-level runtimes often defer user-visible handling to their event loop or interpreter checkpoints."
+                                        ],
+                                        "why": [
+                                                "Graceful cancellation needs coordination with files, locks, network requests, and child processes."
+                                        ],
+                                        "inputs": [
+                                                "Delivered SIGINT",
+                                                "Registered handler or runtime signal hook"
+                                        ],
+                                        "outputs": [
+                                                "Cancellation flag",
+                                                "Runtime exception",
+                                                "Shutdown callback",
+                                                "Forwarded signal"
+                                        ],
+                                        "failures": [
+                                                "Doing complex work directly inside a native signal handler can deadlock or corrupt state."
+                                        ],
+                                        "source": [
+                                                "external: async-signal-safe restrictions",
+                                                "external: runtime signal handling docs"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "runtime-checkpoint",
+                                                "child-processes"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "runtime-checkpoint",
+                                "step": "08",
                                 "domain": "runtime",
                                 "owner": "runtime",
-                                "title": "Async Work",
-                                "purpose": "Decouples slow side effects from the request path.",
+                                "title": "Runtime Checkpoint",
+                                "purpose": "Language runtimes translate SIGINT at controlled execution points.",
                                 "chips": [
-                                        "queue",
-                                        "worker"
+                                        "Python",
+                                        "event loop"
                                 ],
                                 "position": {
                                         "x": 390,
-                                        "y": 770
+                                        "y": 845
                                 },
                                 "details": {
-                                        "summary": "Decouples slow side effects from the request path.",
+                                        "summary": "Runtimes such as Python record the signal and raise KeyboardInterrupt in the main thread at a safe point.",
                                         "what": [
-                                                "Project-specific details for Async Work should replace this example text."
+                                                "The runtime avoids running arbitrary language code in the low-level signal context.",
+                                                "Async runtimes may convert interruption into task cancellation or loop shutdown."
                                         ],
                                         "why": [
-                                                "This node marks an architectural responsibility or contract."
+                                                "Language-level interruption integrates with exceptions, finally blocks, and structured cleanup."
                                         ],
                                         "inputs": [
-                                                "Replace with source-backed inputs"
+                                                "Pending signal flag",
+                                                "Interpreter or event-loop checkpoint"
                                         ],
                                         "outputs": [
-                                                "Replace with source-backed outputs"
+                                                "KeyboardInterrupt, task cancellation, or runtime shutdown path"
                                         ],
                                         "failures": [
-                                                "Replace with the first files/logs/tests to inspect"
+                                                "C extensions, blocking system calls, and broad exception handlers can delay or hide KeyboardInterrupt."
                                         ],
                                         "source": [
-                                                "example: replace with project source path"
+                                                "external: Python signal module",
+                                                "external: Python KeyboardInterrupt behavior"
                                         ],
-                                        "source_confidence": "inferred",
+                                        "source_confidence": "source-backed",
                                         "related": [
-                                                "observability"
+                                                "cleanup-path"
                                         ]
                                 }
                         },
                         {
-                                "id": "reporting-surface",
-                                "step": "07",
+                                "id": "child-processes",
+                                "step": "09",
+                                "domain": "data",
+                                "owner": "data",
+                                "title": "Children + Pipelines",
+                                "purpose": "Child processes may receive SIGINT directly or need explicit forwarding.",
+                                "chips": [
+                                        "pipeline",
+                                        "subprocess"
+                                ],
+                                "position": {
+                                        "x": 690,
+                                        "y": 845
+                                },
+                                "details": {
+                                        "summary": "Process group membership determines whether children are interrupted with the parent or survive as separate work.",
+                                        "what": [
+                                                "Shell pipelines usually receive the same SIGINT together.",
+                                                "Supervisors and applications that create new sessions may need to forward cancellation."
+                                        ],
+                                        "why": [
+                                                "A user expects cancellation to stop the whole command, not only the visible parent process."
+                                        ],
+                                        "inputs": [
+                                                "Process tree",
+                                                "Process groups",
+                                                "Signal-forwarding policy"
+                                        ],
+                                        "outputs": [
+                                                "Stopped children, surviving children, or propagated shutdown request"
+                                        ],
+                                        "failures": [
+                                                "Orphaned children, stuck subprocesses, and partial output often come from mismatched process-group handling."
+                                        ],
+                                        "source": [
+                                                "external: POSIX process groups",
+                                                "external: subprocess/session behavior"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "cleanup-path"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "cleanup-path",
+                                "step": "10",
+                                "domain": "delivery",
+                                "owner": "delivery",
+                                "title": "Cleanup Path",
+                                "purpose": "The program unwinds and releases resources before exiting.",
+                                "chips": [
+                                        "finally",
+                                        "defer"
+                                ],
+                                "position": {
+                                        "x": 990,
+                                        "y": 845
+                                },
+                                "details": {
+                                        "summary": "Graceful interruption runs cleanup code for files, locks, temporary directories, terminal modes, network connections, and child processes.",
+                                        "what": [
+                                                "High-level `finally` or defer blocks can run during exception unwinding.",
+                                                "Programs may restore terminal mode and flush logs before returning status."
+                                        ],
+                                        "why": [
+                                                "Cancellation should preserve system integrity even when work does not complete."
+                                        ],
+                                        "inputs": [
+                                                "Runtime exception or cancellation flag",
+                                                "Open resources",
+                                                "Partial work state"
+                                        ],
+                                        "outputs": [
+                                                "Closed resources",
+                                                "Restored terminal state",
+                                                "Consistent cancellation result"
+                                        ],
+                                        "failures": [
+                                                "Catching KeyboardInterrupt without re-raising or exiting can make scripts continue after the user asked them to stop."
+                                        ],
+                                        "source": [
+                                                "external: language cleanup semantics",
+                                                "external: application signal handling patterns"
+                                        ],
+                                        "source_confidence": "source-backed",
+                                        "related": [
+                                                "shell-status"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "shell-status",
+                                "step": "11",
                                 "domain": "interface",
                                 "owner": "product",
-                                "title": "Reporting Surface",
-                                "purpose": "Exposes results, status, and derived views back to users.",
+                                "title": "Shell Observes Status",
+                                "purpose": "The parent shell reports cancellation and decides the next prompt state.",
                                 "chips": [
-                                        "read model",
+                                        "wait",
                                         "status"
                                 ],
                                 "position": {
-                                        "x": 690,
-                                        "y": 770
+                                        "x": 90,
+                                        "y": 1045
                                 },
                                 "details": {
-                                        "summary": "Exposes results, status, and derived views back to users.",
+                                        "summary": "The shell waits for the foreground job, records status, updates job-control state, and returns control to the user.",
                                         "what": [
-                                                "Project-specific details for Reporting Surface should replace this example text."
+                                                "Interactive shells may print a new prompt or job status message.",
+                                                "Scripts can branch based on the command's non-zero status."
                                         ],
                                         "why": [
-                                                "This node marks an architectural responsibility or contract."
+                                                "The cancellation result must become visible to both humans and automation."
                                         ],
                                         "inputs": [
-                                                "Replace with source-backed inputs"
+                                                "Child wait status",
+                                                "Shell job table"
                                         ],
                                         "outputs": [
-                                                "Replace with source-backed outputs"
+                                                "Prompt return",
+                                                "Exit status variable",
+                                                "Optional job notification"
                                         ],
                                         "failures": [
-                                                "Replace with the first files/logs/tests to inspect"
+                                                "If the foreground job leaves the terminal in raw mode, the prompt can appear broken until terminal settings are reset."
                                         ],
                                         "source": [
-                                                "example: replace with project source path"
-                                        ],
-                                        "source_confidence": "external",
-                                        "related": []
-                                }
-                        },
-                        {
-                                "id": "ci-release",
-                                "step": "08",
-                                "domain": "delivery",
-                                "owner": "delivery",
-                                "title": "CI And Release",
-                                "purpose": "Builds, tests, packages, and deploys project changes.",
-                                "chips": [
-                                        "quality gate",
-                                        "deploy"
-                                ],
-                                "position": {
-                                        "x": 990,
-                                        "y": 245
-                                },
-                                "details": {
-                                        "summary": "Builds, tests, packages, and deploys project changes.",
-                                        "what": [
-                                                "Project-specific details for CI And Release should replace this example text."
-                                        ],
-                                        "why": [
-                                                "This node marks an architectural responsibility or contract."
-                                        ],
-                                        "inputs": [
-                                                "Replace with source-backed inputs"
-                                        ],
-                                        "outputs": [
-                                                "Replace with source-backed outputs"
-                                        ],
-                                        "failures": [
-                                                "Replace with the first files/logs/tests to inspect"
-                                        ],
-                                        "source": [
-                                                "example: replace with project source path"
+                                                "external: shell wait behavior",
+                                                "external: job-control shells"
                                         ],
                                         "source_confidence": "source-backed",
                                         "related": [
-                                                "workflow-engine",
-                                                "observability"
+                                                "debugging-evidence"
                                         ]
                                 }
                         },
                         {
-                                "id": "observability",
-                                "step": "09",
+                                "id": "debugging-evidence",
+                                "step": "12",
                                 "domain": "signal",
                                 "owner": "signal",
-                                "title": "Observability",
-                                "purpose": "Provides logs, metrics, traces, and operational status for debugging.",
+                                "title": "Debugging Evidence",
+                                "purpose": "Shows where to inspect when Ctrl+C does not behave as expected.",
                                 "chips": [
-                                        "logs",
-                                        "unknown"
+                                        "stty",
+                                        "ps",
+                                        "logs"
                                 ],
                                 "position": {
-                                        "x": 990,
-                                        "y": 770
+                                        "x": 690,
+                                        "y": 1045
                                 },
                                 "details": {
-                                        "summary": "Provides logs, metrics, traces, and operational status for debugging.",
+                                        "summary": "Terminal settings, process groups, signal handlers, blocked system calls, and child-process policy explain most surprising interrupt behavior.",
                                         "what": [
-                                                "Project-specific details for Observability should replace this example text."
+                                                "Check terminal mode and VINTR mapping.",
+                                                "Inspect process group membership and foreground job state.",
+                                                "Look for broad exception handlers, ignored SIGINT, or child processes outside the foreground group."
                                         ],
                                         "why": [
-                                                "This node marks an architectural responsibility or contract."
+                                                "Interrupt bugs are boundary bugs: terminal configuration, OS state, runtime behavior, and application cleanup all matter."
                                         ],
                                         "inputs": [
-                                                "Replace with source-backed inputs"
+                                                "Observed Ctrl+C behavior",
+                                                "Terminal and process metadata",
+                                                "Application logs"
                                         ],
                                         "outputs": [
-                                                "Replace with source-backed outputs"
+                                                "Likely boundary where cancellation is stuck or suppressed"
                                         ],
                                         "failures": [
-                                                "Replace with the first files/logs/tests to inspect"
+                                                "Assuming Ctrl+C is a direct application callback hides the OS and runtime layers that may be responsible."
                                         ],
                                         "source": [
-                                                "example: replace with project source path"
+                                                "external: stty",
+                                                "external: ps/jobs diagnostics",
+                                                "generated example guidance"
                                         ],
-                                        "source_confidence": "unknown",
+                                        "source_confidence": "inferred",
                                         "related": []
                                 }
                         }
                 ],
                 "edges": [
                         [
-                                "user-entry",
-                                "request-router",
-                                "request",
+                                "active-terminal",
+                                "interrupt-character",
+                                "keystroke",
                                 "control"
                         ],
                         [
-                                "request-router",
-                                "auth-policy",
-                                "context",
+                                "interrupt-character",
+                                "tty-line-discipline",
+                                "VINTR",
                                 "control"
                         ],
                         [
-                                "auth-policy",
-                                "workflow-engine",
-                                "decision",
-                                "signal"
-                        ],
-                        [
-                                "request-router",
-                                "workflow-engine",
-                                "handler",
-                                "control"
-                        ],
-                        [
-                                "workflow-engine",
-                                "state-store",
-                                "read/write",
+                                "tty-line-discipline",
+                                "foreground-process-group",
+                                "target lookup",
                                 "artifact"
                         ],
                         [
-                                "workflow-engine",
-                                "async-work",
-                                "job",
-                                "artifact"
-                        ],
-                        [
-                                "state-store",
-                                "reporting-surface",
-                                "read model",
-                                "artifact"
-                        ],
-                        [
-                                "workflow-engine",
-                                "observability",
-                                "logs/metrics",
+                                "foreground-process-group",
+                                "sigint-delivery",
+                                "target set",
                                 "signal"
                         ],
                         [
-                                "async-work",
-                                "observability",
-                                "worker status",
-                                "signal"
-                        ],
-                        [
-                                "ci-release",
-                                "workflow-engine",
-                                "deploy",
+                                "sigint-delivery",
+                                "default-action",
+                                "default disposition",
                                 "decision"
                         ],
                         [
-                                "ci-release",
-                                "observability",
-                                "check status",
+                                "sigint-delivery",
+                                "custom-handler",
+                                "handler disposition",
+                                "decision"
+                        ],
+                        [
+                                "custom-handler",
+                                "runtime-checkpoint",
+                                "deferred handling",
+                                "signal"
+                        ],
+                        [
+                                "foreground-process-group",
+                                "child-processes",
+                                "group membership",
+                                "artifact"
+                        ],
+                        [
+                                "runtime-checkpoint",
+                                "cleanup-path",
+                                "exception/cancel",
+                                "control"
+                        ],
+                        [
+                                "child-processes",
+                                "cleanup-path",
+                                "propagate",
+                                "signal"
+                        ],
+                        [
+                                "default-action",
+                                "shell-status",
+                                "wait status",
+                                "artifact"
+                        ],
+                        [
+                                "cleanup-path",
+                                "shell-status",
+                                "exit code",
+                                "artifact"
+                        ],
+                        [
+                                "shell-status",
+                                "debugging-evidence",
+                                "surprise case",
                                 "signal"
                         ]
                 ],
@@ -1692,178 +1857,202 @@
                         "overview": {
                                 "label": "Overview",
                                 "focus": [
-                                        "user-entry",
-                                        "auth-policy",
-                                        "ci-release",
-                                        "request-router",
-                                        "workflow-engine",
-                                        "state-store",
-                                        "async-work",
-                                        "reporting-surface",
-                                        "observability"
+                                        "active-terminal",
+                                        "interrupt-character",
+                                        "tty-line-discipline",
+                                        "foreground-process-group",
+                                        "sigint-delivery",
+                                        "default-action",
+                                        "custom-handler",
+                                        "runtime-checkpoint",
+                                        "child-processes",
+                                        "cleanup-path",
+                                        "shell-status",
+                                        "debugging-evidence"
+                                ]
+                        },
+                        "kernel": {
+                                "label": "Kernel Path",
+                                "focus": [
+                                        "active-terminal",
+                                        "interrupt-character",
+                                        "tty-line-discipline",
+                                        "foreground-process-group",
+                                        "sigint-delivery",
+                                        "default-action",
+                                        "shell-status"
                                 ]
                         },
                         "runtime": {
-                                "label": "Runtime",
+                                "label": "Runtime Handling",
                                 "focus": [
-                                        "user-entry",
-                                        "request-router",
-                                        "auth-policy",
-                                        "workflow-engine",
-                                        "async-work",
-                                        "state-store",
-                                        "reporting-surface"
-                                ]
-                        },
-                        "delivery": {
-                                "label": "Delivery",
-                                "focus": [
-                                        "ci-release",
-                                        "workflow-engine",
-                                        "async-work",
-                                        "reporting-surface",
-                                        "observability"
+                                        "sigint-delivery",
+                                        "custom-handler",
+                                        "runtime-checkpoint",
+                                        "child-processes",
+                                        "cleanup-path",
+                                        "shell-status"
                                 ]
                         },
                         "debugging": {
                                 "label": "Debugging",
                                 "focus": [
-                                        "observability",
-                                        "request-router",
-                                        "workflow-engine",
-                                        "state-store",
-                                        "async-work"
+                                        "interrupt-character",
+                                        "foreground-process-group",
+                                        "sigint-delivery",
+                                        "runtime-checkpoint",
+                                        "child-processes",
+                                        "cleanup-path",
+                                        "debugging-evidence"
                                 ]
                         }
                 },
                 "layout": {
                         "orientation": "vertical",
-                        "reading_path": "top-to-bottom sequence flow with orthogonal handoffs across vertical responsibility lanes"
+                        "reading_path": "top-to-bottom interrupt flow from terminal input to shell-visible outcome"
                 },
                 "edgeHandles": {
-                        "user-entry->request-router": [
+                        "active-terminal->interrupt-character": [
                                 "out-bottom",
                                 "in-top"
                         ],
-                        "request-router->auth-policy": [
+                        "interrupt-character->tty-line-discipline": [
                                 "out-right",
                                 "in-left"
                         ],
-                        "auth-policy->workflow-engine": [
+                        "tty-line-discipline->foreground-process-group": [
                                 "out-bottom",
                                 "in-top"
                         ],
-                        "request-router->workflow-engine": [
+                        "foreground-process-group->sigint-delivery": [
                                 "out-right",
                                 "in-left"
                         ],
-                        "workflow-engine->state-store": [
+                        "sigint-delivery->default-action": [
                                 "out-right",
                                 "in-left"
                         ],
-                        "workflow-engine->async-work": [
+                        "sigint-delivery->custom-handler": [
                                 "out-bottom",
                                 "in-top"
                         ],
-                        "state-store->reporting-surface": [
-                                "out-bottom",
-                                "in-top"
-                        ],
-                        "workflow-engine->observability": [
-                                "out-right",
-                                "in-left"
-                        ],
-                        "async-work->observability": [
-                                "out-right",
-                                "in-left"
-                        ],
-                        "ci-release->workflow-engine": [
+                        "custom-handler->runtime-checkpoint": [
                                 "out-left",
                                 "in-right"
                         ],
-                        "ci-release->observability": [
-                                "out-bottom",
-                                "in-top"
+                        "foreground-process-group->child-processes": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "runtime-checkpoint->cleanup-path": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "child-processes->cleanup-path": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "default-action->shell-status": [
+                                "out-left",
+                                "in-right"
+                        ],
+                        "cleanup-path->shell-status": [
+                                "out-left",
+                                "in-right"
+                        ],
+                        "shell-status->debugging-evidence": [
+                                "out-right",
+                                "in-left"
                         ]
                 }
         },
         "groupDetails": {
                 "overview": {
-                        "title": "Project Architecture",
-                        "purpose": "A modern sequence-style map of responsibilities and contracts.",
-                        "domain": "runtime",
-                        "summary": "Read downward through each responsibility lane, with clean orthogonal handoffs between entry, runtime, state, delivery, and signal.",
-                        "why": "It gives maintainers a first map before they dive into files.",
+                        "title": "What Happens When A Keyboard Interrupt Occurs",
+                        "purpose": "A deep example architecture map for Ctrl+C in a terminal.",
+                        "domain": "signal",
+                        "summary": "Ctrl+C is not a direct application callback. The terminal line discipline maps a configured interrupt character to SIGINT, the kernel targets the foreground process group, and each process responds according to its signal disposition, runtime integration, and cleanup policy.",
+                        "why": "The flow demonstrates how visual architecture docs expose hidden responsibility boundaries across human input, kernel behavior, language runtimes, and application cleanup.",
                         "points": [
-                                "Vertical responsibility lanes keep the full map legible while preserving sequence-style flow.",
-                                "Use focus modes to narrow the reading path.",
-                                "Source confidence labels should remain visible in chips."
+                                "Foreground process group targeting is the central routing rule.",
+                                "SIGINT can terminate, be ignored, remain pending, or become a language-level exception.",
+                                "Most confusing cases come from raw terminal mode, child process groups, broad exception handlers, or incomplete cleanup."
                         ],
                         "focus": [
-                                "user-entry",
-                                "request-router",
-                                "auth-policy",
-                                "workflow-engine",
-                                "state-store",
-                                "async-work",
-                                "reporting-surface",
-                                "ci-release",
-                                "observability"
+                                "active-terminal",
+                                "interrupt-character",
+                                "tty-line-discipline",
+                                "foreground-process-group",
+                                "sigint-delivery",
+                                "default-action",
+                                "custom-handler",
+                                "runtime-checkpoint",
+                                "child-processes",
+                                "cleanup-path",
+                                "shell-status",
+                                "debugging-evidence"
+                        ]
+                },
+                "kernel": {
+                        "title": "Kernel Path",
+                        "purpose": "Follow the path owned by the terminal driver, process groups, and signal delivery.",
+                        "domain": "runtime",
+                        "summary": "The kernel transforms terminal input into a signal targeted at the foreground process group.",
+                        "why": "This explains why Ctrl+C affects whole jobs and pipelines rather than a single visible process.",
+                        "points": [
+                                "VINTR controls which character means interrupt.",
+                                "The foreground process group determines recipients.",
+                                "Default disposition terminates unless the program changed it."
+                        ],
+                        "focus": [
+                                "active-terminal",
+                                "interrupt-character",
+                                "tty-line-discipline",
+                                "foreground-process-group",
+                                "sigint-delivery",
+                                "default-action",
+                                "shell-status"
                         ]
                 },
                 "runtime": {
-                        "title": "Runtime Flow",
-                        "purpose": "Request handling through core workflow and user-visible result.",
-                        "domain": "runtime",
-                        "summary": "Highlights the direct path from user entry to durable state and reporting.",
-                        "why": "Most debugging starts by finding where the runtime contract broke.",
+                        "title": "Runtime Handling",
+                        "purpose": "Show how a program turns SIGINT into cancellation, exceptions, and cleanup.",
+                        "domain": "signal",
+                        "summary": "Custom handlers and high-level runtimes defer or translate SIGINT so application cleanup can run.",
+                        "why": "This is where graceful cancellation either works cleanly or gets accidentally swallowed.",
                         "points": [
-                                "Router and policy decide whether work can start.",
-                                "Workflow engine owns the core transition.",
-                                "State and reporting define externally visible results."
+                                "Native handlers should do minimal async-signal-safe work.",
+                                "Language runtimes often raise exceptions at safe checkpoints.",
+                                "Subprocesses need process-group-aware cleanup."
                         ],
                         "focus": [
-                                "user-entry",
-                                "request-router",
-                                "auth-policy",
-                                "workflow-engine",
-                                "state-store",
-                                "async-work",
-                                "reporting-surface"
-                        ]
-                },
-                "delivery": {
-                        "title": "Delivery Flow",
-                        "purpose": "How project changes become runnable behavior.",
-                        "domain": "delivery",
-                        "summary": "Connects CI/release gates to runtime deployment and operational evidence.",
-                        "why": "Build and release systems often explain production behavior drift.",
-                        "points": [
-                                "Validate delivery contracts before blaming runtime.",
-                                "Release signals should point back to runtime versions."
-                        ],
-                        "focus": [
-                                "ci-release",
-                                "workflow-engine",
-                                "observability"
+                                "sigint-delivery",
+                                "custom-handler",
+                                "runtime-checkpoint",
+                                "child-processes",
+                                "cleanup-path",
+                                "shell-status"
                         ]
                 },
                 "debugging": {
-                        "title": "Debugging Flow",
-                        "purpose": "The first places to inspect when the system breaks.",
+                        "title": "Debugging Ctrl+C",
+                        "purpose": "Identify the first evidence to inspect when interruption behaves oddly.",
                         "domain": "signal",
-                        "summary": "Focuses on runtime, async work, release status, and observability evidence.",
-                        "why": "Useful architecture docs shorten incident orientation time.",
+                        "summary": "Surprises usually come from terminal mode, foreground process group state, signal disposition, runtime checkpoints, or child process ownership.",
+                        "why": "A visual map should shorten incident orientation, not merely decorate the happy path.",
                         "points": [
-                                "Start with logs and status.",
-                                "Separate delivery failure from runtime failure.",
-                                "Check async queues when direct requests succeeded but side effects did not."
+                                "Use terminal settings to verify VINTR and raw/canonical mode.",
+                                "Use process inspection to verify foreground group membership.",
+                                "Audit signal handlers and broad exception handling before blaming the shell."
                         ],
                         "focus": [
-                                "workflow-engine",
-                                "async-work",
-                                "observability",
-                                "ci-release"
+                                "interrupt-character",
+                                "foreground-process-group",
+                                "sigint-delivery",
+                                "runtime-checkpoint",
+                                "child-processes",
+                                "cleanup-path",
+                                "debugging-evidence"
                         ]
                 }
         }
@@ -1955,8 +2144,32 @@
         return new Set(BOARD.views[mode]?.focus || []);
       }
 
-      function visibleEdgeIds(mode, selectedId, context) {
+      function isDetailNode(node) {
+        return node.hidden === true || node.tier === "detail";
+      }
+
+      function shouldShowNode(node, mode, selectedId, showDetails, context) {
+        if (!isDetailNode(node)) return true;
+        if (showDetails) return true;
+        const focus = modeFocus(mode);
+        if (mode !== "overview" && focus.has(node.id)) return true;
+        if (!selectedId) return false;
+        if (context.related.has(node.id)) return true;
+        return (node.revealFor || []).includes(selectedId);
+      }
+
+      function visibleNodeIds(mode, selectedId, showDetails) {
+        const context = selectionContext(selectedId);
+        return new Set(
+          BOARD.nodes
+            .filter(node => shouldShowNode(node, mode, selectedId, showDetails, context))
+            .map(node => node.id)
+        );
+      }
+
+      function visibleEdgeIds(mode, selectedId, showDetails, context) {
         if (selectedId) return context.activeEdges;
+        if (showDetails) return MAIN_EDGE_IDS;
         return VIEW_EDGE_IDS[mode] || MAIN_EDGE_IDS;
       }
 
@@ -1964,9 +2177,11 @@
       const PANEL_RESERVE = 560;
       const TOPBAR_RESERVE = 96;
 
-      function boundsForIds(ids) {
-        const selected = ids.map(id => NODE_BY_ID[id]).filter(Boolean);
-        const nodes = selected.length ? selected : BOARD.nodes;
+      function boundsForIds(ids, options = {}) {
+        const includeDetails = options.includeDetails ?? false;
+        const selected = ids.map(id => NODE_BY_ID[id]).filter(node => node && (includeDetails || !isDetailNode(node)));
+        const fallbackNodes = BOARD.nodes.filter(node => includeDetails || !isDetailNode(node));
+        const nodes = selected.length ? selected : fallbackNodes;
         const minX = Math.min(...nodes.map(node => node.position.x));
         const minY = Math.min(...nodes.map(node => node.position.y));
         const maxX = Math.max(...nodes.map(node => node.position.x + NODE_SIZE.width));
@@ -1975,7 +2190,7 @@
       }
 
       function viewportForIds(ids, options = {}) {
-        const bounds = boundsForIds(ids);
+        const bounds = boundsForIds(ids, options);
         const reservePanel = options.reservePanel ?? window.innerWidth >= 980;
         const availableWidth = Math.max(360, window.innerWidth - (reservePanel ? PANEL_RESERVE : 32) - 48);
         const availableHeight = Math.max(300, window.innerHeight - TOPBAR_RESERVE - 30);
@@ -1995,9 +2210,10 @@
         };
       }
 
-      function buildNodes(mode, selectedId) {
+      function buildNodes(mode, selectedId, showDetails) {
         const context = selectionContext(selectedId);
         const focus = modeFocus(mode);
+        const visibleIds = visibleNodeIds(mode, selectedId, showDetails);
         const hasModeFocus = focus.size > 0;
         const hasSelection = Boolean(selectedId);
 
@@ -2005,21 +2221,21 @@
           id: lane.id,
           type: "lane",
           position: lane.position,
-            data: {
-              title: lane.title,
-              subtitle: lane.subtitle,
-              domain: lane.domain,
-              width: lane.width,
-              height: lane.height,
-              dimmed: hasSelection
-            },
+          data: {
+            title: lane.title,
+            subtitle: lane.subtitle,
+            domain: lane.domain,
+            width: lane.width,
+            height: lane.height,
+            dimmed: hasSelection
+          },
           draggable: false,
           selectable: false,
           focusable: false,
           zIndex: -2
         }));
 
-        const nodes = BOARD.nodes.map(node => {
+        const nodes = BOARD.nodes.filter(node => visibleIds.has(node.id)).map(node => {
           const isSelected = node.id === selectedId;
           const isRelated = context.related.has(node.id);
           const modeDimmed = hasModeFocus && !focus.has(node.id);
@@ -2048,12 +2264,13 @@
         return [...lanes, ...nodes];
       }
 
-      function buildEdges(mode, selectedId) {
+      function buildEdges(mode, selectedId, showDetails) {
         const context = selectionContext(selectedId);
         const hasSelection = Boolean(selectedId);
-        const visible = visibleEdgeIds(mode, selectedId, context);
+        const visible = visibleEdgeIds(mode, selectedId, showDetails, context);
+        const nodeIds = visibleNodeIds(mode, selectedId, showDetails);
 
-        return BOARD.edges.filter(([source, target]) => visible.has(`${source}->${target}`)).map(([source, target, label, kind]) => {
+        return BOARD.edges.filter(([source, target]) => visible.has(`${source}->${target}`) && nodeIds.has(source) && nodeIds.has(target)).map(([source, target, label, kind]) => {
           const id = `${source}->${target}`;
           const [sourceHandle, targetHandle] = EDGE_HANDLES[id] || ["out-right", "in-left"];
           const primary = MAIN_EDGE_IDS.has(id);
@@ -2085,9 +2302,10 @@
       }
 
       function edgeColor(kind) {
-        if (kind === "artifact") return (DOMAINS.storage || DOMAINS.data || DOMAINS.runtime).accent;
+        if (kind === "artifact" || kind === "data") return (DOMAINS.storage || DOMAINS.data || DOMAINS.runtime).accent;
         if (kind === "signal") return (DOMAINS.signal || DOMAINS.runtime).accent;
         if (kind === "decision") return (DOMAINS.decision || DOMAINS.delivery || DOMAINS.runtime).accent;
+        if (kind === "dependency") return (DOMAINS.infra || DOMAINS.runtime).accent;
         return (DOMAINS.runtime || DOMAINS.infra).accent;
       }
 
@@ -2398,17 +2616,16 @@
       function Toolbar({
         mode,
         selectedId,
+        showDetails,
         theme,
         onModeChange,
         onFitAll,
         onResetLayout,
         onClearSelection,
+        onDetailsToggle,
         onThemeToggle
       }) {
-        const reactFlow = useReactFlow();
         const modes = Object.entries(BOARD.views);
-        const zoomIn = useCallback(() => reactFlow.zoomIn({ duration: 180 }), [reactFlow]);
-        const zoomOut = useCallback(() => reactFlow.zoomOut({ duration: 180 }), [reactFlow]);
 
         return h(
           "div",
@@ -2422,10 +2639,10 @@
           h(
             "div",
             { className: "toolbar-cluster" },
-            h("span", { className: "toolbar-label" }, "Highlight"),
+            h("span", { className: "toolbar-label" }, "View"),
             h(
               "div",
-              { className: "mode-tabs", role: "group", "aria-label": "Highlight a pipeline group" },
+              { className: "mode-tabs", role: "group", "aria-label": "Choose architecture view" },
               modes.map(([key, value]) =>
                 h(
                   "button",
@@ -2458,6 +2675,17 @@
               "button",
               {
                 type: "button",
+                className: `toolbar-button ${showDetails ? "is-active" : ""}`,
+                onClick: onDetailsToggle,
+                "aria-pressed": String(showDetails),
+                title: showDetails ? "Hide detail nodes" : "Show detail nodes"
+              },
+              "Details"
+            ),
+            h(
+              "button",
+              {
+                type: "button",
                 className: "toolbar-button is-icon",
                 onClick: onThemeToggle,
                 "aria-label": theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
@@ -2465,8 +2693,6 @@
               },
               theme === "dark" ? h(Sun, { "aria-hidden": true }) : h(Moon, { "aria-hidden": true })
             ),
-            h("button", { type: "button", className: "toolbar-button is-icon", onClick: zoomOut, "aria-label": "Zoom out", title: "Zoom out" }, h(Minus, { "aria-hidden": true })),
-            h("button", { type: "button", className: "toolbar-button is-icon", onClick: zoomIn, "aria-label": "Zoom in", title: "Zoom in" }, h(Plus, { "aria-hidden": true })),
             selectedId
               ? h(
                   "button",
@@ -2511,6 +2737,7 @@
       function FlowBoard() {
         const [mode, setMode] = useState("overview");
         const [selectedId, setSelectedId] = useState(null);
+        const [showDetails, setShowDetails] = useState(false);
         const [resetNonce, setResetNonce] = useState(0);
         const [theme, setTheme] = useState(initialTheme);
         const [isNavigating, setIsNavigating] = useState(false);
@@ -2518,8 +2745,8 @@
         const didInitialFit = useRef(false);
         const reactFlow = useReactFlow();
 
-        const nodes = useMemo(() => buildNodes(mode, selectedId), [mode, selectedId, resetNonce]);
-        const edges = useMemo(() => buildEdges(mode, selectedId), [mode, selectedId]);
+        const nodes = useMemo(() => buildNodes(mode, selectedId, showDetails), [mode, selectedId, showDetails, resetNonce]);
+        const edges = useMemo(() => buildEdges(mode, selectedId, showDetails), [mode, selectedId, showDetails]);
 
         const setViewportForIds = useCallback(
           (ids, options = {}) => {
@@ -2532,7 +2759,7 @@
 
         const centerNode = useCallback(id => {
           if (!NODE_BY_ID[id]) return;
-          setViewportForIds([id], { padding: 0.95, maxZoom: 1.05, duration: 420 });
+          setViewportForIds([id], { padding: 0.95, maxZoom: 1.05, duration: 420, includeDetails: true });
         }, [setViewportForIds]);
 
         const selectNode = useCallback(
@@ -2554,7 +2781,7 @@
             if (nextMode === "overview") {
               setViewportForIds(view.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false });
             } else {
-              setViewportForIds(view.focus, { padding: 0.34, maxZoom: 1.05 });
+              setViewportForIds(view.focus, { padding: 0.34, maxZoom: 1.05, includeDetails: true });
             }
           },
           [setViewportForIds]
@@ -2570,7 +2797,7 @@
           if (mode === "overview") {
             setViewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false });
           } else {
-            setViewportForIds((BOARD.views[mode] || BOARD.views.overview).focus, { padding: 0.34, maxZoom: 1.05 });
+            setViewportForIds((BOARD.views[mode] || BOARD.views.overview).focus, { padding: 0.34, maxZoom: 1.05, includeDetails: true });
           }
         }, [mode, setViewportForIds]);
 
@@ -2581,6 +2808,10 @@
 
         const toggleTheme = useCallback(() => {
           setTheme(value => (value === "dark" ? "light" : "dark"));
+        }, []);
+
+        const toggleDetails = useCallback(() => {
+          setShowDetails(value => !value);
         }, []);
 
         const beginCanvasNavigation = useCallback(event => {
@@ -2644,11 +2875,13 @@
           h(Toolbar, {
             mode,
             selectedId,
+            showDetails,
             theme,
             onModeChange: focusMode,
             onFitAll: fitAll,
             onResetLayout: resetLayout,
             onClearSelection: clearSelection,
+            onDetailsToggle: toggleDetails,
             onThemeToggle: toggleTheme
           }),
           h(

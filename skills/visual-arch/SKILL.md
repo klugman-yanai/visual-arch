@@ -1,6 +1,6 @@
 ---
 name: visual-arch
-description: "Create robust, project-agnostic, high-quality visual architecture documents for codebases, systems, repositories, services, products, and technical projects. Produces source-backed standalone React Flow HTML architecture maps with graph views, navigable nodes, lanes/groups, detail content, source confidence labels, coordinated subagent analysis, and verification. Use for architecture maps, onboarding docs, system overviews, pipeline diagrams, service maps, repo maps, and dependency/workflow visualizations."
+description: "Use when creating source-backed interactive visual architecture documents for a codebase, system, service, repository, pipeline, protocol, or technical workflow; useful for architecture maps, onboarding docs, system overviews, service maps, dependency/workflow visualizations, and debugging-oriented flow docs."
 ---
 
 # Visual Arch
@@ -25,12 +25,15 @@ Create a polished, self-contained React Flow architecture HTML document from any
    - Use `references/content-model.md`.
    - Capture domains/groups, nodes, edges, views, owners, source files, inputs, outputs, failure/debug entry points, source confidence, and "why this exists".
    - Prefer truthful incompleteness over invented certainty. Mark inferred details with `source_confidence: "inferred"`.
+   - Treat overview, focus views, and details as distinct reader tasks. The overview should carry the primary flow; focused views and node selection reveal supporting mechanics.
 
 4. Generate the document.
    - Use `assets/visual-architecture-template.html` as the primary bundled template.
    - Build a `VISUAL_ARCH_DATA` object with `domains`, `owners`, `board`, and `groupDetails`.
    - Replace the `__VISUAL_ARCH_DATA__` token in the template with that JSON object.
-   - Default to a vertical, top-to-bottom flow across vertical responsibility lanes. Treat the artifact as a modern interactive upgrade of a sequence diagram: columns are architectural responsibilities, and the reading path moves downward through the important contracts.
+   - Read `references/design-principles.md` before making layout/design decisions for a new document or major redesign.
+   - Default to a vertical, top-to-bottom flow across vertical responsibility swimlanes. Treat the artifact as a modern interactive upgrade of a process/sequence diagram: columns are architectural responsibilities, and the reading path moves downward through the important contracts.
+   - Do not replace process swimlanes with a freeform narrative map unless the target is primarily topology, hierarchy, matrix, or timeline and you can state why.
    - If the target project already contains a strong `docs/visual-architecture.html`, use it as a style and interaction precedent while replacing the data with the current project's source-backed model.
    - Preserve standalone behavior: no private runtime services, useful fallback content, accessible controls, responsive layout.
 
@@ -53,16 +56,18 @@ The document must be useful to a new maintainer. Include the architecture shape,
 - Concrete source references.
 - Source confidence labels: `source-backed`, `inferred`, `external`, or `unknown`.
 - Multiple views for complex systems: overview plus focused flows.
+- A first viewport that supports Shneiderman-style progressive disclosure: overview first, focus/filter next, details on selection.
+- A readable primary path. Secondary artifacts, support mechanics, and reporting/status loops should be quieter than the main flow.
 
 Do not create a marketing landing page. The first screen is the actual interactive architecture surface.
 
 ## User Questions
 
-Ask the user only when a choice materially changes the artifact and cannot be inferred from the project or request. The default orientation is vertical sequence-style flow. Ask about orientation only when the user hints at a preference, the system is primarily spatial/topological, or the flow could be read equally well in multiple directions.
+Ask the user only when a choice materially changes the artifact and cannot be inferred from the project or request. The default orientation is vertical swimlane process flow. Ask about orientation only when the user hints at a preference, the system is primarily spatial/topological, or the flow could be read equally well in multiple directions.
 
 Good intake questions:
 
-- "Should this read as a vertical sequence-style flow, or as a horizontal lifecycle map?"
+- "Should this read as a vertical swimlane process flow, or as a horizontal lifecycle map?"
 - "Who is the primary reader: new maintainer, reviewer, operator, or product/leadership?"
 - "Should the document prioritize runtime behavior, deployment/release flow, data movement, or repo/package structure?"
 
@@ -76,7 +81,7 @@ Use 4-6 specialized passes when allowed. Parallelize the first four roles; synth
 - **Project cartographer**: inventory repo shape, languages, docs, manifests, services, entrypoints.
 - **Flow analyst**: identify runtime, build, deploy, data, and control flows.
 - **Contract auditor**: extract interfaces, artifacts, persistence, external systems, failure points.
-- **Design planner**: choose visual grouping, node density, vertical responsibility lanes by default, views, color roles, and interaction priorities.
+- **Design planner**: choose visual grouping, node density, vertical responsibility swimlanes by default, views, color roles, edge hierarchy, progressive disclosure, and interaction priorities.
 - **Narrative editor**: turn findings into concise node/detail text for maintainers.
 - **Visual verifier**: inspect the generated HTML for blank render, overlap, missing controls, broken references.
 
@@ -88,10 +93,13 @@ Merge results yourself. Resolve contradictions by checking source. Do not let su
 - Prefer `rg`/`fd` for discovery.
 - Keep text short enough for nodes; put depth in the detail drawer.
 - Use stable IDs (`lower-kebab-case`) for nodes and edges.
-- Keep the graph readable: 8-30 primary nodes is usually better than exhaustive file-level mapping.
-- Use lanes/groups to express responsibility or lifecycle phases. Prefer tall vertical lanes with a top-to-bottom reading path, like a polished sequence diagram.
+- Keep the graph readable: 8-18 overview nodes and 8-30 total primary nodes is usually better than exhaustive file-level mapping.
+- Use lanes/groups to express responsibility or lifecycle phases. Prefer tall vertical swimlanes with a top-to-bottom reading path, like a polished process/sequence diagram.
+- Lanes are not a rigid placement engine. Stagger nodes, create a lower reporting/evidence band, or use a limited cross-lane exception when strict columns make the story harder to follow.
+- Default overview edges to the main control path plus essential branches. Put supporting artifact/data/dependency edges behind focus views, selection, or details when they clutter the first read.
 - Route edges deliberately with explicit handles. Clean connector flow is part of the design, not a cosmetic afterthought.
 - Use colors by function, not by brand, unless the project has explicit design guidance.
+- Keep icons, domain colors, and legends secondary. They orient the reader; they do not replace node order, lane responsibility, and edge contracts.
 - Keep the output static and portable by default. Avoid requiring npm installs, bundlers, private assets, or live services unless the selected stack is intentionally integrated into an existing app.
 - Cite generated or inferred sources honestly: `inferred from <path>`, `external: <name>`, or `generated artifact`.
 
@@ -140,11 +148,14 @@ Before final response:
 - Inferred and unknown claims are visibly labeled.
 - Excluded generated/vendor/noise areas are noted in the working summary when relevant.
 - Desktop and mobile first viewports show title, controls, diagram, and details without obvious overlap.
+- The overview reads as a source-backed swimlane process map unless a documented exception applies.
+- Focus views preserve spatial memory; they filter or emphasize the same map rather than becoming unrelated layouts.
 - The final answer reports the output path and verification commands.
 
 ## Resources
 
 - `assets/visual-architecture-template.html`: primary standalone React Flow HTML template. Copy or adapt it unless constraints point to another stack.
+- `references/design-principles.md`: source-backed layout, interaction, and visual hierarchy guidance.
 - `references/content-model.md`: expected model structure and authoring rules.
 - `references/agent-prompts.md`: copy-ready prompts for specialized subagents.
 - `scripts/validate_architecture_doc.py`: structural validator for generated HTML.
