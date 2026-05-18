@@ -1811,7 +1811,7 @@
             setSelectedId(null);
             replaceUrlHash(null);
             if (nextMode === "overview") {
-              setViewportForIds(view.focus, { padding: 0.24, maxZoom: 0.68, reservePanel: false });
+              setViewportForIds(view.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false });
             } else {
               setViewportForIds(view.focus, { padding: 0.34, maxZoom: 1.05 });
             }
@@ -1827,7 +1827,7 @@
           setSelectedId(null);
           replaceUrlHash(null);
           if (mode === "overview") {
-            setViewportForIds(BOARD.views.overview.focus, { padding: 0.24, maxZoom: 0.68, reservePanel: false });
+            setViewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false });
           } else {
             setViewportForIds((BOARD.views[mode] || BOARD.views.overview).focus, { padding: 0.34, maxZoom: 1.05 });
           }
@@ -1892,7 +1892,7 @@
           didInitialFit.current = true;
           replaceUrlHash(null);
           window.setTimeout(
-            () => setViewportForIds(BOARD.views.overview.focus, { padding: 0.24, maxZoom: 0.68, reservePanel: false, duration: 0 }),
+            () => setViewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false, duration: 0 }),
             0
           );
         }, [setViewportForIds]);
@@ -1926,7 +1926,7 @@
                 edges,
                 nodeTypes,
                 edgeTypes,
-                defaultViewport: viewportForIds(BOARD.views.overview.focus, { padding: 0.24, maxZoom: 0.68, reservePanel: false }),
+                defaultViewport: viewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false }),
                 minZoom: 0.28,
                 maxZoom: 1.45,
                 nodesDraggable: false,
@@ -1949,7 +1949,7 @@
                 onInit: instance => {
                   window.setTimeout(() => {
                     instance.setViewport(
-                      viewportForIds(BOARD.views.overview.focus, { padding: 0.24, maxZoom: 0.68, reservePanel: false }),
+                      viewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false }),
                       { duration: 0 }
                     );
                   }, 0);
