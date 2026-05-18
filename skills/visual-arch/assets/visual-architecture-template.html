@@ -2017,10 +2017,10 @@
       }
 
       function edgeColor(kind) {
-        if (kind === "artifact") return DOMAINS.storage.accent;
-        if (kind === "signal") return DOMAINS.signal.accent;
-        if (kind === "decision") return DOMAINS.decision.accent;
-        return DOMAINS.runtime.accent;
+        if (kind === "artifact") return (DOMAINS.storage || DOMAINS.data || DOMAINS.runtime).accent;
+        if (kind === "signal") return (DOMAINS.signal || DOMAINS.runtime).accent;
+        if (kind === "decision") return (DOMAINS.decision || DOMAINS.delivery || DOMAINS.runtime).accent;
+        return (DOMAINS.runtime || DOMAINS.infra).accent;
       }
 
       function BmtNode(props) {

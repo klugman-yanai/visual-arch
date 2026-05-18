@@ -14,6 +14,14 @@ BOARD_RE = re.compile(
     r"const\s+BOARD\s*=\s*(\{.*?\});\s*const\s+GROUP_DETAILS\s*=",
     re.DOTALL,
 )
+DOMAINS_RE = re.compile(
+    r"const\s+DOMAINS\s*=\s*(\{.*?\});\s*const\s+OWNERS\s*=",
+    re.DOTALL,
+)
+OWNERS_RE = re.compile(
+    r"const\s+OWNERS\s*=\s*(\{.*?\});\s*const\s+BOARD\s*=",
+    re.DOTALL,
+)
 CONFIDENCE_VALUES = {"source-backed", "inferred", "external", "unknown"}
 
 
@@ -22,19 +30,26 @@ def fail(message: str) -> None:
     raise SystemExit(1)
 
 
-def load_model(path: Path) -> dict:
+def extract_json(text: str, pattern: re.Pattern[str], label: str) -> dict:
+    match = pattern.search(text)
+    if not match:
+        fail(f"could not find React Flow `const {label} = ...;` model")
+    try:
+        return json.loads(match.group(1))
+    except json.JSONDecodeError as error:
+        fail(f"{label} is not valid JSON: {error}")
+
+
+def load_models(path: Path) -> tuple[dict, dict, dict]:
     text = path.read_text(encoding="utf-8")
     if "<!doctype html>" not in text.lower():
         fail("document is not an HTML document with a doctype")
     if "ReactFlow" not in text:
         fail("document does not appear to include the React Flow renderer")
-    match = BOARD_RE.search(text)
-    if not match:
-        fail("could not find React Flow `const BOARD = {...};` model")
-    try:
-        return json.loads(match.group(1))
-    except json.JSONDecodeError as error:
-        fail(f"BOARD is not valid JSON: {error}")
+    domains = extract_json(text, DOMAINS_RE, "DOMAINS")
+    owners = extract_json(text, OWNERS_RE, "OWNERS")
+    board = extract_json(text, BOARD_RE, "BOARD")
+    return domains, owners, board
 
 
 def require_keys(obj: dict, keys: set[str], label: str) -> None:
@@ -44,8 +59,14 @@ def require_keys(obj: dict, keys: set[str], label: str) -> None:
 
 
 def validate(path: Path) -> None:
-    model = load_model(path)
+    domains, owners, model = load_models(path)
     require_keys(model, {"lanes", "nodes", "edges", "views"}, "model")
+    if "runtime" not in domains:
+        fail("DOMAINS must include a runtime fallback domain")
+    if "infra" not in domains:
+        fail("DOMAINS must include an infra fallback domain")
+    if "suite" not in owners:
+        fail("OWNERS must include a suite fallback owner")
 
     nodes = model["nodes"]
     edges = model["edges"]
@@ -71,6 +92,15 @@ def validate(path: Path) -> None:
             fail(f"node {node_id} has no source references")
         if details["source_confidence"] not in CONFIDENCE_VALUES:
             fail(f"node {node_id} has invalid source_confidence {details['source_confidence']!r}")
+        if node["domain"] not in domains:
+            fail(f"node {node_id} references unknown domain {node['domain']!r}")
+        if node["owner"] not in owners:
+            fail(f"node {node_id} references unknown owner {node['owner']!r}")
+
+    for index, lane in enumerate(model["lanes"]):
+        require_keys(lane, {"id", "title", "domain", "position"}, f"lane[{index}]")
+        if lane["domain"] not in domains:
+            fail(f"lane {lane['id']} references unknown domain {lane['domain']!r}")
 
     for index, edge in enumerate(edges):
         if not isinstance(edge, list) or len(edge) < 3:
