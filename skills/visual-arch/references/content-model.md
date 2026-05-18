@@ -25,7 +25,7 @@ Required top-level fields:
 
 `owners`: map of owner key to `{ "label": "...", "description": "..." }`. Use functional ownership if people/teams are unknown, such as `runtime`, `build`, `storage`, `external`.
 
-`layout`: optional board metadata. Prefer `{ "orientation": "vertical" }` for a modern sequence-diagram reading path unless the project or user asks for another shape.
+`layout`: optional board metadata. Prefer `{ "orientation": "vertical" }` for a modern sequence-diagram reading path across tall responsibility lanes unless the project or user asks for another shape.
 
 `lanes`: large background columns/rows. Each lane needs `{ "id", "title", "domain", "x", "y", "width", "height" }`.
 

@@ -30,7 +30,7 @@ Create a polished, self-contained React Flow architecture HTML document from any
    - Use `assets/visual-architecture-template.html` as the primary bundled template.
    - Build a `VISUAL_ARCH_DATA` object with `domains`, `owners`, `board`, and `groupDetails`.
    - Replace the `__VISUAL_ARCH_DATA__` token in the template with that JSON object.
-   - Default to a vertical, top-to-bottom flow. Treat the artifact as a modern interactive upgrade of a sequence diagram: entrypoints at the top, orchestration/policy/work in the middle, state/reporting/signal at the bottom.
+   - Default to a vertical, top-to-bottom flow across vertical responsibility lanes. Treat the artifact as a modern interactive upgrade of a sequence diagram: columns are architectural responsibilities, and the reading path moves downward through the important contracts.
    - Preserve standalone behavior: no private runtime services, useful fallback content, accessible controls, responsive layout.
 
 5. Verify before completion.
@@ -75,7 +75,7 @@ Use 4-6 specialized passes when allowed. Parallelize the first four roles; synth
 - **Project cartographer**: inventory repo shape, languages, docs, manifests, services, entrypoints.
 - **Flow analyst**: identify runtime, build, deploy, data, and control flows.
 - **Contract auditor**: extract interfaces, artifacts, persistence, external systems, failure points.
-- **Design planner**: choose visual grouping, node density, vertical lane layout by default, views, color roles, and interaction priorities.
+- **Design planner**: choose visual grouping, node density, vertical responsibility lanes by default, views, color roles, and interaction priorities.
 - **Narrative editor**: turn findings into concise node/detail text for maintainers.
 - **Visual verifier**: inspect the generated HTML for blank render, overlap, missing controls, broken references.
 
@@ -88,7 +88,7 @@ Merge results yourself. Resolve contradictions by checking source. Do not let su
 - Keep text short enough for nodes; put depth in the detail drawer.
 - Use stable IDs (`lower-kebab-case`) for nodes and edges.
 - Keep the graph readable: 8-30 primary nodes is usually better than exhaustive file-level mapping.
-- Use lanes/groups to express responsibility or lifecycle phases. Prefer horizontal lanes stacked vertically, so the reading path is top-to-bottom.
+- Use lanes/groups to express responsibility or lifecycle phases. Prefer tall vertical lanes with a top-to-bottom reading path, like a polished sequence diagram.
 - Use colors by function, not by brand, unless the project has explicit design guidance.
 - Keep the output static and portable by default. Avoid requiring npm installs, bundlers, private assets, or live services unless the selected stack is intentionally integrated into an existing app.
 - Cite generated or inferred sources honestly: `inferred from <path>`, `external: <name>`, or `generated artifact`.

@@ -71,38 +71,50 @@
       {
         "id": "lane-entry",
         "title": "Interaction",
-        "subtitle": "User and automation entrypoints.",
+        "subtitle": "Users, automations, and request shaping.",
         "domain": "interface",
         "position": {
           "x": 40,
           "y": 150
         },
-        "width": 1120,
-        "height": 210
+        "width": 270,
+        "height": 720
       },
       {
         "id": "lane-runtime",
-        "title": "Runtime sequence",
-        "subtitle": "Routing, policy, core workflow, and side effects.",
+        "title": "Runtime Core",
+        "subtitle": "Policy, orchestration, and durable work.",
         "domain": "runtime",
         "position": {
-          "x": 40,
-          "y": 390
+          "x": 340,
+          "y": 150
         },
-        "width": 1120,
-        "height": 430
+        "width": 270,
+        "height": 720
       },
       {
-        "id": "lane-evidence",
-        "title": "State, delivery, and signal",
-        "subtitle": "Durable results, release gates, and debugging evidence.",
+        "id": "lane-state",
+        "title": "State Boundary",
+        "subtitle": "Persistence, reads, and surfaced results.",
         "domain": "data",
         "position": {
-          "x": 40,
-          "y": 850
+          "x": 640,
+          "y": 150
         },
-        "width": 1120,
-        "height": 250
+        "width": 270,
+        "height": 720
+      },
+      {
+        "id": "lane-signal",
+        "title": "Delivery + Signal",
+        "subtitle": "Release gates and debugging evidence.",
+        "domain": "signal",
+        "position": {
+          "x": 940,
+          "y": 150
+        },
+        "width": 270,
+        "height": 720
       }
     ],
     "nodes": [
@@ -118,8 +130,8 @@
           "source-backed"
         ],
         "position": {
-          "x": 100,
-          "y": 215
+          "x": 90,
+          "y": 245
         },
         "details": {
           "summary": "The supported way users or automations enter the system.",
@@ -159,8 +171,8 @@
           "inferred"
         ],
         "position": {
-          "x": 420,
-          "y": 215
+          "x": 90,
+          "y": 420
         },
         "details": {
           "summary": "Classifies requests and sends them to the right workflow.",
@@ -201,8 +213,8 @@
           "policy"
         ],
         "position": {
-          "x": 420,
-          "y": 455
+          "x": 390,
+          "y": 245
         },
         "details": {
           "summary": "Guards privileged operations and user-specific data.",
@@ -242,8 +254,8 @@
           "source-backed"
         ],
         "position": {
-          "x": 740,
-          "y": 455
+          "x": 390,
+          "y": 420
         },
         "details": {
           "summary": "Runs the product operation from validated input to durable result.",
@@ -285,8 +297,8 @@
           "artifact"
         ],
         "position": {
-          "x": 420,
-          "y": 915
+          "x": 690,
+          "y": 420
         },
         "details": {
           "summary": "Persists canonical product state and read models.",
@@ -326,8 +338,8 @@
           "worker"
         ],
         "position": {
-          "x": 740,
-          "y": 650
+          "x": 390,
+          "y": 595
         },
         "details": {
           "summary": "Decouples slow side effects from the request path.",
@@ -367,8 +379,8 @@
           "status"
         ],
         "position": {
-          "x": 740,
-          "y": 915
+          "x": 690,
+          "y": 595
         },
         "details": {
           "summary": "Exposes results, status, and derived views back to users.",
@@ -406,8 +418,8 @@
           "deploy"
         ],
         "position": {
-          "x": 100,
-          "y": 650
+          "x": 990,
+          "y": 245
         },
         "details": {
           "summary": "Builds, tests, packages, and deploys project changes.",
@@ -448,8 +460,8 @@
           "unknown"
         ],
         "position": {
-          "x": 100,
-          "y": 915
+          "x": 990,
+          "y": 595
         },
         "details": {
           "summary": "Provides logs, metrics, traces, and operational status for debugging.",
@@ -549,13 +561,13 @@
         "label": "Overview",
         "focus": [
           "user-entry",
-          "request-router",
           "auth-policy",
-          "workflow-engine",
-          "async-work",
-          "state-store",
-          "reporting-surface",
           "ci-release",
+          "request-router",
+          "workflow-engine",
+          "state-store",
+          "async-work",
+          "reporting-surface",
           "observability"
         ]
       },
@@ -576,22 +588,25 @@
         "focus": [
           "ci-release",
           "workflow-engine",
+          "async-work",
+          "reporting-surface",
           "observability"
         ]
       },
       "debugging": {
         "label": "Debugging",
         "focus": [
-          "workflow-engine",
-          "async-work",
           "observability",
-          "ci-release"
+          "request-router",
+          "workflow-engine",
+          "state-store",
+          "async-work"
         ]
       }
     },
     "layout": {
       "orientation": "vertical",
-      "reading_path": "top-to-bottom sequence-style flow"
+      "reading_path": "top-to-bottom flow across vertical responsibility lanes"
     }
   },
   "groupDetails": {
@@ -599,10 +614,10 @@
       "title": "Project Architecture",
       "purpose": "A modern sequence-style map of responsibilities and contracts.",
       "domain": "runtime",
-      "summary": "Read from top to bottom: entry, routing, policy, core workflow, side effects, state, delivery, and signal.",
+      "summary": "Read downward through each responsibility lane: entry and routing, policy and work, state and results, then delivery and signal.",
       "why": "It gives maintainers a first map before they dive into files.",
       "points": [
-        "The layout is intentionally vertical, like an upgraded sequence diagram.",
+        "Vertical responsibility lanes keep the full map legible while preserving sequence-style flow.",
         "Use focus modes to narrow the reading path.",
         "Source confidence labels should remain visible in chips."
       ],
