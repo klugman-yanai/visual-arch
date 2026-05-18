@@ -1817,6 +1817,25 @@
         INCOMING.get(target).push(source);
       });
 
+      function edgeSet(edges) {
+        return new Set(edges.map(([source, target]) => `${source}->${target}`));
+      }
+
+      const MAIN_EDGE_IDS = edgeSet(BOARD.edges);
+      const VIEW_EDGE_IDS = Object.fromEntries(
+        Object.entries(BOARD.views).map(([viewKey, view]) => {
+          const focus = new Set(view.focus || []);
+          return [
+            viewKey,
+            new Set(
+              BOARD.edges
+                .filter(([source, target]) => focus.has(source) && focus.has(target))
+                .map(([source, target]) => `${source}->${target}`)
+            )
+          ];
+        })
+      );
+
       const VIEWPORTS = {
         overview: { x: 38, y: 160, zoom: 0.7 },
         runtime: { x: -1220, y: 160, zoom: 0.76 },
@@ -1982,7 +2001,7 @@
             type: "contract",
             markerEnd: {
               type: MarkerType.ArrowClosed,
-              color: dimmed ? "#c7c1b6" : color
+              color
             },
             data: {
               label,
