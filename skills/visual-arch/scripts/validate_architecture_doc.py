@@ -10,11 +10,11 @@ import sys
 from pathlib import Path
 
 
-REACT_MODEL_RE = re.compile(
+MODEL_RE = re.compile(
     r"const\s+ARCHITECTURE_MODEL\s*=\s*(\{.*?\});\s*(?:const|function)\s",
     re.DOTALL,
 )
-MERMAID_RE = re.compile(r'<script\s+type="application/json"\s+id="architecture-model">\s*(\{.*?\})\s*</script>', re.DOTALL)
+CONFIDENCE_VALUES = {"source-backed", "inferred", "external", "unknown"}
 
 
 def fail(message: str) -> None:
@@ -26,20 +26,15 @@ def load_model(path: Path) -> dict:
     text = path.read_text(encoding="utf-8")
     if "<!doctype html>" not in text.lower():
         fail("document is not an HTML document with a doctype")
-    renderer_found = "ReactFlow" in text or "mermaid" in text.lower()
-    if not renderer_found:
-        fail("document does not appear to include a supported flow renderer")
-    match = REACT_MODEL_RE.search(text)
-    model_label = "React Flow `const ARCHITECTURE_MODEL = {...};`"
+    if "ReactFlow" not in text:
+        fail("document does not appear to include the React Flow renderer")
+    match = MODEL_RE.search(text)
     if not match:
-        match = MERMAID_RE.search(text)
-        model_label = "Mermaid `<script type=\"application/json\" id=\"architecture-model\">`"
-    if not match:
-        fail("could not find a supported architecture model: React Flow `ARCHITECTURE_MODEL` or Mermaid `#architecture-model` JSON script")
+        fail("could not find React Flow `const ARCHITECTURE_MODEL = {...};`")
     try:
         return json.loads(match.group(1))
     except json.JSONDecodeError as error:
-        fail(f"{model_label} is not valid JSON: {error}")
+        fail(f"ARCHITECTURE_MODEL is not valid JSON: {error}")
 
 
 def require_keys(obj: dict, keys: set[str], label: str) -> None:
@@ -71,9 +66,11 @@ def validate(path: Path) -> None:
             fail(f"duplicate node id: {node_id}")
         node_ids.add(node_id)
         details = node["details"]
-        require_keys(details, {"summary", "inputs", "outputs", "why", "failures", "source"}, f"node[{node_id}].details")
+        require_keys(details, {"summary", "inputs", "outputs", "why", "failures", "source", "source_confidence"}, f"node[{node_id}].details")
         if not details["source"]:
             fail(f"node {node_id} has no source references")
+        if details["source_confidence"] not in CONFIDENCE_VALUES:
+            fail(f"node {node_id} has invalid source_confidence {details['source_confidence']!r}")
 
     for index, edge in enumerate(edges):
         require_keys(edge, {"id", "source", "target", "label"}, f"edge[{index}]")
@@ -94,8 +91,7 @@ def validate(path: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Validate standalone visual-arch HTML generated from the bundled React Flow "
-            "or constrained Mermaid templates."
+            "Validate standalone visual-arch HTML generated from the bundled React Flow template."
         )
     )
     parser.add_argument("html", type=Path)

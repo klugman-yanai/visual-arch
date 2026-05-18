@@ -43,6 +43,7 @@ Required top-level fields:
     "why": "Why this exists in the system.",
     "failures": ["Where to check first when this breaks"],
     "source": ["path/to/file.ext", "inferred from path/to/config.yml"],
+    "source_confidence": "source-backed",
     "related": ["other-node-id"]
   }
 }
@@ -69,6 +70,15 @@ Use `kind` values consistently:
 
 `views`: map of view key to `{ "label": "Overview", "focus": ["node-id"] }`. Include `overview`.
 
+## Source Confidence
+
+Every node and important claim must use one of:
+
+- `source-backed`: direct evidence in source, config, tests, docs, workflows, or generated artifacts intentionally referenced.
+- `inferred`: reasonable inference from evidence; visible text should say "inferred".
+- `external`: external service, user, vendor, or manually operated system.
+- `unknown`: visible gap where evidence is missing.
+
 ## Authoring Rules
 
 - Include only claims supported by source or clearly marked inference.
@@ -76,6 +86,8 @@ Use `kind` values consistently:
 - Keep node titles under 30 characters when possible.
 - Keep card `purpose` under 140 characters.
 - Every node should have at least one source reference.
+- Every node should have `details.source_confidence`.
 - Every important edge should name the contract, not just "uses".
 - Use coordinates that create a left-to-right or top-to-bottom reading path.
 - Keep external systems as nodes when they affect architecture.
+- Exclude generated, vendored, cached, secret, and low-level utility files unless they define a real architecture contract.

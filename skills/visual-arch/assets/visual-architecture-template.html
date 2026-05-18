@@ -9,6 +9,7 @@
       :root {
         color-scheme: light;
         --canvas: #f7f6f2;
+        --canvas-strong: #ece9df;
         --surface: #fffefa;
         --ink: #171717;
         --muted: #625f58;
@@ -17,10 +18,14 @@
         --panel: rgba(255, 254, 250, 0.92);
         --shadow: 0 20px 58px rgba(34, 31, 24, 0.14);
         --grid: rgba(93, 88, 76, 0.09);
+        --ok: #1c7c5c;
+        --warn: #9a6b21;
+        --unknown: #6b7280;
       }
       :root[data-theme="dark"] {
         color-scheme: dark;
         --canvas: #24231f;
+        --canvas-strong: #302e29;
         --surface: #302f2a;
         --ink: #f3eee4;
         --muted: #c8c0b1;
@@ -29,6 +34,9 @@
         --panel: rgba(48, 47, 42, 0.92);
         --shadow: 0 22px 64px rgba(0, 0, 0, 0.34);
         --grid: rgba(228, 220, 205, 0.08);
+        --ok: #61c8a2;
+        --warn: #e1b85a;
+        --unknown: #a8b0b8;
       }
       * { box-sizing: border-box; }
       html, body, #root { width: 100%; height: 100%; margin: 0; }
@@ -48,6 +56,26 @@
           radial-gradient(circle at 88% 12%, rgba(18, 137, 112, 0.09), transparent 30rem),
           var(--canvas);
       }
+      #boot-fallback {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+        background: var(--canvas);
+      }
+      body.app-ready #boot-fallback { display: none; }
+      .fallback-card {
+        max-width: 680px;
+        border: 1px solid rgba(120, 113, 100, 0.18);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        padding: 24px;
+      }
+      .fallback-card h1 { margin: 0 0 8px; font-size: clamp(1.8rem, 5vw, 3.2rem); line-height: 1; }
+      .fallback-card p { margin: 8px 0 0; color: var(--muted); }
       .topbar {
         position: absolute;
         inset: 14px 14px auto 14px;
@@ -80,7 +108,27 @@
         font-size: 1.05rem;
         font-weight: 900;
       }
+      .subtitle {
+        display: block;
+        margin-top: 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
       .tabs, .actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+      .search {
+        min-height: 34px;
+        min-width: 180px;
+        border: 1px solid rgba(120, 113, 100, 0.22);
+        border-radius: 6px;
+        background: color-mix(in srgb, var(--surface) 84%, transparent);
+        color: var(--ink);
+        padding: 7px 9px;
+        font: inherit;
+        font-size: 0.82rem;
+      }
       .button {
         min-height: 34px;
         border: 1px solid transparent;
@@ -136,6 +184,21 @@
       }
       .node h3 { margin: 7px 12px 0; font-size: 1.14rem; line-height: 1.12; }
       .node p { margin: 7px 12px 12px; color: var(--muted); font-size: 0.82rem; }
+      .confidence {
+        display: inline-flex;
+        width: fit-content;
+        max-width: calc(100% - 24px);
+        margin: 9px 12px 0;
+        border: 1px solid color-mix(in srgb, var(--confidence-color, var(--unknown)) 32%, transparent);
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--confidence-color, var(--unknown)) 10%, transparent);
+        color: color-mix(in srgb, var(--confidence-color, var(--unknown)) 86%, var(--ink));
+        padding: 3px 7px;
+        font-size: 0.62rem;
+        font-weight: 950;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
       .drawer {
         position: absolute;
         z-index: 18;
@@ -162,13 +225,45 @@
       .section ul { margin: 9px 0 0; padding-left: 18px; }
       .sources { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
       .source { border: 1px solid rgba(120, 113, 100, 0.18); border-radius: 6px; padding: 6px 8px; font: 0.74rem ui-monospace, SFMono-Regular, Consolas, monospace; }
+      .legend {
+        position: absolute;
+        left: 14px;
+        bottom: 92px;
+        z-index: 12;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        max-width: min(620px, calc(100vw - 28px));
+        border: 1px solid rgba(120, 113, 100, 0.18);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 12px 28px rgba(34, 31, 24, 0.1);
+        padding: 9px;
+        backdrop-filter: blur(14px);
+      }
+      .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 800;
+      }
+      .legend-swatch { width: 9px; height: 9px; border-radius: 999px; background: var(--legend-color); }
       @media (max-width: 760px) {
         .topbar { grid-template-columns: 1fr; }
         .drawer { top: auto; bottom: 14px; max-height: 46vh; }
+        .legend { display: none; }
       }
     </style>
   </head>
   <body>
+    <div id="boot-fallback">
+      <div class="fallback-card">
+        <h1>Visual Architecture</h1>
+        <p>The interactive map is loading. If it does not appear, check network access to the React and XYFlow CDN assets.</p>
+      </div>
+    </div>
     <div id="root"></div>
     <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
@@ -190,9 +285,9 @@
           { "id": "lane-system", "title": "System Boundary", "domain": "system", "x": 40, "y": 120, "width": 840, "height": 360 }
         ],
         "nodes": [
-          { "id": "entrypoint", "title": "Entrypoint", "domain": "system", "owner": "project", "x": 120, "y": 210, "purpose": "The first project-specific execution surface.", "details": { "summary": "Replace this placeholder node with a real entrypoint.", "inputs": ["User or automation request"], "outputs": ["Runtime action"], "why": "Shows where the system starts.", "failures": ["Check the entrypoint source"], "source": ["replace-with/source-path"], "related": ["runtime"] } },
-          { "id": "runtime", "title": "Runtime", "domain": "runtime", "owner": "project", "x": 390, "y": 210, "purpose": "The main execution path.", "details": { "summary": "Replace this placeholder node with real runtime behavior.", "inputs": ["Entrypoint call"], "outputs": ["Result or artifact"], "why": "Shows the central behavior.", "failures": ["Check runtime logs/tests"], "source": ["replace-with/source-path"], "related": ["output"] } },
-          { "id": "output", "title": "Output", "domain": "external", "owner": "external", "x": 660, "y": 210, "purpose": "The visible result or handoff.", "details": { "summary": "Replace this placeholder node with a real output.", "inputs": ["Runtime result"], "outputs": ["User-visible artifact"], "why": "Shows what the system produces.", "failures": ["Check output validation"], "source": ["replace-with/source-path"], "related": ["runtime"] } }
+          { "id": "entrypoint", "title": "Entrypoint", "domain": "system", "owner": "project", "x": 120, "y": 210, "purpose": "The first project-specific execution surface.", "details": { "summary": "Replace this placeholder node with a real entrypoint.", "inputs": ["User or automation request"], "outputs": ["Runtime action"], "why": "Shows where the system starts.", "failures": ["Check the entrypoint source"], "source": ["replace-with/source-path"], "source_confidence": "source-backed", "related": ["runtime"] } },
+          { "id": "runtime", "title": "Runtime", "domain": "runtime", "owner": "project", "x": 390, "y": 210, "purpose": "The main execution path.", "details": { "summary": "Replace this placeholder node with real runtime behavior.", "inputs": ["Entrypoint call"], "outputs": ["Result or artifact"], "why": "Shows the central behavior.", "failures": ["Check runtime logs/tests"], "source": ["replace-with/source-path"], "source_confidence": "source-backed", "related": ["output"] } },
+          { "id": "output", "title": "Output", "domain": "external", "owner": "external", "x": 660, "y": 210, "purpose": "The visible result or handoff.", "details": { "summary": "Replace this placeholder node with a real output.", "inputs": ["Runtime result"], "outputs": ["User-visible artifact"], "why": "Shows what the system produces.", "failures": ["Check output validation"], "source": ["replace-with/source-path"], "source_confidence": "external", "related": ["runtime"] } }
         ],
         "edges": [
           { "id": "entrypoint-runtime", "source": "entrypoint", "target": "runtime", "label": "call", "kind": "control" },
@@ -206,9 +301,24 @@
       const { createRoot } = ReactDOM;
       const { Background, BaseEdge, Controls, EdgeLabelRenderer, MarkerType, ReactFlow, ReactFlowProvider, getBezierPath, useReactFlow } = window.ReactFlow;
       const byId = Object.fromEntries(ARCHITECTURE_MODEL.nodes.map(node => [node.id, node]));
+      const confidenceLabels = {
+        "source-backed": "Source backed",
+        inferred: "Inferred",
+        external: "External",
+        unknown: "Unknown"
+      };
+      const confidenceColors = {
+        "source-backed": "var(--ok)",
+        inferred: "var(--warn)",
+        external: "#4263be",
+        unknown: "var(--unknown)"
+      };
       function vars(domainKey) {
         const domain = ARCHITECTURE_MODEL.domains[domainKey] || ARCHITECTURE_MODEL.domains.system;
         return { "--accent": domain.color, "--soft": domain.soft };
+      }
+      function confidenceStyle(value) {
+        return { "--confidence-color": confidenceColors[value] || confidenceColors.unknown };
       }
       function directRelations(id) {
         return [...new Set(ARCHITECTURE_MODEL.edges.flatMap(edge => edge.source === id ? [edge.target] : edge.target === id ? [edge.source] : []))].filter(Boolean);
@@ -218,8 +328,10 @@
       }
       function ArchitectureNode({ data, selected }) {
         const domain = ARCHITECTURE_MODEL.domains[data.domain] || ARCHITECTURE_MODEL.domains.system;
+        const confidence = data.details?.source_confidence || "unknown";
         return h("div", { className: `node ${selected ? "selected" : ""} ${data.dimmed ? "dimmed" : ""}`, style: vars(data.domain) },
           h("div", { className: "node-domain" }, domain.label),
+          h("span", { className: "confidence", style: confidenceStyle(confidence) }, confidenceLabels[confidence] || "Unknown"),
           h("h3", null, data.title),
           h("p", null, data.purpose)
         );
@@ -243,6 +355,18 @@
           ...ARCHITECTURE_MODEL.nodes.map(node => ({ id: node.id, type: "architecture", position: { x: node.x, y: node.y }, data: { ...node, dimmed: selectedId ? !related.has(node.id) : !focus.has(node.id) }, draggable: false }))
         ];
       }
+      function matchesQuery(node, query) {
+        if (!query) return true;
+        const haystack = [
+          node.title,
+          node.purpose,
+          node.domain,
+          node.owner,
+          node.details?.summary,
+          ...(node.details?.source || [])
+        ].join(" ").toLowerCase();
+        return haystack.includes(query.toLowerCase());
+      }
       function buildEdges(selectedId) {
         const related = new Set(selectedId ? [selectedId, ...directRelations(selectedId)] : []);
         return ARCHITECTURE_MODEL.edges.map(edge => ({ id: edge.id, source: edge.source, target: edge.target, type: "contract", markerEnd: { type: MarkerType.ArrowClosed }, data: { ...edge, active: selectedId && (edge.source === selectedId || edge.target === selectedId), dimmed: selectedId && !(related.has(edge.source) && related.has(edge.target)) } }));
@@ -259,6 +383,7 @@
             h("section", { className: "section" }, h("h3", null, "Reads"), h("ul", null, details.inputs.map(item => h("li", { key: item }, item)))),
             h("section", { className: "section" }, h("h3", null, "Writes"), h("ul", null, details.outputs.map(item => h("li", { key: item }, item)))),
             h("section", { className: "section" }, h("h3", null, "Why it exists"), h("p", null, details.why)),
+            h("section", { className: "section" }, h("h3", null, "Source confidence"), h("p", null, confidenceLabels[details.source_confidence] || "Unknown")),
             h("section", { className: "section" }, h("h3", null, "Check first if it fails"), h("ul", null, details.failures.map(item => h("li", { key: item }, item)))),
             h("section", { className: "section" }, h("h3", null, "Where to look"), h("div", { className: "sources" }, details.source.map(item => h("span", { key: item, className: "source" }, item))))
           )
@@ -267,8 +392,9 @@
       function Board() {
         const [view, setView] = useState("overview");
         const [selectedId, setSelectedId] = useState(ARCHITECTURE_MODEL.nodes[0]?.id);
+        const [query, setQuery] = useState("");
         const reactFlow = useReactFlow();
-        const nodes = useMemo(() => buildNodes(selectedId, view), [selectedId, view]);
+        const nodes = useMemo(() => buildNodes(selectedId, view).map(node => byId[node.id] && !matchesQuery(byId[node.id], query) ? { ...node, data: { ...node.data, dimmed: true } } : node), [selectedId, view, query]);
         const edges = useMemo(() => buildEdges(selectedId), [selectedId]);
         const fit = useCallback(() => reactFlow.fitView({ padding: 0.18, duration: 260 }), [reactFlow]);
         const theme = useCallback(() => {
@@ -276,16 +402,33 @@
         }, []);
         return h("div", { className: "app" },
           h("div", { className: "topbar" },
-            h("div", null, h("span", { className: "kicker" }, "Visual architecture"), h("span", { className: "title" }, ARCHITECTURE_MODEL.title)),
+            h("div", null, h("span", { className: "kicker" }, "Visual architecture"), h("span", { className: "title" }, ARCHITECTURE_MODEL.title), h("span", { className: "subtitle" }, ARCHITECTURE_MODEL.subtitle || "")),
             h("div", { className: "tabs" }, Object.entries(ARCHITECTURE_MODEL.views).map(([key, value]) => h("button", { key, className: `button ${view === key ? "active" : ""}`, onClick: () => { setView(key); setSelectedId(value.focus[0]); setTimeout(fit, 0); } }, value.label))),
-            h("div", { className: "actions" }, h("button", { className: "button icon", title: "Fit all", onClick: fit }, "□"), h("button", { className: "button icon", title: "Toggle theme", onClick: theme }, "◐"))
+            h("div", { className: "actions" },
+              h("input", { className: "search", type: "search", value: query, placeholder: "Search map", "aria-label": "Search architecture map", onChange: event => setQuery(event.target.value) }),
+              h("button", { className: "button icon", title: "Fit all", "aria-label": "Fit all", onClick: fit }, "□"),
+              h("button", { className: "button icon", title: "Toggle theme", "aria-label": "Toggle theme", onClick: theme }, "◐")
+            )
           ),
           h("div", { className: "flow" }, h(ReactFlow, { nodes, edges, nodeTypes, edgeTypes, fitView: true, minZoom: 0.25, maxZoom: 1.5, nodesDraggable: false, nodesConnectable: false, onNodeClick: (_event, node) => byId[node.id] && setSelectedId(node.id), defaultEdgeOptions: { type: "contract" }, proOptions: { hideAttribution: true } }, h(Background, { variant: "lines", gap: 34, size: 0.75, color: "var(--grid)" }), h(Controls, { position: "bottom-left", showInteractive: false }))),
+          h("div", { className: "legend", "aria-label": "Source confidence legend" },
+            Object.entries(confidenceLabels).map(([key, label]) => h("span", { key, className: "legend-item" }, h("span", { className: "legend-swatch", style: { "--legend-color": confidenceColors[key] } }), label))
+          ),
           h(Drawer, { selectedId })
         );
       }
       function App() { return h(ReactFlowProvider, null, h(Board)); }
+      window.addEventListener("error", error => {
+        const fallback = document.querySelector("#boot-fallback .fallback-card");
+        if (fallback && !fallback.dataset.enhanced) {
+          fallback.dataset.enhanced = "true";
+          const detail = document.createElement("p");
+          detail.textContent = `Load error: ${error.message || "unknown error"}`;
+          fallback.append(detail);
+        }
+      });
       createRoot(document.getElementById("root")).render(h(App));
+      document.body.classList.add("app-ready");
     </script>
   </body>
 </html>

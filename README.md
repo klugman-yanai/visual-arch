@@ -1,6 +1,8 @@
 # visual-arch
 
-Reusable agent skill for creating project-agnostic visual architecture documents.
+Reusable agent skill for creating polished, project-agnostic visual architecture documents.
+
+`visual-arch` helps Codex and Claude inspect a project, coordinate focused analysis passes, and produce a source-backed React Flow architecture map as a standalone HTML document.
 
 ## Install
 
@@ -16,4 +18,19 @@ For a targeted non-interactive install:
 
     First explore the project, then use $visual-arch to create an interactive visual architecture document for this project.
 
-The skill uses specialized discovery, stack-selection, content, and verification passes to create a source-backed architecture document. React Flow is the primary bundled template for rich interactive maps. Mermaid is included only for constrained cases where the user explicitly wants a text-native, Markdown-adjacent, or no-React document.
+## What It Creates
+
+- A standalone React Flow HTML architecture document.
+- Clickable architecture nodes with detail panels.
+- Lanes, focused views, edge labels, source references, and confidence labels.
+- Local validation and optional browser render checks.
+
+See `examples/project-agnostic/visual-architecture.html` for a simplified, project-agnostic sample.
+
+## Trust And Runtime Notes
+
+- The skill itself does not send project code anywhere.
+- Agents using the skill inspect local project files to build the document.
+- The bundled HTML template loads React, React DOM, and XYFlow from public CDNs.
+- The validator scripts run locally.
+- Generated documents should be reviewed before publishing when they include private paths, internal system names, or inferred architecture claims.

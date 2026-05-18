@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Visual Architecture</title>
+    <link rel="stylesheet" href="https://unpkg.com/@xyflow/react@12.10.2/dist/style.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        --canvas: #f7f6f2;
+        --canvas-strong: #ece9df;
+        --surface: #fffefa;
+        --ink: #171717;
+        --muted: #625f58;
+        --quiet: #8a857c;
+        --line: #d8d4c8;
+        --panel: rgba(255, 254, 250, 0.92);
+        --shadow: 0 20px 58px rgba(34, 31, 24, 0.14);
+        --grid: rgba(93, 88, 76, 0.09);
+        --ok: #1c7c5c;
+        --warn: #9a6b21;
+        --unknown: #6b7280;
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --canvas: #24231f;
+        --canvas-strong: #302e29;
+        --surface: #302f2a;
+        --ink: #f3eee4;
+        --muted: #c8c0b1;
+        --quiet: #a89f91;
+        --line: #565247;
+        --panel: rgba(48, 47, 42, 0.92);
+        --shadow: 0 22px 64px rgba(0, 0, 0, 0.34);
+        --grid: rgba(228, 220, 205, 0.08);
+        --ok: #61c8a2;
+        --warn: #e1b85a;
+        --unknown: #a8b0b8;
+      }
+      * { box-sizing: border-box; }
+      html, body, #root { width: 100%; height: 100%; margin: 0; }
+      body {
+        overflow: hidden;
+        background: var(--canvas);
+        color: var(--ink);
+        font: 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      button { font: inherit; }
+      .app {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        background:
+          radial-gradient(circle at 8% 8%, rgba(66, 99, 190, 0.10), transparent 28rem),
+          radial-gradient(circle at 88% 12%, rgba(18, 137, 112, 0.09), transparent 30rem),
+          var(--canvas);
+      }
+      #boot-fallback {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+        background: var(--canvas);
+      }
+      body.app-ready #boot-fallback { display: none; }
+      .fallback-card {
+        max-width: 680px;
+        border: 1px solid rgba(120, 113, 100, 0.18);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        padding: 24px;
+      }
+      .fallback-card h1 { margin: 0 0 8px; font-size: clamp(1.8rem, 5vw, 3.2rem); line-height: 1; }
+      .fallback-card p { margin: 8px 0 0; color: var(--muted); }
+      .topbar {
+        position: absolute;
+        inset: 14px 14px auto 14px;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) minmax(280px, 1.5fr) auto;
+        gap: 12px;
+        align-items: center;
+        border: 1px solid rgba(120, 113, 100, 0.18);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 14px 34px rgba(34, 31, 24, 0.10);
+        padding: 10px 12px;
+        backdrop-filter: blur(14px);
+      }
+      .kicker {
+        display: block;
+        color: var(--quiet);
+        font-size: 0.68rem;
+        font-weight: 850;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .title {
+        display: block;
+        margin-top: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 1.05rem;
+        font-weight: 900;
+      }
+      .subtitle {
+        display: block;
+        margin-top: 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+      .tabs, .actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+      .search {
+        min-height: 34px;
+        min-width: 180px;
+        border: 1px solid rgba(120, 113, 100, 0.22);
+        border-radius: 6px;
+        background: color-mix(in srgb, var(--surface) 84%, transparent);
+        color: var(--ink);
+        padding: 7px 9px;
+        font: inherit;
+        font-size: 0.82rem;
+      }
+      .button {
+        min-height: 34px;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+        padding: 7px 10px;
+        font-size: 0.82rem;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+      .button:hover { border-color: rgba(120, 113, 100, 0.28); background: rgba(127, 127, 127, 0.08); }
+      .button.active { background: var(--ink); color: var(--surface); }
+      .button.icon { display: inline-grid; width: 34px; place-items: center; padding-inline: 0; }
+      .flow { width: 100%; height: 100%; }
+      .lane {
+        width: var(--lane-width);
+        height: var(--lane-height);
+        border-inline: 1px solid rgba(120, 113, 100, 0.18);
+        border-top: 4px solid var(--accent);
+        background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 68%);
+        pointer-events: none;
+      }
+      .lane-title {
+        padding: 14px 18px;
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 950;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+      .node {
+        width: 220px;
+        min-height: 86px;
+        border: 1px solid color-mix(in srgb, var(--accent) 42%, #afa99d);
+        border-top: 5px solid var(--accent);
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--soft) 38%, var(--surface));
+        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.10);
+        color: var(--ink);
+        overflow: hidden;
+      }
+      .node.selected { box-shadow: 0 22px 52px rgba(34, 31, 24, 0.20), 0 0 0 4px color-mix(in srgb, var(--accent) 19%, transparent); }
+      .node.dimmed { opacity: 0.34; filter: saturate(0.7); }
+      .node-domain {
+        padding: 10px 12px 0;
+        color: color-mix(in srgb, var(--accent) 78%, var(--ink));
+        font-size: 0.62rem;
+        font-weight: 950;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .node h3 { margin: 7px 12px 0; font-size: 1.14rem; line-height: 1.12; }
+      .node p { margin: 7px 12px 12px; color: var(--muted); font-size: 0.82rem; }
+      .confidence {
+        display: inline-flex;
+        width: fit-content;
+        max-width: calc(100% - 24px);
+        margin: 9px 12px 0;
+        border: 1px solid color-mix(in srgb, var(--confidence-color, var(--unknown)) 32%, transparent);
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--confidence-color, var(--unknown)) 10%, transparent);
+        color: color-mix(in srgb, var(--confidence-color, var(--unknown)) 86%, var(--ink));
+        padding: 3px 7px;
+        font-size: 0.62rem;
+        font-weight: 950;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .drawer {
+        position: absolute;
+        z-index: 18;
+        top: 88px;
+        right: 14px;
+        width: min(500px, calc(100vw - 28px));
+        max-height: calc(100vh - 108px);
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(120, 113, 100, 0.18);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        backdrop-filter: blur(16px);
+      }
+      .drawer-head { border-top: 5px solid var(--accent); border-bottom: 1px solid rgba(120, 113, 100, 0.16); padding: 16px 18px; }
+      .drawer h2 { margin: 7px 0 0; font-size: 1.45rem; line-height: 1.05; }
+      .drawer p, .drawer li { color: var(--muted); }
+      .drawer-body { overflow: auto; padding: 6px 18px 18px; }
+      .section { border-bottom: 1px solid rgba(120, 113, 100, 0.14); padding: 13px 0; }
+      .section:last-child { border-bottom: 0; }
+      .section h3 { margin: 0; color: var(--quiet); font-size: 0.72rem; font-weight: 950; letter-spacing: 0.12em; text-transform: uppercase; }
+      .section ul { margin: 9px 0 0; padding-left: 18px; }
+      .sources { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+      .source { border: 1px solid rgba(120, 113, 100, 0.18); border-radius: 6px; padding: 6px 8px; font: 0.74rem ui-monospace, SFMono-Regular, Consolas, monospace; }
+      .legend {
+        position: absolute;
+        left: 14px;
+        bottom: 92px;
+        z-index: 12;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        max-width: min(620px, calc(100vw - 28px));
+        border: 1px solid rgba(120, 113, 100, 0.18);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 12px 28px rgba(34, 31, 24, 0.1);
+        padding: 9px;
+        backdrop-filter: blur(14px);
+      }
+      .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 800;
+      }
+      .legend-swatch { width: 9px; height: 9px; border-radius: 999px; background: var(--legend-color); }
+      @media (max-width: 760px) {
+        .topbar { grid-template-columns: 1fr; }
+        .drawer { top: auto; bottom: 14px; max-height: 46vh; }
+        .legend { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="boot-fallback">
+      <div class="fallback-card">
+        <h1>Visual Architecture</h1>
+        <p>The interactive map is loading. If it does not appear, check network access to the React and XYFlow CDN assets.</p>
+      </div>
+    </div>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/@xyflow/react@12.10.2/dist/umd/index.js"></script>
+    <script>
+      const ARCHITECTURE_MODEL = {
+        "title": "Product Platform Architecture",
+        "subtitle": "A project-agnostic example of request flow, data contracts, delivery, and observability.",
+        "domains": {
+                "interface": {
+                        "label": "Interface",
+                        "color": "#4263be",
+                        "soft": "#dfe6ff"
+                },
+                "runtime": {
+                        "label": "Runtime",
+                        "color": "#128970",
+                        "soft": "#dff7ef"
+                },
+                "data": {
+                        "label": "Data",
+                        "color": "#9a6b21",
+                        "soft": "#f6ebcf"
+                },
+                "delivery": {
+                        "label": "Delivery",
+                        "color": "#8b4bb3",
+                        "soft": "#eadcf7"
+                },
+                "signal": {
+                        "label": "Signal",
+                        "color": "#bf3b5f",
+                        "soft": "#f8dce5"
+                }
+        },
+        "owners": {
+                "product": {
+                        "label": "Product Surface",
+                        "description": "User-facing entrypoints and supported interaction contracts."
+                },
+                "runtime": {
+                        "label": "Application Runtime",
+                        "description": "Request handling, orchestration, and domain behavior."
+                },
+                "data": {
+                        "label": "Data Boundary",
+                        "description": "Persistence, queues, artifacts, and externally visible state."
+                },
+                "delivery": {
+                        "label": "Delivery System",
+                        "description": "Build, test, release, and deployment responsibilities."
+                },
+                "signal": {
+                        "label": "Operations Signal",
+                        "description": "Logs, metrics, status, and debugging entrypoints."
+                }
+        },
+        "lanes": [
+                {
+                        "id": "lane-interface",
+                        "title": "Interaction Boundary",
+                        "domain": "interface",
+                        "x": 40,
+                        "y": 130,
+                        "width": 300,
+                        "height": 760
+                },
+                {
+                        "id": "lane-runtime",
+                        "title": "Runtime Core",
+                        "domain": "runtime",
+                        "x": 360,
+                        "y": 130,
+                        "width": 620,
+                        "height": 760
+                },
+                {
+                        "id": "lane-data",
+                        "title": "State And External Contracts",
+                        "domain": "data",
+                        "x": 1000,
+                        "y": 130,
+                        "width": 300,
+                        "height": 760
+                },
+                {
+                        "id": "lane-delivery",
+                        "title": "Delivery And Signal",
+                        "domain": "delivery",
+                        "x": 1320,
+                        "y": 130,
+                        "width": 300,
+                        "height": 760
+                }
+        ],
+        "nodes": [
+                {
+                        "id": "user-entry",
+                        "title": "User Entry",
+                        "domain": "interface",
+                        "owner": "product",
+                        "x": 100,
+                        "y": 240,
+                        "purpose": "The supported way users or automations enter the system.",
+                        "details": {
+                                "summary": "Represents a UI, CLI, webhook, or API gateway that starts product workflows.",
+                                "inputs": [
+                                        "User action",
+                                        "Automation request",
+                                        "External webhook"
+                                ],
+                                "outputs": [
+                                        "Normalized request"
+                                ],
+                                "why": "Keeps the architecture boundary visible before internal runtime details begin.",
+                                "failures": [
+                                        "Check route registration",
+                                        "Check authentication and request validation"
+                                ],
+                                "source": [
+                                        "example: replace with app routes, CLI entrypoints, or API specs"
+                                ],
+                                "source_confidence": "external",
+                                "related": [
+                                        "request-router"
+                                ]
+                        }
+                },
+                {
+                        "id": "request-router",
+                        "title": "Request Router",
+                        "domain": "runtime",
+                        "owner": "runtime",
+                        "x": 430,
+                        "y": 220,
+                        "purpose": "Classifies requests and sends them to the right workflow.",
+                        "details": {
+                                "summary": "Maps external actions to internal handlers and establishes routing contracts.",
+                                "inputs": [
+                                        "Normalized request",
+                                        "Auth/session context"
+                                ],
+                                "outputs": [
+                                        "Handler invocation",
+                                        "Rejected request"
+                                ],
+                                "why": "Most systems centralize policy, routing, or command dispatch here.",
+                                "failures": [
+                                        "Check route table",
+                                        "Check middleware order",
+                                        "Check integration tests"
+                                ],
+                                "source": [
+                                        "example: replace with router, controller, or command dispatcher"
+                                ],
+                                "source_confidence": "inferred",
+                                "related": [
+                                        "workflow-engine",
+                                        "auth-policy"
+                                ]
+                        }
+                },
+                {
+                        "id": "auth-policy",
+                        "title": "Auth And Policy",
+                        "domain": "runtime",
+                        "owner": "runtime",
+                        "x": 430,
+                        "y": 480,
+                        "purpose": "Guards privileged operations and user-specific data.",
+                        "details": {
+                                "summary": "Combines identity, permissions, and tenant/project scoping before state changes.",
+                                "inputs": [
+                                        "Identity claims",
+                                        "Request context",
+                                        "Policy config"
+                                ],
+                                "outputs": [
+                                        "Allowed action",
+                                        "Denied action"
+                                ],
+                                "why": "Authorization is a key contract between interface and domain logic.",
+                                "failures": [
+                                        "Check policy config",
+                                        "Check auth middleware",
+                                        "Check denied-request logs"
+                                ],
+                                "source": [
+                                        "example: replace with auth middleware and policy tests"
+                                ],
+                                "source_confidence": "inferred",
+                                "related": [
+                                        "request-router",
+                                        "workflow-engine"
+                                ]
+                        }
+                },
+                {
+                        "id": "workflow-engine",
+                        "title": "Workflow Engine",
+                        "domain": "runtime",
+                        "owner": "runtime",
+                        "x": 700,
+                        "y": 340,
+                        "purpose": "Runs the core product operation from validated input to durable result.",
+                        "details": {
+                                "summary": "Coordinates domain services, validation, persistence, and side effects.",
+                                "inputs": [
+                                        "Handler invocation",
+                                        "Policy decision",
+                                        "Loaded state"
+                                ],
+                                "outputs": [
+                                        "Domain result",
+                                        "State mutation",
+                                        "Side effect request"
+                                ],
+                                "why": "This is the central explanation target for maintainers joining a project.",
+                                "failures": [
+                                        "Check domain tests",
+                                        "Check retry/error handling",
+                                        "Check state transition logs"
+                                ],
+                                "source": [
+                                        "example: replace with service layer, job runner, or use-case module"
+                                ],
+                                "source_confidence": "source-backed",
+                                "related": [
+                                        "state-store",
+                                        "event-queue",
+                                        "observability"
+                                ]
+                        }
+                },
+                {
+                        "id": "state-store",
+                        "title": "State Store",
+                        "domain": "data",
+                        "owner": "data",
+                        "x": 1060,
+                        "y": 230,
+                        "purpose": "Persists canonical product state and read models.",
+                        "details": {
+                                "summary": "Represents databases, object storage, indexes, or durable files that define current state.",
+                                "inputs": [
+                                        "Validated writes",
+                                        "Migration scripts"
+                                ],
+                                "outputs": [
+                                        "Current state",
+                                        "Historical records"
+                                ],
+                                "why": "Architecture maps should make durable contracts and ownership explicit.",
+                                "failures": [
+                                        "Check schema migrations",
+                                        "Check connection config",
+                                        "Check data integrity tests"
+                                ],
+                                "source": [
+                                        "example: replace with schema, models, or storage paths"
+                                ],
+                                "source_confidence": "source-backed",
+                                "related": [
+                                        "workflow-engine",
+                                        "reporting-api"
+                                ]
+                        }
+                },
+                {
+                        "id": "event-queue",
+                        "title": "Async Queue",
+                        "domain": "data",
+                        "owner": "data",
+                        "x": 1060,
+                        "y": 500,
+                        "purpose": "Decouples slow side effects from the request path.",
+                        "details": {
+                                "summary": "Represents jobs, queues, streams, or scheduled workers used after core state changes.",
+                                "inputs": [
+                                        "Side effect request",
+                                        "Scheduled trigger"
+                                ],
+                                "outputs": [
+                                        "Worker task",
+                                        "Delivery event"
+                                ],
+                                "why": "Async contracts are common failure points and should be explicit.",
+                                "failures": [
+                                        "Check queue depth",
+                                        "Check worker retries",
+                                        "Check dead-letter handling"
+                                ],
+                                "source": [
+                                        "example: replace with queue config, worker code, or workflow files"
+                                ],
+                                "source_confidence": "inferred",
+                                "related": [
+                                        "workflow-engine",
+                                        "observability"
+                                ]
+                        }
+                },
+                {
+                        "id": "reporting-api",
+                        "title": "Reporting API",
+                        "domain": "interface",
+                        "owner": "product",
+                        "x": 100,
+                        "y": 620,
+                        "purpose": "Exposes results, status, and derived views back to users.",
+                        "details": {
+                                "summary": "Provides read-side contracts such as dashboards, status endpoints, exports, or CLI output.",
+                                "inputs": [
+                                        "Current state",
+                                        "Derived result"
+                                ],
+                                "outputs": [
+                                        "User-visible status",
+                                        "Exported artifact"
+                                ],
+                                "why": "The architecture should show how users observe the system after work completes.",
+                                "failures": [
+                                        "Check response serialization",
+                                        "Check cache/index freshness",
+                                        "Check contract tests"
+                                ],
+                                "source": [
+                                        "example: replace with read endpoints, views, or export commands"
+                                ],
+                                "source_confidence": "external",
+                                "related": [
+                                        "state-store"
+                                ]
+                        }
+                },
+                {
+                        "id": "ci-release",
+                        "title": "CI And Release",
+                        "domain": "delivery",
+                        "owner": "delivery",
+                        "x": 1380,
+                        "y": 250,
+                        "purpose": "Builds, tests, packages, and deploys project changes.",
+                        "details": {
+                                "summary": "Represents the delivery path from source change to runnable artifact or environment.",
+                                "inputs": [
+                                        "Source change",
+                                        "Build config",
+                                        "Test suite"
+                                ],
+                                "outputs": [
+                                        "Validated artifact",
+                                        "Deployment"
+                                ],
+                                "why": "Delivery is part of architecture when it controls runtime behavior and quality gates.",
+                                "failures": [
+                                        "Check workflow logs",
+                                        "Check package metadata",
+                                        "Check environment configuration"
+                                ],
+                                "source": [
+                                        "example: replace with CI workflows, Dockerfiles, or deployment manifests"
+                                ],
+                                "source_confidence": "source-backed",
+                                "related": [
+                                        "workflow-engine",
+                                        "observability"
+                                ]
+                        }
+                },
+                {
+                        "id": "observability",
+                        "title": "Observability",
+                        "domain": "signal",
+                        "owner": "signal",
+                        "x": 1380,
+                        "y": 540,
+                        "purpose": "Provides logs, metrics, traces, and operational status for debugging.",
+                        "details": {
+                                "summary": "Collects runtime and delivery signals that maintainers use when the system breaks.",
+                                "inputs": [
+                                        "Runtime events",
+                                        "Worker status",
+                                        "Deployment status"
+                                ],
+                                "outputs": [
+                                        "Logs",
+                                        "Metrics",
+                                        "Alerts",
+                                        "Dashboards"
+                                ],
+                                "why": "A useful architecture doc points maintainers to the first places to inspect failures.",
+                                "failures": [
+                                        "Check logging config",
+                                        "Check dashboard freshness",
+                                        "Check alert routing"
+                                ],
+                                "source": [
+                                        "example: replace with logging, metrics, status files, or monitoring config"
+                                ],
+                                "source_confidence": "unknown",
+                                "related": [
+                                        "workflow-engine",
+                                        "event-queue",
+                                        "ci-release"
+                                ]
+                        }
+                }
+        ],
+        "edges": [
+                {
+                        "id": "user-entry-request-router",
+                        "source": "user-entry",
+                        "target": "request-router",
+                        "label": "request",
+                        "kind": "control"
+                },
+                {
+                        "id": "request-router-auth-policy",
+                        "source": "request-router",
+                        "target": "auth-policy",
+                        "label": "context",
+                        "kind": "control"
+                },
+                {
+                        "id": "auth-policy-workflow-engine",
+                        "source": "auth-policy",
+                        "target": "workflow-engine",
+                        "label": "decision",
+                        "kind": "signal"
+                },
+                {
+                        "id": "request-router-workflow-engine",
+                        "source": "request-router",
+                        "target": "workflow-engine",
+                        "label": "handler",
+                        "kind": "control"
+                },
+                {
+                        "id": "workflow-engine-state-store",
+                        "source": "workflow-engine",
+                        "target": "state-store",
+                        "label": "read/write",
+                        "kind": "data"
+                },
+                {
+                        "id": "workflow-engine-event-queue",
+                        "source": "workflow-engine",
+                        "target": "event-queue",
+                        "label": "job",
+                        "kind": "data"
+                },
+                {
+                        "id": "state-store-reporting-api",
+                        "source": "state-store",
+                        "target": "reporting-api",
+                        "label": "read model",
+                        "kind": "data"
+                },
+                {
+                        "id": "workflow-engine-observability",
+                        "source": "workflow-engine",
+                        "target": "observability",
+                        "label": "logs/metrics",
+                        "kind": "signal"
+                },
+                {
+                        "id": "event-queue-observability",
+                        "source": "event-queue",
+                        "target": "observability",
+                        "label": "worker status",
+                        "kind": "signal"
+                },
+                {
+                        "id": "ci-release-workflow-engine",
+                        "source": "ci-release",
+                        "target": "workflow-engine",
+                        "label": "deploy",
+                        "kind": "dependency"
+                },
+                {
+                        "id": "ci-release-observability",
+                        "source": "ci-release",
+                        "target": "observability",
+                        "label": "check status",
+                        "kind": "signal"
+                }
+        ],
+        "views": {
+                "overview": {
+                        "label": "Overview",
+                        "focus": [
+                                "user-entry",
+                                "request-router",
+                                "auth-policy",
+                                "workflow-engine",
+                                "state-store",
+                                "event-queue",
+                                "reporting-api",
+                                "ci-release",
+                                "observability"
+                        ]
+                },
+                "runtime": {
+                        "label": "Runtime",
+                        "focus": [
+                                "user-entry",
+                                "request-router",
+                                "auth-policy",
+                                "workflow-engine",
+                                "state-store",
+                                "event-queue",
+                                "reporting-api"
+                        ]
+                },
+                "delivery": {
+                        "label": "Delivery",
+                        "focus": [
+                                "ci-release",
+                                "workflow-engine",
+                                "observability"
+                        ]
+                },
+                "debugging": {
+                        "label": "Debugging",
+                        "focus": [
+                                "workflow-engine",
+                                "event-queue",
+                                "observability",
+                                "ci-release"
+                        ]
+                }
+        }
+};
+      const { createElement: h, useCallback, useMemo, useState } = React;
+      const { createRoot } = ReactDOM;
+      const { Background, BaseEdge, Controls, EdgeLabelRenderer, MarkerType, ReactFlow, ReactFlowProvider, getBezierPath, useReactFlow } = window.ReactFlow;
+      const byId = Object.fromEntries(ARCHITECTURE_MODEL.nodes.map(node => [node.id, node]));
+      const confidenceLabels = {
+        "source-backed": "Source backed",
+        inferred: "Inferred",
+        external: "External",
+        unknown: "Unknown"
+      };
+      const confidenceColors = {
+        "source-backed": "var(--ok)",
+        inferred: "var(--warn)",
+        external: "#4263be",
+        unknown: "var(--unknown)"
+      };
+      function vars(domainKey) {
+        const domain = ARCHITECTURE_MODEL.domains[domainKey] || ARCHITECTURE_MODEL.domains.system;
+        return { "--accent": domain.color, "--soft": domain.soft };
+      }
+      function confidenceStyle(value) {
+        return { "--confidence-color": confidenceColors[value] || confidenceColors.unknown };
+      }
+      function directRelations(id) {
+        return [...new Set(ARCHITECTURE_MODEL.edges.flatMap(edge => edge.source === id ? [edge.target] : edge.target === id ? [edge.source] : []))].filter(Boolean);
+      }
+      function LaneNode({ data }) {
+        return h("div", { className: "lane", style: { ...vars(data.domain), "--lane-width": `${data.width}px`, "--lane-height": `${data.height}px` } }, h("div", { className: "lane-title" }, data.title));
+      }
+      function ArchitectureNode({ data, selected }) {
+        const domain = ARCHITECTURE_MODEL.domains[data.domain] || ARCHITECTURE_MODEL.domains.system;
+        const confidence = data.details?.source_confidence || "unknown";
+        return h("div", { className: `node ${selected ? "selected" : ""} ${data.dimmed ? "dimmed" : ""}`, style: vars(data.domain) },
+          h("div", { className: "node-domain" }, domain.label),
+          h("span", { className: "confidence", style: confidenceStyle(confidence) }, confidenceLabels[confidence] || "Unknown"),
+          h("h3", null, data.title),
+          h("p", null, data.purpose)
+        );
+      }
+      function ContractEdge(props) {
+        const [path, labelX, labelY] = getBezierPath(props);
+        const edge = props.data || {};
+        const color = edge.color || "#8f887d";
+        return h(React.Fragment, null,
+          h(BaseEdge, { path, markerEnd: props.markerEnd, style: { stroke: color, strokeWidth: edge.active ? 2.8 : 1.8, strokeDasharray: edge.kind === "data" || edge.kind === "dependency" ? "7 7" : undefined, opacity: edge.dimmed ? 0.18 : 0.75 } }),
+          h(EdgeLabelRenderer, null, h("div", { style: { position: "absolute", transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`, border: "1px solid rgba(120,113,100,.18)", borderRadius: "999px", background: "var(--panel)", padding: "4px 8px", fontSize: ".72rem", fontWeight: 850, opacity: edge.dimmed ? 0 : 1 } }, edge.label))
+        );
+      }
+      const nodeTypes = { architecture: ArchitectureNode, lane: LaneNode };
+      const edgeTypes = { contract: ContractEdge };
+      function buildNodes(selectedId, viewKey) {
+        const focus = new Set((ARCHITECTURE_MODEL.views[viewKey] || ARCHITECTURE_MODEL.views.overview).focus);
+        const related = new Set(selectedId ? [selectedId, ...directRelations(selectedId)] : focus);
+        return [
+          ...ARCHITECTURE_MODEL.lanes.map(lane => ({ id: lane.id, type: "lane", position: { x: lane.x, y: lane.y }, data: lane, selectable: false, draggable: false })),
+          ...ARCHITECTURE_MODEL.nodes.map(node => ({ id: node.id, type: "architecture", position: { x: node.x, y: node.y }, data: { ...node, dimmed: selectedId ? !related.has(node.id) : !focus.has(node.id) }, draggable: false }))
+        ];
+      }
+      function matchesQuery(node, query) {
+        if (!query) return true;
+        const haystack = [
+          node.title,
+          node.purpose,
+          node.domain,
+          node.owner,
+          node.details?.summary,
+          ...(node.details?.source || [])
+        ].join(" ").toLowerCase();
+        return haystack.includes(query.toLowerCase());
+      }
+      function buildEdges(selectedId) {
+        const related = new Set(selectedId ? [selectedId, ...directRelations(selectedId)] : []);
+        return ARCHITECTURE_MODEL.edges.map(edge => ({ id: edge.id, source: edge.source, target: edge.target, type: "contract", markerEnd: { type: MarkerType.ArrowClosed }, data: { ...edge, active: selectedId && (edge.source === selectedId || edge.target === selectedId), dimmed: selectedId && !(related.has(edge.source) && related.has(edge.target)) } }));
+      }
+      function Drawer({ selectedId }) {
+        const node = byId[selectedId] || ARCHITECTURE_MODEL.nodes[0];
+        const domain = ARCHITECTURE_MODEL.domains[node.domain] || ARCHITECTURE_MODEL.domains.system;
+        const owner = ARCHITECTURE_MODEL.owners[node.owner] || { label: node.owner, description: "" };
+        const details = node.details;
+        return h("aside", { className: "drawer", style: vars(node.domain) },
+          h("div", { className: "drawer-head" }, h("span", { className: "kicker" }, `${owner.label} / ${domain.label}`), h("h2", null, node.title), h("p", null, node.purpose)),
+          h("div", { className: "drawer-body" },
+            h("section", { className: "section" }, h("h3", null, "What it does"), h("p", null, details.summary)),
+            h("section", { className: "section" }, h("h3", null, "Reads"), h("ul", null, details.inputs.map(item => h("li", { key: item }, item)))),
+            h("section", { className: "section" }, h("h3", null, "Writes"), h("ul", null, details.outputs.map(item => h("li", { key: item }, item)))),
+            h("section", { className: "section" }, h("h3", null, "Why it exists"), h("p", null, details.why)),
+            h("section", { className: "section" }, h("h3", null, "Source confidence"), h("p", null, confidenceLabels[details.source_confidence] || "Unknown")),
+            h("section", { className: "section" }, h("h3", null, "Check first if it fails"), h("ul", null, details.failures.map(item => h("li", { key: item }, item)))),
+            h("section", { className: "section" }, h("h3", null, "Where to look"), h("div", { className: "sources" }, details.source.map(item => h("span", { key: item, className: "source" }, item))))
+          )
+        );
+      }
+      function Board() {
+        const [view, setView] = useState("overview");
+        const [selectedId, setSelectedId] = useState(ARCHITECTURE_MODEL.nodes[0]?.id);
+        const [query, setQuery] = useState("");
+        const reactFlow = useReactFlow();
+        const nodes = useMemo(() => buildNodes(selectedId, view).map(node => byId[node.id] && !matchesQuery(byId[node.id], query) ? { ...node, data: { ...node.data, dimmed: true } } : node), [selectedId, view, query]);
+        const edges = useMemo(() => buildEdges(selectedId), [selectedId]);
+        const fit = useCallback(() => reactFlow.fitView({ padding: 0.18, duration: 260 }), [reactFlow]);
+        const theme = useCallback(() => {
+          document.documentElement.dataset.theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        }, []);
+        return h("div", { className: "app" },
+          h("div", { className: "topbar" },
+            h("div", null, h("span", { className: "kicker" }, "Visual architecture"), h("span", { className: "title" }, ARCHITECTURE_MODEL.title), h("span", { className: "subtitle" }, ARCHITECTURE_MODEL.subtitle || "")),
+            h("div", { className: "tabs" }, Object.entries(ARCHITECTURE_MODEL.views).map(([key, value]) => h("button", { key, className: `button ${view === key ? "active" : ""}`, onClick: () => { setView(key); setSelectedId(value.focus[0]); setTimeout(fit, 0); } }, value.label))),
+            h("div", { className: "actions" },
+              h("input", { className: "search", type: "search", value: query, placeholder: "Search map", "aria-label": "Search architecture map", onChange: event => setQuery(event.target.value) }),
+              h("button", { className: "button icon", title: "Fit all", "aria-label": "Fit all", onClick: fit }, "□"),
+              h("button", { className: "button icon", title: "Toggle theme", "aria-label": "Toggle theme", onClick: theme }, "◐")
+            )
+          ),
+          h("div", { className: "flow" }, h(ReactFlow, { nodes, edges, nodeTypes, edgeTypes, fitView: true, minZoom: 0.25, maxZoom: 1.5, nodesDraggable: false, nodesConnectable: false, onNodeClick: (_event, node) => byId[node.id] && setSelectedId(node.id), defaultEdgeOptions: { type: "contract" }, proOptions: { hideAttribution: true } }, h(Background, { variant: "lines", gap: 34, size: 0.75, color: "var(--grid)" }), h(Controls, { position: "bottom-left", showInteractive: false }))),
+          h("div", { className: "legend", "aria-label": "Source confidence legend" },
+            Object.entries(confidenceLabels).map(([key, label]) => h("span", { key, className: "legend-item" }, h("span", { className: "legend-swatch", style: { "--legend-color": confidenceColors[key] } }), label))
+          ),
+          h(Drawer, { selectedId })
+        );
+      }
+      function App() { return h(ReactFlowProvider, null, h(Board)); }
+      window.addEventListener("error", error => {
+        const fallback = document.querySelector("#boot-fallback .fallback-card");
+        if (fallback && !fallback.dataset.enhanced) {
+          fallback.dataset.enhanced = "true";
+          const detail = document.createElement("p");
+          detail.textContent = `Load error: ${error.message || "unknown error"}`;
+          fallback.append(detail);
+        }
+      });
+      createRoot(document.getElementById("root")).render(h(App));
+      document.body.classList.add("app-ready");
+    </script>
+  </body>
+</html>
