@@ -1000,10 +1000,48 @@
     </div>
     <div id="root"></div>
 
+    <script>
+      function showBootError(error) {
+        document.body.classList.remove("app-ready");
+        const fallback = document.querySelector("#boot-fallback .fallback-card");
+        if (!fallback || fallback.dataset.enhanced) return;
+        fallback.dataset.enhanced = "true";
+        const message = error?.reason?.message || error?.message || String(error || "The interactive module failed to load.");
+        const detail = document.createElement("p");
+        detail.textContent = `Load error: ${message}`;
+        fallback.append(detail);
+      }
+
+      window.addEventListener("error", showBootError);
+      window.addEventListener("unhandledrejection", showBootError);
+      window.setTimeout(() => {
+        if (!document.body.classList.contains("app-ready")) {
+          showBootError(new Error("React Flow did not finish loading. Check CDN/network access."));
+        }
+      }, 12000);
+    </script>
     <script type="module">
-      import React, { useCallback, useEffect, useMemo, useRef, useState } from "https://esm.sh/react@18.3.1";
-      import { createRoot } from "https://esm.sh/react-dom@18.3.1/client";
-      import {
+      async function importFirst(label, urls) {
+        const errors = [];
+        for (const url of urls) {
+          try {
+            return await import(url);
+          } catch (error) {
+            errors.push(`${url}: ${error?.message || error}`);
+          }
+        }
+        throw new Error(`${label} failed to load from all CDNs. ${errors.join(" | ")}`);
+      }
+
+      const React = await importFirst("React", [
+        "https://esm.sh/react@18.3.1",
+        "https://cdn.jsdelivr.net/npm/react@18.3.1/+esm"
+      ]);
+      const { createRoot } = await importFirst("React DOM", [
+        "https://esm.sh/react-dom@18.3.1/client",
+        "https://cdn.jsdelivr.net/npm/react-dom@18.3.1/client/+esm"
+      ]);
+      const {
         Background,
         BaseEdge,
         Controls,
@@ -1015,8 +1053,12 @@
         ReactFlowProvider,
         getBezierPath,
         useReactFlow
-      } from "https://esm.sh/@xyflow/react@12.10.2?deps=react@18.3.1,react-dom@18.3.1";
+      } = await importFirst("React Flow", [
+        "https://esm.sh/@xyflow/react@12.10.2?deps=react@18.3.1,react-dom@18.3.1",
+        "https://cdn.jsdelivr.net/npm/@xyflow/react@12.10.2/+esm"
+      ]);
 
+      const { useCallback, useEffect, useMemo, useRef, useState } = React;
       const h = React.createElement;
 
       function IconSvg({ children, ...props }) {
@@ -1941,7 +1983,6 @@
             markerEnd: {
               type: MarkerType.ArrowClosed,
               color: dimmed ? "#c7c1b6" : color
-              color
             },
             data: {
               label,
@@ -2582,20 +2623,6 @@
       function App() {
         return h(ReactFlowProvider, null, h(FlowBoard));
       }
-
-      function showBootError(error) {
-        document.body.classList.remove("app-ready");
-        const fallback = document.querySelector("#boot-fallback .fallback-card");
-        if (!fallback || fallback.dataset.enhanced) return;
-        fallback.dataset.enhanced = "true";
-        const message = error?.reason?.message || error?.message || "The interactive module failed to load.";
-        const detail = document.createElement("p");
-        detail.textContent = `Load error: ${message}`;
-        fallback.append(detail);
-      }
-
-      window.addEventListener("error", showBootError);
-      window.addEventListener("unhandledrejection", showBootError);
 
       createRoot(document.getElementById("root")).render(h(App));
     </script>
