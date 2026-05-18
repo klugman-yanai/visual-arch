@@ -14,6 +14,10 @@ BOARD_RE = re.compile(
     r"const\s+BOARD\s*=\s*(\{.*?\});\s*const\s+GROUP_DETAILS\s*=",
     re.DOTALL,
 )
+DATA_RE = re.compile(
+    r"const\s+VISUAL_ARCH_DATA\s*=\s*(\{.*?\});\s*const\s+DOMAINS\s*=\s*VISUAL_ARCH_DATA\.domains",
+    re.DOTALL,
+)
 DOMAINS_RE = re.compile(
     r"const\s+DOMAINS\s*=\s*(\{.*?\});\s*const\s+OWNERS\s*=",
     re.DOTALL,
@@ -40,12 +44,26 @@ def extract_json(text: str, pattern: re.Pattern[str], label: str) -> dict:
         fail(f"{label} is not valid JSON: {error}")
 
 
+def normalize_model(raw: dict) -> tuple[dict, dict, dict]:
+    if {"domains", "owners", "board"}.issubset(raw):
+        return raw["domains"], raw["owners"], raw["board"]
+    fail("model JSON must contain domains, owners, and board")
+
+
 def load_models(path: Path) -> tuple[dict, dict, dict]:
     text = path.read_text(encoding="utf-8")
+    if path.suffix == ".json":
+        return normalize_model(json.loads(text))
     if "<!doctype html>" not in text.lower():
         fail("document is not an HTML document with a doctype")
     if "ReactFlow" not in text:
         fail("document does not appear to include the React Flow renderer")
+    data_match = DATA_RE.search(text)
+    if data_match:
+        try:
+            return normalize_model(json.loads(data_match.group(1)))
+        except json.JSONDecodeError as error:
+            fail(f"VISUAL_ARCH_DATA is not valid JSON: {error}")
     domains = extract_json(text, DOMAINS_RE, "DOMAINS")
     owners = extract_json(text, OWNERS_RE, "OWNERS")
     board = extract_json(text, BOARD_RE, "BOARD")
@@ -128,11 +146,11 @@ def main() -> None:
             "Validate standalone visual-arch HTML generated from the bundled production-style React Flow template."
         )
     )
-    parser.add_argument("html", type=Path)
+    parser.add_argument("input", type=Path, help="Generated HTML document or source model JSON")
     args = parser.parse_args()
-    if not args.html.exists():
-        fail(f"file does not exist: {args.html}")
-    validate(args.html)
+    if not args.input.exists():
+        fail(f"file does not exist: {args.input}")
+    validate(args.input)
 
 
 if __name__ == "__main__":

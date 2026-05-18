@@ -1,19 +1,20 @@
 # Content Model
 
-Use this model as the intermediate artifact before generating HTML. It can live in scratch notes, a temp JSON file, or directly inside the template as `BOARD` plus `DOMAINS`, `OWNERS`, and `GROUP_DETAILS`.
+Use this model as the intermediate artifact before generating HTML. It can live in scratch notes, a temp JSON file, or directly inside the template as `VISUAL_ARCH_DATA`.
 
 Required top-level fields:
 
 ```json
 {
-  "title": "Project Architecture",
-  "subtitle": "Short boundary statement",
   "domains": {},
   "owners": {},
-  "lanes": [],
-  "nodes": [],
-  "edges": [],
-  "views": {}
+  "board": {
+    "lanes": [],
+    "nodes": [],
+    "edges": [],
+    "views": {}
+  },
+  "groupDetails": {}
 }
 ```
 

@@ -27,6 +27,15 @@ For a targeted non-interactive install:
 
 See `examples/project-agnostic/visual-architecture.html` for a simplified, project-agnostic sample.
 
+The sample is generated from:
+
+- `skills/visual-arch/assets/visual-architecture-template.html`
+- `examples/project-agnostic/model.json`
+
+Regenerate it with:
+
+    python scripts/build_example.py
+
 ## Trust And Runtime Notes
 
 - The skill itself does not send project code anywhere.
