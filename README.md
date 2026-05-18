@@ -4,13 +4,13 @@ Reusable agent skill for creating project-agnostic visual architecture documents
 
 ## Install
 
-Install for Codex and Claude Code:
+Run the interactive installer and choose your agent/harness:
+
+    npx skills add klugman-yanai/visual-arch
+
+For a targeted non-interactive install:
 
     npx skills add klugman-yanai/visual-arch --skill visual-arch -a codex -a claude-code
-
-Install globally for all supported agents interactively:
-
-    npx skills add klugman-yanai/visual-arch --skill visual-arch -g
 
 ## Use
 
