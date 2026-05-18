@@ -31,6 +31,7 @@ Create a polished, self-contained React Flow architecture HTML document from any
    - Build a `VISUAL_ARCH_DATA` object with `domains`, `owners`, `board`, and `groupDetails`.
    - Replace the `__VISUAL_ARCH_DATA__` token in the template with that JSON object.
    - Default to a vertical, top-to-bottom flow across vertical responsibility lanes. Treat the artifact as a modern interactive upgrade of a sequence diagram: columns are architectural responsibilities, and the reading path moves downward through the important contracts.
+   - If the target project already contains a strong `docs/visual-architecture.html`, use it as a style and interaction precedent while replacing the data with the current project's source-backed model.
    - Preserve standalone behavior: no private runtime services, useful fallback content, accessible controls, responsive layout.
 
 5. Verify before completion.
@@ -89,6 +90,7 @@ Merge results yourself. Resolve contradictions by checking source. Do not let su
 - Use stable IDs (`lower-kebab-case`) for nodes and edges.
 - Keep the graph readable: 8-30 primary nodes is usually better than exhaustive file-level mapping.
 - Use lanes/groups to express responsibility or lifecycle phases. Prefer tall vertical lanes with a top-to-bottom reading path, like a polished sequence diagram.
+- Route edges deliberately with explicit handles. Clean connector flow is part of the design, not a cosmetic afterthought.
 - Use colors by function, not by brand, unless the project has explicit design guidance.
 - Keep the output static and portable by default. Avoid requiring npm installs, bundlers, private assets, or live services unless the selected stack is intentionally integrated into an existing app.
 - Cite generated or inferred sources honestly: `inferred from <path>`, `external: <name>`, or `generated artifact`.

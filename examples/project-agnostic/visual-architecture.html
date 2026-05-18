@@ -1051,7 +1051,7 @@
         Position,
         ReactFlow,
         ReactFlowProvider,
-        getBezierPath,
+        getSmoothStepPath,
         useReactFlow
       } = await importFirst("React Flow", [
         "https://esm.sh/@xyflow/react@12.10.2?deps=react@18.3.1,react-dom@18.3.1",
@@ -1210,7 +1210,7 @@
                                         "y": 150
                                 },
                                 "width": 270,
-                                "height": 720
+                                "height": 840
                         },
                         {
                                 "id": "lane-runtime",
@@ -1222,7 +1222,7 @@
                                         "y": 150
                                 },
                                 "width": 270,
-                                "height": 720
+                                "height": 840
                         },
                         {
                                 "id": "lane-state",
@@ -1234,7 +1234,7 @@
                                         "y": 150
                                 },
                                 "width": 270,
-                                "height": 720
+                                "height": 840
                         },
                         {
                                 "id": "lane-signal",
@@ -1246,7 +1246,7 @@
                                         "y": 150
                                 },
                                 "width": 270,
-                                "height": 720
+                                "height": 840
                         }
                 ],
                 "nodes": [
@@ -1346,7 +1346,7 @@
                                 ],
                                 "position": {
                                         "x": 390,
-                                        "y": 245
+                                        "y": 420
                                 },
                                 "details": {
                                         "summary": "Guards privileged operations and user-specific data.",
@@ -1387,7 +1387,7 @@
                                 ],
                                 "position": {
                                         "x": 390,
-                                        "y": 420
+                                        "y": 595
                                 },
                                 "details": {
                                         "summary": "Runs the product operation from validated input to durable result.",
@@ -1430,7 +1430,7 @@
                                 ],
                                 "position": {
                                         "x": 690,
-                                        "y": 420
+                                        "y": 595
                                 },
                                 "details": {
                                         "summary": "Persists canonical product state and read models.",
@@ -1471,7 +1471,7 @@
                                 ],
                                 "position": {
                                         "x": 390,
-                                        "y": 595
+                                        "y": 770
                                 },
                                 "details": {
                                         "summary": "Decouples slow side effects from the request path.",
@@ -1512,7 +1512,7 @@
                                 ],
                                 "position": {
                                         "x": 690,
-                                        "y": 595
+                                        "y": 770
                                 },
                                 "details": {
                                         "summary": "Exposes results, status, and derived views back to users.",
@@ -1593,7 +1593,7 @@
                                 ],
                                 "position": {
                                         "x": 990,
-                                        "y": 595
+                                        "y": 770
                                 },
                                 "details": {
                                         "summary": "Provides logs, metrics, traces, and operational status for debugging.",
@@ -1738,7 +1738,53 @@
                 },
                 "layout": {
                         "orientation": "vertical",
-                        "reading_path": "top-to-bottom flow across vertical responsibility lanes"
+                        "reading_path": "top-to-bottom sequence flow with orthogonal handoffs across vertical responsibility lanes"
+                },
+                "edgeHandles": {
+                        "user-entry->request-router": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "request-router->auth-policy": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "auth-policy->workflow-engine": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "request-router->workflow-engine": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "workflow-engine->state-store": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "workflow-engine->async-work": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "state-store->reporting-surface": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "workflow-engine->observability": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "async-work->observability": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "ci-release->workflow-engine": [
+                                "out-left",
+                                "in-right"
+                        ],
+                        "ci-release->observability": [
+                                "out-bottom",
+                                "in-top"
+                        ]
                 }
         },
         "groupDetails": {
@@ -1746,7 +1792,7 @@
                         "title": "Project Architecture",
                         "purpose": "A modern sequence-style map of responsibilities and contracts.",
                         "domain": "runtime",
-                        "summary": "Read downward through each responsibility lane: entry and routing, policy and work, state and results, then delivery and signal.",
+                        "summary": "Read downward through each responsibility lane, with clean orthogonal handoffs between entry, runtime, state, delivery, and signal.",
                         "why": "It gives maintainers a first map before they dive into files.",
                         "points": [
                                 "Vertical responsibility lanes keep the full map legible while preserving sequence-style flow.",
@@ -1827,7 +1873,7 @@
       const BOARD = VISUAL_ARCH_DATA.board;
       const GROUP_DETAILS = VISUAL_ARCH_DATA.groupDetails;
 
-      const EDGE_HANDLES = Object.freeze({});
+      const EDGE_HANDLES = Object.freeze(BOARD.edgeHandles || {});
 
       const NODE_BY_ID = Object.fromEntries(BOARD.nodes.map(node => [node.id, node]));
       const INCOMING = new Map();
@@ -2105,7 +2151,11 @@
       }
 
       function ContractEdge(props) {
-        const [edgePath, labelX, labelY] = getBezierPath(props);
+        const [edgePath, labelX, labelY] = getSmoothStepPath({
+          ...props,
+          borderRadius: 18,
+          offset: 28
+        });
         const dimmed = props.data?.dimmed;
         const active = props.data?.active;
         const kind = props.data?.kind;

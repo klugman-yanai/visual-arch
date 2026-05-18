@@ -27,6 +27,19 @@ For a targeted non-interactive install:
 
 See `examples/project-agnostic/visual-architecture.html` for a simplified, project-agnostic sample.
 
+## Design Benchmark
+
+This skill is based on the evolving production document at
+`kardome-bmt-suite/docs/visual-architecture.html`. When maintaining this repo,
+compare the template and example against that document's current design
+language: grouped lanes, clean tracks, deliberate edge handles, polished detail
+panels, and a first viewport that feels like a usable architecture tool rather
+than a generic diagram.
+
+Keep the public skill project-agnostic. Do not copy Kardome-specific names into
+the skill description or example model unless they are only mentioned here as
+maintainer context.
+
 The sample is generated from:
 
 - `skills/visual-arch/assets/visual-architecture-template.html`

@@ -13,6 +13,7 @@ Required top-level fields:
     "lanes": [],
     "nodes": [],
     "edges": [],
+    "edgeHandles": {},
     "views": {}
   },
   "groupDetails": {}
@@ -65,6 +66,8 @@ Required top-level fields:
 }
 ```
 
+`edgeHandles`: optional map of edge id (`source->target`) to `[sourceHandle, targetHandle]`. Use it for polished routing. Prefer `out-bottom` to `in-top` for vertical sequence steps, `out-right` to `in-left` for left-to-right handoffs, and `out-left` to `in-right` only for intentional reverse handoffs.
+
 Use `kind` values consistently:
 
 - `control`: orchestration, calls, task dispatch, lifecycle transitions.
@@ -92,6 +95,7 @@ Every node and important claim must use one of:
 - Every node should have at least one source reference.
 - Every node should have `details.source_confidence`.
 - Every important edge should name the contract, not just "uses".
+- Every polished output should set edge handles for nontrivial layouts; do not leave React Flow to guess connector placement when edges would cross or wander.
 - Use coordinates that create a top-to-bottom reading path by default. Use left-to-right only when that better matches the user's goal or the system's shape.
 - Keep external systems as nodes when they affect architecture.
 - Exclude generated, vendored, cached, secret, and low-level utility files unless they define a real architecture contract.
