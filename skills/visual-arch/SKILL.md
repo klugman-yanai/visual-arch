@@ -16,6 +16,7 @@ Create a polished, self-contained React Flow architecture HTML document from any
 
 2. Dispatch specialized subagents when the user explicitly asked for subagents, parallel agents, delegation, or this skill.
    - Use `references/agent-prompts.md` for role prompts.
+   - Start with the intake strategist if the request leaves important choices ambiguous.
    - Dispatch cartographer, flow analyst, contract auditor, and design planner in parallel when possible.
    - Use the environment's available subagent mechanism (`spawn_agent`, task agents, or equivalent). If no subagent tool exists, run the same roles locally in named passes and state that fallback.
    - Require structured output from each role: facts, candidate nodes, candidate edges, exclusions, uncertainties, and evidence paths.
@@ -29,6 +30,7 @@ Create a polished, self-contained React Flow architecture HTML document from any
    - Use `assets/visual-architecture-template.html` as the primary bundled template.
    - Build a `VISUAL_ARCH_DATA` object with `domains`, `owners`, `board`, and `groupDetails`.
    - Replace the `__VISUAL_ARCH_DATA__` token in the template with that JSON object.
+   - Default to a vertical, top-to-bottom flow. Treat the artifact as a modern interactive upgrade of a sequence diagram: entrypoints at the top, orchestration/policy/work in the middle, state/reporting/signal at the bottom.
    - Preserve standalone behavior: no private runtime services, useful fallback content, accessible controls, responsive layout.
 
 5. Verify before completion.
@@ -53,14 +55,27 @@ The document must be useful to a new maintainer. Include the architecture shape,
 
 Do not create a marketing landing page. The first screen is the actual interactive architecture surface.
 
+## User Questions
+
+Ask the user only when a choice materially changes the artifact and cannot be inferred from the project or request. The default orientation is vertical sequence-style flow. Ask about orientation only when the user hints at a preference, the system is primarily spatial/topological, or the flow could be read equally well in multiple directions.
+
+Good intake questions:
+
+- "Should this read as a vertical sequence-style flow, or as a horizontal lifecycle map?"
+- "Who is the primary reader: new maintainer, reviewer, operator, or product/leadership?"
+- "Should the document prioritize runtime behavior, deployment/release flow, data movement, or repo/package structure?"
+
+Avoid blocking on questions that have a safe default. When in doubt, create a vertical maintainer-oriented first draft and note the assumption.
+
 ## Subagent Roles
 
 Use 4-6 specialized passes when allowed. Parallelize the first four roles; synthesize them yourself before writing the HTML.
 
+- **Intake strategist**: decide whether user questions are needed, choose default orientation, audience, and emphasis. Do not ask low-value questions.
 - **Project cartographer**: inventory repo shape, languages, docs, manifests, services, entrypoints.
 - **Flow analyst**: identify runtime, build, deploy, data, and control flows.
 - **Contract auditor**: extract interfaces, artifacts, persistence, external systems, failure points.
-- **Design planner**: choose visual grouping, node density, lane layout, views, color roles, and interaction priorities.
+- **Design planner**: choose visual grouping, node density, vertical lane layout by default, views, color roles, and interaction priorities.
 - **Narrative editor**: turn findings into concise node/detail text for maintainers.
 - **Visual verifier**: inspect the generated HTML for blank render, overlap, missing controls, broken references.
 
@@ -73,7 +88,7 @@ Merge results yourself. Resolve contradictions by checking source. Do not let su
 - Keep text short enough for nodes; put depth in the detail drawer.
 - Use stable IDs (`lower-kebab-case`) for nodes and edges.
 - Keep the graph readable: 8-30 primary nodes is usually better than exhaustive file-level mapping.
-- Use lanes/groups to express responsibility or lifecycle phases.
+- Use lanes/groups to express responsibility or lifecycle phases. Prefer horizontal lanes stacked vertically, so the reading path is top-to-bottom.
 - Use colors by function, not by brand, unless the project has explicit design guidance.
 - Keep the output static and portable by default. Avoid requiring npm installs, bundlers, private assets, or live services unless the selected stack is intentionally integrated into an existing app.
 - Cite generated or inferred sources honestly: `inferred from <path>`, `external: <name>`, or `generated artifact`.

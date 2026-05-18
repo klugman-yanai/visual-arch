@@ -1202,39 +1202,39 @@
                 "lanes": [
                         {
                                 "id": "lane-entry",
-                                "title": "Interaction boundary",
-                                "subtitle": "Supported user and automation entrypoints.",
+                                "title": "Interaction",
+                                "subtitle": "User and automation entrypoints.",
                                 "domain": "interface",
                                 "position": {
                                         "x": 40,
-                                        "y": 155
+                                        "y": 150
                                 },
-                                "width": 520,
-                                "height": 600
+                                "width": 1120,
+                                "height": 210
                         },
                         {
                                 "id": "lane-runtime",
-                                "title": "Runtime core",
-                                "subtitle": "Policy, orchestration, domain behavior, and side effects.",
+                                "title": "Runtime sequence",
+                                "subtitle": "Routing, policy, core workflow, and side effects.",
                                 "domain": "runtime",
                                 "position": {
-                                        "x": 590,
-                                        "y": 155
+                                        "x": 40,
+                                        "y": 390
                                 },
-                                "width": 760,
-                                "height": 600
+                                "width": 1120,
+                                "height": 430
                         },
                         {
                                 "id": "lane-evidence",
                                 "title": "State, delivery, and signal",
-                                "subtitle": "Durable state, release gates, and debugging evidence.",
+                                "subtitle": "Durable results, release gates, and debugging evidence.",
                                 "domain": "data",
                                 "position": {
-                                        "x": 1380,
-                                        "y": 155
+                                        "x": 40,
+                                        "y": 850
                                 },
-                                "width": 520,
-                                "height": 600
+                                "width": 1120,
+                                "height": 250
                         }
                 ],
                 "nodes": [
@@ -1251,7 +1251,7 @@
                                 ],
                                 "position": {
                                         "x": 100,
-                                        "y": 270
+                                        "y": 215
                                 },
                                 "details": {
                                         "summary": "The supported way users or automations enter the system.",
@@ -1291,8 +1291,8 @@
                                         "inferred"
                                 ],
                                 "position": {
-                                        "x": 310,
-                                        "y": 270
+                                        "x": 420,
+                                        "y": 215
                                 },
                                 "details": {
                                         "summary": "Classifies requests and sends them to the right workflow.",
@@ -1333,8 +1333,8 @@
                                         "policy"
                                 ],
                                 "position": {
-                                        "x": 660,
-                                        "y": 230
+                                        "x": 420,
+                                        "y": 455
                                 },
                                 "details": {
                                         "summary": "Guards privileged operations and user-specific data.",
@@ -1374,8 +1374,8 @@
                                         "source-backed"
                                 ],
                                 "position": {
-                                        "x": 910,
-                                        "y": 270
+                                        "x": 740,
+                                        "y": 455
                                 },
                                 "details": {
                                         "summary": "Runs the product operation from validated input to durable result.",
@@ -1417,8 +1417,8 @@
                                         "artifact"
                                 ],
                                 "position": {
-                                        "x": 1440,
-                                        "y": 230
+                                        "x": 420,
+                                        "y": 915
                                 },
                                 "details": {
                                         "summary": "Persists canonical product state and read models.",
@@ -1458,8 +1458,8 @@
                                         "worker"
                                 ],
                                 "position": {
-                                        "x": 1160,
-                                        "y": 430
+                                        "x": 740,
+                                        "y": 650
                                 },
                                 "details": {
                                         "summary": "Decouples slow side effects from the request path.",
@@ -1499,8 +1499,8 @@
                                         "status"
                                 ],
                                 "position": {
-                                        "x": 1440,
-                                        "y": 430
+                                        "x": 740,
+                                        "y": 915
                                 },
                                 "details": {
                                         "summary": "Exposes results, status, and derived views back to users.",
@@ -1538,8 +1538,8 @@
                                         "deploy"
                                 ],
                                 "position": {
-                                        "x": 1680,
-                                        "y": 230
+                                        "x": 100,
+                                        "y": 650
                                 },
                                 "details": {
                                         "summary": "Builds, tests, packages, and deploys project changes.",
@@ -1580,8 +1580,8 @@
                                         "unknown"
                                 ],
                                 "position": {
-                                        "x": 1680,
-                                        "y": 430
+                                        "x": 100,
+                                        "y": 915
                                 },
                                 "details": {
                                         "summary": "Provides logs, metrics, traces, and operational status for debugging.",
@@ -1684,8 +1684,8 @@
                                         "request-router",
                                         "auth-policy",
                                         "workflow-engine",
-                                        "state-store",
                                         "async-work",
+                                        "state-store",
                                         "reporting-surface",
                                         "ci-release",
                                         "observability"
@@ -1698,8 +1698,8 @@
                                         "request-router",
                                         "auth-policy",
                                         "workflow-engine",
-                                        "state-store",
                                         "async-work",
+                                        "state-store",
                                         "reporting-surface"
                                 ]
                         },
@@ -1720,17 +1720,21 @@
                                         "ci-release"
                                 ]
                         }
+                },
+                "layout": {
+                        "orientation": "vertical",
+                        "reading_path": "top-to-bottom sequence-style flow"
                 }
         },
         "groupDetails": {
                 "overview": {
                         "title": "Project Architecture",
-                        "purpose": "A source-backed map of the major responsibilities and contracts.",
+                        "purpose": "A modern sequence-style map of responsibilities and contracts.",
                         "domain": "runtime",
-                        "summary": "Use this overview to orient around entrypoints, runtime work, state, delivery, and signal.",
+                        "summary": "Read from top to bottom: entry, routing, policy, core workflow, side effects, state, delivery, and signal.",
                         "why": "It gives maintainers a first map before they dive into files.",
                         "points": [
-                                "Select a node to inspect its contracts.",
+                                "The layout is intentionally vertical, like an upgraded sequence diagram.",
                                 "Use focus modes to narrow the reading path.",
                                 "Source confidence labels should remain visible in chips."
                         ],

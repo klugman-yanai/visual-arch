@@ -9,6 +9,7 @@ Return:
 ```json
 {
   "role": "role-name",
+  "questions": [{ "question": "...", "reason": "...", "default_if_unanswered": "..." }],
   "facts": [{ "claim": "...", "evidence": ["path"], "confidence": "source-backed|inferred|external|unknown" }],
   "candidate_nodes": [{ "id": "kebab-id", "title": "...", "why": "...", "evidence": ["path"], "confidence": "..." }],
   "candidate_edges": [{ "source": "id", "target": "id", "label": "contract", "kind": "control|data|signal|dependency", "evidence": ["path"], "confidence": "..." }],
@@ -16,6 +17,15 @@ Return:
   "uncertainties": [{ "question": "...", "needed_evidence": "..." }]
 }
 ```
+
+## Intake Strategist
+
+You are the intake strategist for a high-quality visual architecture document for `[target]`. Do not edit files. Decide whether the agent should ask the user any questions before building. Ask only high-impact questions whose answer would materially change the artifact. Default to a vertical, top-to-bottom, sequence-style architecture flow for maintainers unless the user or project clearly points elsewhere. Return the shared JSON shape, with `questions` populated only for necessary questions. Include:
+
+- recommended audience: maintainer, reviewer, operator, product/leadership, or mixed.
+- recommended emphasis: runtime, deployment/release, data movement, repo/package structure, or mixed.
+- recommended orientation: vertical, horizontal, radial, matrix, or custom.
+- reason for asking or not asking about orientation.
 
 ## Project Cartographer
 
@@ -31,7 +41,7 @@ You are the contract auditor for `[target]`. Find interfaces and failure/debug e
 
 ## Design Planner
 
-You are the design planner for a high-quality React Flow visual architecture document for `[target]`. Do not edit files. Return the shared JSON shape plus a `layout_plan` object with lanes, views, color roles, node density, important first-viewport content, and interaction priorities. Prefer 8-30 primary nodes, visible source confidence labels, and a maintainer-oriented reading path.
+You are the design planner for a high-quality React Flow visual architecture document for `[target]`. Do not edit files. Return the shared JSON shape plus a `layout_plan` object with `orientation`, lanes, views, color roles, node density, important first-viewport content, and interaction priorities. Prefer a vertical sequence-style reading path: entrypoints at the top, orchestration/policy/work in the middle, state/reporting/signal at the bottom. Use horizontal or custom layouts only when source evidence or user preference makes them better. Prefer 8-30 primary nodes and visible source confidence labels.
 
 ## Narrative Editor
 

@@ -9,6 +9,7 @@ Required top-level fields:
   "domains": {},
   "owners": {},
   "board": {
+    "layout": { "orientation": "vertical" },
     "lanes": [],
     "nodes": [],
     "edges": [],
@@ -23,6 +24,8 @@ Required top-level fields:
 `domains`: map of domain key to `{ "label": "...", "color": "#...", "soft": "#..." }`.
 
 `owners`: map of owner key to `{ "label": "...", "description": "..." }`. Use functional ownership if people/teams are unknown, such as `runtime`, `build`, `storage`, `external`.
+
+`layout`: optional board metadata. Prefer `{ "orientation": "vertical" }` for a modern sequence-diagram reading path unless the project or user asks for another shape.
 
 `lanes`: large background columns/rows. Each lane needs `{ "id", "title", "domain", "x", "y", "width", "height" }`.
 
@@ -89,6 +92,6 @@ Every node and important claim must use one of:
 - Every node should have at least one source reference.
 - Every node should have `details.source_confidence`.
 - Every important edge should name the contract, not just "uses".
-- Use coordinates that create a left-to-right or top-to-bottom reading path.
+- Use coordinates that create a top-to-bottom reading path by default. Use left-to-right only when that better matches the user's goal or the system's shape.
 - Keep external systems as nodes when they affect architecture.
 - Exclude generated, vendored, cached, secret, and low-level utility files unless they define a real architecture contract.
