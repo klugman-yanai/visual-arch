@@ -1,6 +1,6 @@
 # Content Model
 
-Use this model as the intermediate artifact before generating HTML. It can live in scratch notes, a temp JSON file, or directly inside the template as `ARCHITECTURE_MODEL`.
+Use this model as the intermediate artifact before generating HTML. It can live in scratch notes, a temp JSON file, or directly inside the template as `BOARD` plus `DOMAINS`, `OWNERS`, and `GROUP_DETAILS`.
 
 Required top-level fields:
 

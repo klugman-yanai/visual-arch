@@ -27,7 +27,7 @@ Create a polished, self-contained React Flow architecture HTML document from any
 
 4. Generate the document.
    - Use `assets/visual-architecture-template.html` as the primary bundled template.
-   - Replace the `ARCHITECTURE_MODEL` object with project-specific data.
+   - Replace the `DOMAINS`, `OWNERS`, `BOARD`, and `GROUP_DETAILS` objects with project-specific data.
    - Preserve standalone behavior: no private runtime services, useful fallback content, accessible controls, responsive layout.
 
 5. Verify before completion.

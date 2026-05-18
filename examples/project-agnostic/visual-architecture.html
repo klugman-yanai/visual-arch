@@ -11,249 +11,983 @@
         --canvas: #f7f6f2;
         --canvas-strong: #ece9df;
         --surface: #fffefa;
+        --surface-2: #f2f0e8;
         --ink: #171717;
-        --muted: #625f58;
-        --quiet: #8a857c;
+        --muted: #65625c;
+        --quiet: #918d84;
         --line: #d8d4c8;
-        --panel: rgba(255, 254, 250, 0.92);
-        --shadow: 0 20px 58px rgba(34, 31, 24, 0.14);
         --grid: rgba(93, 88, 76, 0.09);
-        --ok: #1c7c5c;
-        --warn: #9a6b21;
-        --unknown: #6b7280;
+        --swim-line: rgba(93, 88, 76, 0.16);
+        --shadow: 0 22px 60px rgba(34, 31, 24, 0.13);
+        --github: #5c5fb8;
+        --package: #2f6f91;
+        --runtime: #0f8b72;
+        --storage: #b77b1b;
+        --signal: #bf3b5f;
+        --decision: #7a5a25;
+        --infra: #59636f;
+        --panel-bg: rgba(255, 254, 250, 0.9);
+        --panel-border: rgba(78, 74, 65, 0.16);
+        --button-hover-bg: rgba(23, 23, 23, 0.04);
+        --button-active-bg: #171717;
+        --button-active-fg: #fffefa;
+        --card-bg: #f7f4ed;
+        --chip-bg: #f6f3eb;
       }
+
       :root[data-theme="dark"] {
         color-scheme: dark;
         --canvas: #24231f;
         --canvas-strong: #302e29;
         --surface: #302f2a;
+        --surface-2: #3a3832;
         --ink: #f3eee4;
         --muted: #c8c0b1;
         --quiet: #a89f91;
         --line: #565247;
-        --panel: rgba(48, 47, 42, 0.92);
-        --shadow: 0 22px 64px rgba(0, 0, 0, 0.34);
         --grid: rgba(228, 220, 205, 0.08);
-        --ok: #61c8a2;
-        --warn: #e1b85a;
-        --unknown: #a8b0b8;
+        --swim-line: rgba(228, 220, 205, 0.13);
+        --shadow: 0 22px 64px rgba(0, 0, 0, 0.32);
+        --github: #9a8dff;
+        --package: #63a8ca;
+        --runtime: #4cc7aa;
+        --storage: #e1b85a;
+        --signal: #f08aa3;
+        --decision: #d0aa70;
+        --infra: #a8b0b8;
+        --panel-bg: rgba(48, 47, 42, 0.9);
+        --panel-border: rgba(243, 238, 228, 0.13);
+        --button-hover-bg: rgba(243, 238, 228, 0.07);
+        --button-active-bg: #f3eee4;
+        --button-active-fg: #24231f;
+        --card-bg: #38362f;
+        --chip-bg: #38362f;
       }
-      * { box-sizing: border-box; }
-      html, body, #root { width: 100%; height: 100%; margin: 0; }
+
+      :root[data-theme="light"] {
+        color-scheme: light;
+        --canvas: #f7f6f2;
+        --canvas-strong: #ece9df;
+        --surface: #fffefa;
+        --surface-2: #f2f0e8;
+        --ink: #171717;
+        --muted: #65625c;
+        --quiet: #918d84;
+        --line: #d8d4c8;
+        --grid: rgba(93, 88, 76, 0.09);
+        --swim-line: rgba(93, 88, 76, 0.16);
+        --shadow: 0 22px 60px rgba(34, 31, 24, 0.13);
+        --github: #5c5fb8;
+        --package: #2f6f91;
+        --runtime: #0f8b72;
+        --storage: #b77b1b;
+        --signal: #bf3b5f;
+        --decision: #7a5a25;
+        --infra: #59636f;
+        --panel-bg: rgba(255, 254, 250, 0.9);
+        --panel-border: rgba(78, 74, 65, 0.16);
+        --button-hover-bg: rgba(23, 23, 23, 0.04);
+        --button-active-bg: #171717;
+        --button-active-fg: #fffefa;
+        --card-bg: #f7f4ed;
+        --chip-bg: #f6f3eb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
       body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
         overflow: hidden;
         background: var(--canvas);
         color: var(--ink);
-        font: 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font:
+          14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
       }
-      button { font: inherit; }
-      .app {
+
+      button {
+        font: inherit;
+      }
+
+      #root {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #boot-fallback {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+        background:
+          radial-gradient(circle at 20% 15%, rgba(92, 95, 184, 0.12), transparent 30rem),
+          radial-gradient(circle at 80% 12%, rgba(15, 139, 114, 0.12), transparent 28rem),
+          var(--canvas);
+        color: var(--ink);
+        z-index: 50;
+      }
+
+      body.app-ready #boot-fallback {
+        display: none;
+      }
+
+      .fallback-card {
+        max-width: 720px;
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        background: var(--panel-bg);
+        box-shadow: var(--shadow);
+        padding: 28px;
+      }
+
+      .fallback-card h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 5vw, 3.4rem);
+        line-height: 0.98;
+        letter-spacing: -0.04em;
+      }
+
+      .fallback-card p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      .app-shell {
         position: relative;
         width: 100vw;
         height: 100vh;
         background:
-          radial-gradient(circle at 8% 8%, rgba(66, 99, 190, 0.10), transparent 28rem),
-          radial-gradient(circle at 88% 12%, rgba(18, 137, 112, 0.09), transparent 30rem),
-          var(--canvas);
+          radial-gradient(circle at 8% 8%, rgba(92, 95, 184, 0.1), transparent 28rem),
+          radial-gradient(circle at 88% 12%, rgba(15, 139, 114, 0.09), transparent 30rem),
+          linear-gradient(180deg, #fbfaf6 0%, var(--canvas) 100%);
       }
-      #boot-fallback {
-        position: fixed;
-        inset: 0;
-        z-index: 50;
-        display: grid;
-        place-items: center;
-        padding: 28px;
-        background: var(--canvas);
-      }
-      body.app-ready #boot-fallback { display: none; }
-      .fallback-card {
-        max-width: 680px;
-        border: 1px solid rgba(120, 113, 100, 0.18);
-        border-radius: 8px;
-        background: var(--panel);
-        box-shadow: var(--shadow);
-        padding: 24px;
-      }
-      .fallback-card h1 { margin: 0 0 8px; font-size: clamp(1.8rem, 5vw, 3.2rem); line-height: 1; }
-      .fallback-card p { margin: 8px 0 0; color: var(--muted); }
+
       .topbar {
         position: absolute;
         inset: 14px 14px auto 14px;
         z-index: 20;
         display: grid;
-        grid-template-columns: minmax(220px, 1fr) minmax(280px, 1.5fr) auto;
+        grid-template-columns: minmax(220px, 0.9fr) minmax(360px, 1.5fr) auto;
         gap: 12px;
         align-items: center;
-        border: 1px solid rgba(120, 113, 100, 0.18);
+        border: 1px solid var(--panel-border);
         border-radius: 8px;
-        background: var(--panel);
-        box-shadow: 0 14px 34px rgba(34, 31, 24, 0.10);
+        background: var(--panel-bg);
+        box-shadow: 0 14px 34px rgba(34, 31, 24, 0.1);
         padding: 10px 12px;
         backdrop-filter: blur(14px);
       }
-      .kicker {
-        display: block;
+
+      .brand {
+        min-width: 0;
+      }
+
+      .brand-kicker {
         color: var(--quiet);
+        display: block;
         font-size: 0.68rem;
         font-weight: 850;
-        letter-spacing: 0.14em;
+        letter-spacing: 0.15em;
+        line-height: 1;
         text-transform: uppercase;
       }
-      .title {
+
+      .brand-title {
         display: block;
-        margin-top: 4px;
+        margin-top: 5px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         font-size: 1.05rem;
         font-weight: 900;
+        letter-spacing: -0.01em;
       }
-      .subtitle {
+
+      .toolbar-cluster {
+        min-width: 0;
+      }
+
+      .toolbar-label {
+        color: var(--quiet);
         display: block;
-        margin-top: 3px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        color: var(--muted);
-        font-size: 0.78rem;
+        margin-bottom: 4px;
+        font-size: 0.64rem;
+        font-weight: 950;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
       }
-      .tabs, .actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-      .search {
-        min-height: 34px;
-        min-width: 180px;
-        border: 1px solid rgba(120, 113, 100, 0.22);
-        border-radius: 6px;
-        background: color-mix(in srgb, var(--surface) 84%, transparent);
-        color: var(--ink);
-        padding: 7px 9px;
-        font: inherit;
-        font-size: 0.82rem;
+
+      .mode-tabs,
+      .view-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
       }
-      .button {
-        min-height: 34px;
+
+      .mode-tabs {
+        flex-wrap: wrap;
+      }
+
+      .toolbar-button {
         border: 1px solid transparent;
         border-radius: 6px;
         background: transparent;
         color: var(--ink);
         cursor: pointer;
+        min-height: 34px;
         padding: 7px 10px;
         font-size: 0.82rem;
         font-weight: 800;
         white-space: nowrap;
       }
-      .button:hover { border-color: rgba(120, 113, 100, 0.28); background: rgba(127, 127, 127, 0.08); }
-      .button.active { background: var(--ink); color: var(--surface); }
-      .button.icon { display: inline-grid; width: 34px; place-items: center; padding-inline: 0; }
-      .flow { width: 100%; height: 100%; }
-      .lane {
-        width: var(--lane-width);
-        height: var(--lane-height);
-        border-inline: 1px solid rgba(120, 113, 100, 0.18);
+
+      .toolbar-button:hover {
+        border-color: rgba(23, 23, 23, 0.14);
+        background: var(--button-hover-bg);
+      }
+
+      .toolbar-button.is-active {
+        border-color: rgba(23, 23, 23, 0.2);
+        background: var(--button-active-bg);
+        color: var(--button-active-fg);
+      }
+
+      .toolbar-button.is-icon {
+        display: inline-grid;
+        place-items: center;
+        width: 34px;
+        padding-inline: 0;
+        line-height: 1;
+      }
+
+      .toolbar-button svg,
+      .drawer-close svg {
+        display: block;
+        width: 16px;
+        height: 16px;
+        stroke-width: 2.25;
+      }
+
+      .flow-wrap {
+        position: relative;
+        z-index: 4;
+        width: 100%;
+        height: 100%;
+      }
+
+      .react-flow {
+        background: transparent;
+      }
+
+      .react-flow__pane {
+        cursor: grab;
+      }
+
+      .react-flow__pane:active {
+        cursor: grabbing;
+      }
+
+      .react-flow__controls {
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.12);
+        overflow: hidden;
+      }
+
+      .react-flow__controls button {
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        border-bottom-color: rgba(78, 74, 65, 0.12);
+        color: var(--ink);
+      }
+
+      .react-flow__minimap {
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        background: var(--panel-bg);
+        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.1);
+        overflow: hidden;
+      }
+
+      .lane-node {
+        width: var(--lane-width, 300px);
+        height: var(--lane-height, 2600px);
+        border-inline: 1px solid var(--swim-line);
         border-top: 4px solid var(--accent);
-        background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 68%);
+        background: linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--accent) 8%, transparent) 0%,
+          color-mix(in srgb, var(--accent) 4%, transparent) 18%,
+          transparent 72%
+        );
         pointer-events: none;
       }
+
       .lane-title {
-        padding: 14px 18px;
-        color: var(--muted);
+        padding: 14px 0 0 18px;
+        color: #37322c;
         font-size: 0.74rem;
         font-weight: 950;
-        letter-spacing: 0.13em;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
       }
-      .node {
+
+      .lane-subtitle {
+        display: none;
+        max-width: 230px;
+        padding: 5px 0 0 18px;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .arch-node {
         width: 220px;
-        min-height: 86px;
+        min-height: 74px;
         border: 1px solid color-mix(in srgb, var(--accent) 42%, #afa99d);
         border-top: 5px solid var(--accent);
         border-radius: 8px;
-        background: color-mix(in srgb, var(--soft) 38%, var(--surface));
-        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.10);
+        background: color-mix(in srgb, var(--soft) 38%, #fffefa);
+        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.1);
         color: var(--ink);
         overflow: hidden;
+        transition:
+          opacity 160ms ease,
+          filter 160ms ease,
+          box-shadow 160ms ease,
+          transform 160ms ease,
+          border-color 160ms ease;
       }
-      .node.selected { box-shadow: 0 22px 52px rgba(34, 31, 24, 0.20), 0 0 0 4px color-mix(in srgb, var(--accent) 19%, transparent); }
-      .node.dimmed { opacity: 0.34; filter: saturate(0.7); }
-      .node-domain {
+
+      .arch-node.is-selected {
+        border-color: var(--accent);
+        box-shadow:
+          0 22px 52px rgba(34, 31, 24, 0.2),
+          0 0 0 4px color-mix(in srgb, var(--accent) 19%, transparent);
+      }
+
+      .arch-node.is-related:not(.is-selected) {
+        box-shadow:
+          0 16px 38px rgba(34, 31, 24, 0.13),
+          0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+      }
+
+      .arch-node.is-dimmed {
+        filter: saturate(0.68);
+        opacity: 0.34;
+      }
+
+      .node-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
         padding: 10px 12px 0;
-        color: color-mix(in srgb, var(--accent) 78%, var(--ink));
+      }
+
+      .node-domain {
+        color: color-mix(in srgb, var(--accent) 78%, #171717);
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         font-size: 0.62rem;
         font-weight: 950;
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
-      .node h3 { margin: 7px 12px 0; font-size: 1.14rem; line-height: 1.12; }
-      .node p { margin: 7px 12px 12px; color: var(--muted); font-size: 0.82rem; }
-      .confidence {
-        display: inline-flex;
-        width: fit-content;
-        max-width: calc(100% - 24px);
-        margin: 9px 12px 0;
-        border: 1px solid color-mix(in srgb, var(--confidence-color, var(--unknown)) 32%, transparent);
+
+      .node-step {
+        display: none;
+        border-radius: 7px;
+        background: color-mix(in srgb, var(--accent) 86%, #171717);
+        color: #fffefa;
+        font-size: 0.7rem;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        padding: 4px 8px;
+      }
+
+      .node-body {
+        padding: 8px 12px 12px;
+      }
+
+      .node-title {
+        margin: 0;
+        font-size: 1.24rem;
+        font-weight: 950;
+        letter-spacing: -0.015em;
+        line-height: 1.12;
+      }
+
+      .node-start {
+        display: none;
+        margin-bottom: 6px;
+        border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
         border-radius: 999px;
-        background: color-mix(in srgb, var(--confidence-color, var(--unknown)) 10%, transparent);
-        color: color-mix(in srgb, var(--confidence-color, var(--unknown)) 86%, var(--ink));
-        padding: 3px 7px;
+        background: color-mix(in srgb, var(--accent) 12%, transparent);
+        color: color-mix(in srgb, var(--accent) 78%, var(--ink));
+        padding: 2px 7px;
         font-size: 0.62rem;
         font-weight: 950;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
       }
-      .drawer {
+
+      .node-purpose {
+        display: none;
+        margin: 6px 0 0;
+        color: #514d46;
+        font-size: 0.84rem;
+        line-height: 1.28;
+      }
+
+      .node-chips {
+        display: none;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 12px;
+      }
+
+      .chip {
+        max-width: 100%;
+        border: 1px solid rgba(78, 74, 65, 0.13);
+        border-radius: 999px;
+        background: rgba(255, 254, 250, 0.66);
+        color: #444039;
+        overflow: hidden;
+        padding: 5px 8px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.74rem;
+        font-weight: 800;
+      }
+
+      .react-flow__handle {
+        width: 10px;
+        height: 10px;
+        border: 2px solid rgba(255, 254, 250, 0.96);
+        background: var(--accent);
+        opacity: 0.28;
+        pointer-events: none;
+      }
+
+      .arch-node:hover .react-flow__handle,
+      .arch-node.is-selected .react-flow__handle {
+        opacity: 0.9;
+      }
+
+      .contract-edge {
+        transition:
+          opacity 160ms ease,
+          stroke 160ms ease,
+          stroke-width 160ms ease;
+      }
+
+      .edge-label {
+        position: absolute;
+        border: 1px solid rgba(78, 74, 65, 0.13);
+        border-radius: 999px;
+        background: rgba(255, 254, 250, 0.9);
+        box-shadow: 0 8px 20px rgba(34, 31, 24, 0.09);
+        color: #4a453d;
+        font-size: 0.72rem;
+        font-weight: 850;
+        padding: 4px 8px;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+
+      .detail-drawer {
         position: absolute;
         z-index: 18;
         top: 88px;
         right: 14px;
-        width: min(500px, calc(100vw - 28px));
+        width: min(520px, calc(100vw - 28px));
         max-height: calc(100vh - 108px);
         display: flex;
         flex-direction: column;
-        border: 1px solid rgba(120, 113, 100, 0.18);
+        border: 1px solid var(--panel-border);
         border-radius: 8px;
-        background: var(--panel);
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
         box-shadow: var(--shadow);
         overflow: hidden;
         backdrop-filter: blur(16px);
+        transition:
+          opacity 160ms ease,
+          transform 160ms ease,
+          filter 160ms ease,
+          z-index 0ms linear 120ms;
       }
-      .drawer-head { border-top: 5px solid var(--accent); border-bottom: 1px solid rgba(120, 113, 100, 0.16); padding: 16px 18px; }
-      .drawer h2 { margin: 7px 0 0; font-size: 1.45rem; line-height: 1.05; }
-      .drawer p, .drawer li { color: var(--muted); }
-      .drawer-body { overflow: auto; padding: 6px 18px 18px; }
-      .section { border-bottom: 1px solid rgba(120, 113, 100, 0.14); padding: 13px 0; }
-      .section:last-child { border-bottom: 0; }
-      .section h3 { margin: 0; color: var(--quiet); font-size: 0.72rem; font-weight: 950; letter-spacing: 0.12em; text-transform: uppercase; }
-      .section ul { margin: 9px 0 0; padding-left: 18px; }
-      .sources { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
-      .source { border: 1px solid rgba(120, 113, 100, 0.18); border-radius: 6px; padding: 6px 8px; font: 0.74rem ui-monospace, SFMono-Regular, Consolas, monospace; }
-      .legend {
+
+      .app-shell.is-navigating .detail-drawer {
+        z-index: 1;
+        opacity: 0.08;
+        pointer-events: none;
+        transform: translateX(18px) scale(0.99);
+        filter: saturate(0.65);
+      }
+
+      .select-hint {
         position: absolute;
-        left: 14px;
-        bottom: 92px;
+        right: 18px;
+        bottom: 118px;
         z-index: 12;
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        background: var(--panel-bg);
+        box-shadow: 0 12px 28px rgba(34, 31, 24, 0.1);
+        color: var(--muted);
+        padding: 10px 12px;
+        font-size: 0.86rem;
+        font-weight: 800;
+        backdrop-filter: blur(12px);
+        transition:
+          opacity 160ms ease,
+          transform 160ms ease;
+      }
+
+      .app-shell.is-navigating .select-hint {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      .drawer-head {
+        border-top: 5px solid var(--accent, var(--infra));
+        border-bottom: 1px solid rgba(78, 74, 65, 0.12);
+        padding: 17px 18px 15px;
+      }
+
+      .drawer-head-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .drawer-close {
+        display: inline-grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        border: 1px solid rgba(78, 74, 65, 0.14);
+        border-radius: 6px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        line-height: 1;
+        padding: 0;
+      }
+
+      .drawer-close:hover {
+        border-color: rgba(23, 23, 23, 0.24);
+        color: var(--ink);
+      }
+
+      .drawer-kicker {
+        color: color-mix(in srgb, var(--accent, var(--infra)) 78%, #171717);
+        display: block;
+        font-size: 0.68rem;
+        font-weight: 950;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+
+      .drawer-title {
+        margin: 8px 0 0;
+        font-size: 1.5rem;
+        font-weight: 950;
+        letter-spacing: -0.035em;
+        line-height: 1.03;
+      }
+
+      .drawer-purpose {
+        margin: 9px 0 0;
+        color: #514d46;
+        font-size: 0.96rem;
+      }
+
+      .drawer-body {
+        overflow: auto;
+        padding: 6px 18px 18px;
+      }
+
+      .detail-section {
+        border-bottom: 1px solid rgba(78, 74, 65, 0.12);
+        padding: 14px 0;
+      }
+
+      .detail-section:last-child {
+        border-bottom: 0;
+      }
+
+      .detail-section h3 {
+        margin: 0;
+        color: var(--quiet);
+        font-size: 0.72rem;
+        font-weight: 950;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      .detail-section ul {
+        list-style: none;
+        margin: 10px 0 0;
+        padding: 0;
+      }
+
+      .detail-section li {
+        color: var(--muted);
+        margin-top: 8px;
+      }
+
+      .detail-section p {
+        margin: 9px 0 0;
+        color: var(--muted);
+      }
+
+      .io-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .io-card {
+        border: 1px solid rgba(78, 74, 65, 0.12);
+        border-radius: 8px;
+        background: var(--card-bg);
+        padding: 12px;
+      }
+
+      .io-card ul {
+        margin-top: 8px;
+      }
+
+      .source-list {
         display: flex;
         flex-wrap: wrap;
         gap: 7px;
-        max-width: min(620px, calc(100vw - 28px));
-        border: 1px solid rgba(120, 113, 100, 0.18);
-        border-radius: 8px;
-        background: var(--panel);
-        box-shadow: 0 12px 28px rgba(34, 31, 24, 0.1);
-        padding: 9px;
-        backdrop-filter: blur(14px);
+        margin-top: 10px;
       }
-      .legend-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        color: var(--muted);
+
+      .source-chip {
+        border: 1px solid rgba(78, 74, 65, 0.13);
+        border-radius: 6px;
+        background: var(--chip-bg);
+        color: var(--ink);
+        padding: 6px 8px;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
         font-size: 0.74rem;
-        font-weight: 800;
       }
-      .legend-swatch { width: 9px; height: 9px; border-radius: 999px; background: var(--legend-color); }
+
+      .related-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 11px;
+      }
+
+      .related-pill {
+        border: 1px solid rgba(78, 74, 65, 0.13);
+        border-radius: 999px;
+        background: var(--chip-bg);
+        color: var(--ink);
+        cursor: pointer;
+        padding: 6px 9px;
+        font-size: 0.78rem;
+        font-weight: 850;
+      }
+
+      .related-pill:hover {
+        border-color: rgba(23, 23, 23, 0.24);
+        background: #fffefa;
+      }
+
+      .empty-detail {
+        color: var(--muted);
+        padding: 18px;
+      }
+
+      .empty-detail strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--ink);
+        font-size: 1.1rem;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --canvas: #24231f;
+          --canvas-strong: #302e29;
+          --surface: #302f2a;
+          --surface-2: #3a3832;
+          --ink: #f3eee4;
+          --muted: #c8c0b1;
+          --quiet: #a89f91;
+          --line: #565247;
+          --grid: rgba(228, 220, 205, 0.08);
+          --swim-line: rgba(228, 220, 205, 0.13);
+          --shadow: 0 22px 64px rgba(0, 0, 0, 0.32);
+          --github: #9a8dff;
+          --package: #63a8ca;
+          --runtime: #4cc7aa;
+          --storage: #e1b85a;
+          --signal: #f08aa3;
+          --decision: #d0aa70;
+          --infra: #a8b0b8;
+        }
+
+        body {
+          background: var(--canvas);
+        }
+
+        #boot-fallback {
+          background:
+            radial-gradient(circle at 20% 15%, rgba(154, 141, 255, 0.12), transparent 30rem),
+            radial-gradient(circle at 80% 12%, rgba(76, 199, 170, 0.1), transparent 28rem),
+            var(--canvas);
+        }
+
+        .fallback-card,
+        .topbar,
+        .detail-drawer,
+        .select-hint {
+          border-color: rgba(243, 238, 228, 0.13);
+          background: rgba(48, 47, 42, 0.9);
+          box-shadow: var(--shadow);
+        }
+
+        .app-shell {
+          background:
+            radial-gradient(circle at 8% 8%, rgba(154, 141, 255, 0.1), transparent 28rem),
+            radial-gradient(circle at 88% 12%, rgba(76, 199, 170, 0.08), transparent 30rem),
+            linear-gradient(180deg, #292823 0%, var(--canvas) 100%);
+        }
+
+        .toolbar-button {
+          color: var(--ink);
+        }
+
+        .toolbar-button:hover {
+          border-color: rgba(243, 238, 228, 0.18);
+          background: rgba(243, 238, 228, 0.07);
+        }
+
+        .toolbar-button.is-active {
+          border-color: rgba(243, 238, 228, 0.3);
+          background: var(--ink);
+          color: #24231f;
+        }
+
+        .react-flow__controls {
+          border-color: rgba(243, 238, 228, 0.13);
+        }
+
+        .react-flow__controls button {
+          background: rgba(48, 47, 42, 0.94);
+          border-bottom-color: rgba(243, 238, 228, 0.11);
+          color: var(--ink);
+        }
+
+        .lane-title,
+        .brand-title {
+          color: var(--ink);
+        }
+
+        .arch-node {
+          border-color: color-mix(in srgb, var(--accent) 52%, #5f5a4f);
+          background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+        }
+
+        .arch-node.is-selected {
+          box-shadow:
+            0 22px 52px rgba(0, 0, 0, 0.35),
+            0 0 0 4px color-mix(in srgb, var(--accent) 24%, transparent);
+        }
+
+        .node-domain,
+        .drawer-kicker,
+        .node-start {
+          color: color-mix(in srgb, var(--accent) 78%, #f3eee4);
+        }
+
+        .node-step {
+          background: color-mix(in srgb, var(--accent) 72%, #f3eee4);
+          color: #24231f;
+        }
+
+        .node-purpose,
+        .drawer-purpose,
+        .detail-section li,
+        .detail-section p,
+        .lane-subtitle {
+          color: var(--muted);
+        }
+
+        .react-flow__handle {
+          border-color: rgba(36, 35, 31, 0.96);
+        }
+
+        .edge-label,
+        .io-card,
+        .source-chip,
+        .related-pill {
+          border-color: rgba(243, 238, 228, 0.12);
+          background: #38362f;
+          color: var(--ink);
+        }
+
+        .drawer-head,
+        .detail-section {
+          border-bottom-color: rgba(243, 238, 228, 0.12);
+        }
+
+        .drawer-close {
+          border-color: rgba(243, 238, 228, 0.14);
+          color: var(--muted);
+        }
+
+        .drawer-close:hover,
+        .related-pill:hover {
+          border-color: rgba(243, 238, 228, 0.28);
+          background: #403e37;
+          color: var(--ink);
+        }
+      }
+
+      :root[data-theme] body {
+        background: var(--canvas);
+      }
+
+      :root[data-theme] .fallback-card,
+      :root[data-theme] .topbar,
+      :root[data-theme] .select-hint {
+        border-color: var(--panel-border);
+        background: var(--panel-bg);
+        box-shadow: var(--shadow);
+      }
+
+      :root[data-theme] .detail-drawer {
+        border-color: var(--panel-border);
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        box-shadow: var(--shadow);
+      }
+
+      :root[data-theme] .app-shell {
+        background:
+          radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--github) 10%, transparent), transparent 28rem),
+          radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--runtime) 8%, transparent), transparent 30rem),
+          linear-gradient(180deg, color-mix(in srgb, var(--canvas) 82%, var(--surface)) 0%, var(--canvas) 100%);
+      }
+
+      :root[data-theme] .toolbar-button {
+        color: var(--ink);
+      }
+
+      :root[data-theme] .toolbar-button:hover {
+        border-color: color-mix(in srgb, var(--ink) 18%, transparent);
+        background: var(--button-hover-bg);
+      }
+
+      :root[data-theme] .toolbar-button.is-active {
+        border-color: color-mix(in srgb, var(--ink) 28%, transparent);
+        background: var(--button-active-bg);
+        color: var(--button-active-fg);
+      }
+
+      :root[data-theme] .react-flow__controls {
+        border-color: var(--panel-border);
+      }
+
+      :root[data-theme] .react-flow__controls button {
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        color: var(--ink);
+      }
+
+      :root[data-theme] .lane-title,
+      :root[data-theme] .brand-title {
+        color: var(--ink);
+      }
+
+      :root[data-theme] .arch-node {
+        background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+        box-shadow: 0 12px 30px color-mix(in srgb, #000 18%, transparent);
+      }
+
+      :root[data-theme] .node-purpose,
+      :root[data-theme] .drawer-purpose,
+      :root[data-theme] .detail-section li,
+      :root[data-theme] .detail-section p,
+      :root[data-theme] .lane-subtitle {
+        color: var(--muted);
+      }
+
+      :root[data-theme] .edge-label,
+      :root[data-theme] .io-card,
+      :root[data-theme] .source-chip,
+      :root[data-theme] .related-pill {
+        border-color: color-mix(in srgb, var(--ink) 12%, transparent);
+        background: var(--card-bg);
+        color: var(--ink);
+      }
+
+      :root[data-theme] .drawer-head,
+      :root[data-theme] .detail-section {
+        border-bottom-color: color-mix(in srgb, var(--ink) 12%, transparent);
+      }
+
       @media (max-width: 760px) {
-        .topbar { grid-template-columns: 1fr; }
-        .drawer { top: auto; bottom: 14px; max-height: 46vh; }
-        .legend { display: none; }
+        .topbar {
+          grid-template-columns: 1fr;
+          align-items: stretch;
+        }
+
+        .mode-tabs,
+        .view-actions {
+          overflow: auto;
+          padding-bottom: 2px;
+        }
+
+        .detail-drawer {
+          top: auto;
+          right: 10px;
+          bottom: 10px;
+          left: 10px;
+          width: auto;
+          max-height: 52vh;
+        }
+
+        .select-hint {
+          right: 10px;
+          bottom: 74px;
+          left: 10px;
+          text-align: center;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .topbar {
+          inset: 8px 8px auto 8px;
+          padding: 9px;
+        }
+
+        .toolbar-button {
+          min-height: 32px;
+          padding: 6px 9px;
+          font-size: 0.78rem;
+        }
+
+        .brand-title {
+          font-size: 0.98rem;
+        }
       }
     </style>
   </head>
@@ -261,130 +995,242 @@
     <div id="boot-fallback">
       <div class="fallback-card">
         <h1>Visual Architecture</h1>
-        <p>The interactive map is loading. If it does not appear, check network access to the React and XYFlow CDN assets.</p>
+        <p>This portable architecture board loads React Flow from a CDN. If you are offline or the CDN is blocked, the interactive canvas cannot start.</p><p>Replace the bundled model with source-backed architecture data from the target project.</p>
       </div>
     </div>
     <div id="root"></div>
-    <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/@xyflow/react@12.10.2/dist/umd/index.js"></script>
-    <script>
-      const ARCHITECTURE_MODEL = {
-        "title": "Product Platform Architecture",
-        "subtitle": "A project-agnostic example of request flow, data contracts, delivery, and observability.",
-        "domains": {
-                "interface": {
-                        "label": "Interface",
-                        "color": "#4263be",
-                        "soft": "#dfe6ff"
-                },
-                "runtime": {
-                        "label": "Runtime",
-                        "color": "#128970",
-                        "soft": "#dff7ef"
-                },
-                "data": {
-                        "label": "Data",
-                        "color": "#9a6b21",
-                        "soft": "#f6ebcf"
-                },
-                "delivery": {
-                        "label": "Delivery",
-                        "color": "#8b4bb3",
-                        "soft": "#eadcf7"
-                },
-                "signal": {
-                        "label": "Signal",
-                        "color": "#bf3b5f",
-                        "soft": "#f8dce5"
-                }
+
+    <script type="module">
+      import React, { useCallback, useEffect, useMemo, useRef, useState } from "https://esm.sh/react@18.3.1";
+      import { createRoot } from "https://esm.sh/react-dom@18.3.1/client";
+      import {
+        Background,
+        BaseEdge,
+        Controls,
+        EdgeLabelRenderer,
+        Handle,
+        MarkerType,
+        Position,
+        ReactFlow,
+        ReactFlowProvider,
+        getBezierPath,
+        useReactFlow
+      } from "https://esm.sh/@xyflow/react@12.10.2?deps=react@18.3.1,react-dom@18.3.1";
+
+      const h = React.createElement;
+
+      function IconSvg({ children, ...props }) {
+        return h(
+          "svg",
+          {
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: 2.25,
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+            focusable: "false",
+            ...props
+          },
+          children
+        );
+      }
+
+      function Maximize2(props) {
+        return h(
+          IconSvg,
+          props,
+          h("path", { d: "M15 3h6v6" }),
+          h("path", { d: "m21 3-7 7" }),
+          h("path", { d: "M9 21H3v-6" }),
+          h("path", { d: "m3 21 7-7" })
+        );
+      }
+
+      function RotateCcw(props) {
+        return h(
+          IconSvg,
+          props,
+          h("path", { d: "M3 12a9 9 0 1 0 3-6.7" }),
+          h("path", { d: "M3 4v6h6" })
+        );
+      }
+
+      function Sun(props) {
+        return h(
+          IconSvg,
+          props,
+          h("circle", { cx: "12", cy: "12", r: "4" }),
+          h("path", { d: "M12 2v2" }),
+          h("path", { d: "M12 20v2" }),
+          h("path", { d: "m4.93 4.93 1.41 1.41" }),
+          h("path", { d: "m17.66 17.66 1.41 1.41" }),
+          h("path", { d: "M2 12h2" }),
+          h("path", { d: "M20 12h2" }),
+          h("path", { d: "m6.34 17.66-1.41 1.41" }),
+          h("path", { d: "m19.07 4.93-1.41 1.41" })
+        );
+      }
+
+      function Moon(props) {
+        return h(IconSvg, props, h("path", { d: "M20.6 14.5A8.5 8.5 0 0 1 9.5 3.4 7 7 0 1 0 20.6 14.5Z" }));
+      }
+
+      function Minus(props) {
+        return h(IconSvg, props, h("path", { d: "M5 12h14" }));
+      }
+
+      function Plus(props) {
+        return h(IconSvg, props, h("path", { d: "M12 5v14" }), h("path", { d: "M5 12h14" }));
+      }
+
+      function X(props) {
+        return h(IconSvg, props, h("path", { d: "M18 6 6 18" }), h("path", { d: "m6 6 12 12" }));
+      }
+
+      const DOMAINS = {
+        "interface": {
+                "label": "Interface",
+                "accent": "#5c5fb8",
+                "soft": "#ececfe"
         },
-        "owners": {
-                "product": {
-                        "label": "Product Surface",
-                        "description": "User-facing entrypoints and supported interaction contracts."
-                },
-                "runtime": {
-                        "label": "Application Runtime",
-                        "description": "Request handling, orchestration, and domain behavior."
-                },
-                "data": {
-                        "label": "Data Boundary",
-                        "description": "Persistence, queues, artifacts, and externally visible state."
-                },
-                "delivery": {
-                        "label": "Delivery System",
-                        "description": "Build, test, release, and deployment responsibilities."
-                },
-                "signal": {
-                        "label": "Operations Signal",
-                        "description": "Logs, metrics, status, and debugging entrypoints."
-                }
+        "runtime": {
+                "label": "Runtime",
+                "accent": "#0f8b72",
+                "soft": "#e2f5ef"
         },
+        "data": {
+                "label": "Data Boundary",
+                "accent": "#b77b1b",
+                "soft": "#f8efd9"
+        },
+        "delivery": {
+                "label": "Delivery",
+                "accent": "#7a5a25",
+                "soft": "#f4ead9"
+        },
+        "signal": {
+                "label": "Signal",
+                "accent": "#bf3b5f",
+                "soft": "#fae5ec"
+        },
+        "external": {
+                "label": "External",
+                "accent": "#59636f",
+                "soft": "#eceff2"
+        },
+        "infra": {
+                "label": "Infrastructure",
+                "accent": "#59636f",
+                "soft": "#eceff2"
+        }
+};
+
+      const OWNERS = {
+        "product": {
+                "label": "Product Surface",
+                "description": "User-facing entrypoints and supported interaction contracts."
+        },
+        "runtime": {
+                "label": "Runtime Core",
+                "description": "Application orchestration, domain behavior, and service boundaries."
+        },
+        "data": {
+                "label": "Data Boundary",
+                "description": "Persistence, artifacts, queues, external state, and read models."
+        },
+        "delivery": {
+                "label": "Delivery System",
+                "description": "Build, test, release, deployment, and operational quality gates."
+        },
+        "signal": {
+                "label": "Operations Signal",
+                "description": "Logs, metrics, traces, status, and debugging entrypoints."
+        },
+        "external": {
+                "label": "External System",
+                "description": "Users, vendors, and systems outside the project boundary."
+        },
+        "suite": {
+                "label": "Project",
+                "description": "Project-owned architecture responsibility."
+        }
+};
+
+      const BOARD = {
         "lanes": [
                 {
-                        "id": "lane-interface",
-                        "title": "Interaction Boundary",
+                        "id": "lane-entry",
+                        "title": "Interaction boundary",
+                        "subtitle": "Supported user and automation entrypoints.",
                         "domain": "interface",
-                        "x": 40,
-                        "y": 130,
-                        "width": 300,
+                        "position": {
+                                "x": 40,
+                                "y": 185
+                        },
+                        "width": 860,
                         "height": 760
                 },
                 {
                         "id": "lane-runtime",
-                        "title": "Runtime Core",
+                        "title": "Runtime core",
+                        "subtitle": "Policy, orchestration, domain behavior, and side effects.",
                         "domain": "runtime",
-                        "x": 360,
-                        "y": 130,
-                        "width": 620,
-                        "height": 760
+                        "position": {
+                                "x": 980,
+                                "y": 120
+                        },
+                        "width": 1260,
+                        "height": 880
                 },
                 {
-                        "id": "lane-data",
-                        "title": "State And External Contracts",
+                        "id": "lane-evidence",
+                        "title": "State, delivery, and signal",
+                        "subtitle": "Durable state, release gates, and debugging evidence.",
                         "domain": "data",
-                        "x": 1000,
-                        "y": 130,
-                        "width": 300,
-                        "height": 760
-                },
-                {
-                        "id": "lane-delivery",
-                        "title": "Delivery And Signal",
-                        "domain": "delivery",
-                        "x": 1320,
-                        "y": 130,
-                        "width": 300,
+                        "position": {
+                                "x": 2320,
+                                "y": 185
+                        },
+                        "width": 1120,
                         "height": 760
                 }
         ],
         "nodes": [
                 {
                         "id": "user-entry",
-                        "title": "User Entry",
+                        "step": "01",
                         "domain": "interface",
                         "owner": "product",
-                        "x": 100,
-                        "y": 240,
+                        "title": "User Entry",
                         "purpose": "The supported way users or automations enter the system.",
+                        "chips": [
+                                "external",
+                                "source-backed"
+                        ],
+                        "position": {
+                                "x": 100,
+                                "y": 365
+                        },
                         "details": {
-                                "summary": "Represents a UI, CLI, webhook, or API gateway that starts product workflows.",
+                                "summary": "The supported way users or automations enter the system.",
+                                "what": [
+                                        "Project-specific details for User Entry should replace this example text."
+                                ],
+                                "why": [
+                                        "This node marks an architectural responsibility or contract."
+                                ],
                                 "inputs": [
-                                        "User action",
-                                        "Automation request",
-                                        "External webhook"
+                                        "Replace with source-backed inputs"
                                 ],
                                 "outputs": [
-                                        "Normalized request"
+                                        "Replace with source-backed outputs"
                                 ],
-                                "why": "Keeps the architecture boundary visible before internal runtime details begin.",
                                 "failures": [
-                                        "Check route registration",
-                                        "Check authentication and request validation"
+                                        "Replace with the first files/logs/tests to inspect"
                                 ],
                                 "source": [
-                                        "example: replace with app routes, CLI entrypoints, or API specs"
+                                        "example: replace with project source path"
                                 ],
                                 "source_confidence": "external",
                                 "related": [
@@ -394,238 +1240,285 @@
                 },
                 {
                         "id": "request-router",
-                        "title": "Request Router",
-                        "domain": "runtime",
+                        "step": "02",
+                        "domain": "interface",
                         "owner": "runtime",
-                        "x": 430,
-                        "y": 220,
+                        "title": "Request Router",
                         "purpose": "Classifies requests and sends them to the right workflow.",
+                        "chips": [
+                                "dispatch",
+                                "inferred"
+                        ],
+                        "position": {
+                                "x": 450,
+                                "y": 365
+                        },
                         "details": {
-                                "summary": "Maps external actions to internal handlers and establishes routing contracts.",
+                                "summary": "Classifies requests and sends them to the right workflow.",
+                                "what": [
+                                        "Project-specific details for Request Router should replace this example text."
+                                ],
+                                "why": [
+                                        "This node marks an architectural responsibility or contract."
+                                ],
                                 "inputs": [
-                                        "Normalized request",
-                                        "Auth/session context"
+                                        "Replace with source-backed inputs"
                                 ],
                                 "outputs": [
-                                        "Handler invocation",
-                                        "Rejected request"
+                                        "Replace with source-backed outputs"
                                 ],
-                                "why": "Most systems centralize policy, routing, or command dispatch here.",
                                 "failures": [
-                                        "Check route table",
-                                        "Check middleware order",
-                                        "Check integration tests"
+                                        "Replace with the first files/logs/tests to inspect"
                                 ],
                                 "source": [
-                                        "example: replace with router, controller, or command dispatcher"
+                                        "example: replace with project source path"
                                 ],
                                 "source_confidence": "inferred",
                                 "related": [
-                                        "workflow-engine",
-                                        "auth-policy"
+                                        "auth-policy",
+                                        "workflow-engine"
                                 ]
                         }
                 },
                 {
                         "id": "auth-policy",
-                        "title": "Auth And Policy",
+                        "step": "03",
                         "domain": "runtime",
                         "owner": "runtime",
-                        "x": 430,
-                        "y": 480,
+                        "title": "Auth And Policy",
                         "purpose": "Guards privileged operations and user-specific data.",
+                        "chips": [
+                                "identity",
+                                "policy"
+                        ],
+                        "position": {
+                                "x": 1030,
+                                "y": 250
+                        },
                         "details": {
-                                "summary": "Combines identity, permissions, and tenant/project scoping before state changes.",
+                                "summary": "Guards privileged operations and user-specific data.",
+                                "what": [
+                                        "Project-specific details for Auth And Policy should replace this example text."
+                                ],
+                                "why": [
+                                        "This node marks an architectural responsibility or contract."
+                                ],
                                 "inputs": [
-                                        "Identity claims",
-                                        "Request context",
-                                        "Policy config"
+                                        "Replace with source-backed inputs"
                                 ],
                                 "outputs": [
-                                        "Allowed action",
-                                        "Denied action"
+                                        "Replace with source-backed outputs"
                                 ],
-                                "why": "Authorization is a key contract between interface and domain logic.",
                                 "failures": [
-                                        "Check policy config",
-                                        "Check auth middleware",
-                                        "Check denied-request logs"
+                                        "Replace with the first files/logs/tests to inspect"
                                 ],
                                 "source": [
-                                        "example: replace with auth middleware and policy tests"
+                                        "example: replace with project source path"
                                 ],
                                 "source_confidence": "inferred",
                                 "related": [
-                                        "request-router",
                                         "workflow-engine"
                                 ]
                         }
                 },
                 {
                         "id": "workflow-engine",
-                        "title": "Workflow Engine",
+                        "step": "04",
                         "domain": "runtime",
                         "owner": "runtime",
-                        "x": 700,
-                        "y": 340,
-                        "purpose": "Runs the core product operation from validated input to durable result.",
+                        "title": "Workflow Engine",
+                        "purpose": "Runs the product operation from validated input to durable result.",
+                        "chips": [
+                                "core",
+                                "source-backed"
+                        ],
+                        "position": {
+                                "x": 1380,
+                                "y": 365
+                        },
                         "details": {
-                                "summary": "Coordinates domain services, validation, persistence, and side effects.",
+                                "summary": "Runs the product operation from validated input to durable result.",
+                                "what": [
+                                        "Project-specific details for Workflow Engine should replace this example text."
+                                ],
+                                "why": [
+                                        "This node marks an architectural responsibility or contract."
+                                ],
                                 "inputs": [
-                                        "Handler invocation",
-                                        "Policy decision",
-                                        "Loaded state"
+                                        "Replace with source-backed inputs"
                                 ],
                                 "outputs": [
-                                        "Domain result",
-                                        "State mutation",
-                                        "Side effect request"
+                                        "Replace with source-backed outputs"
                                 ],
-                                "why": "This is the central explanation target for maintainers joining a project.",
                                 "failures": [
-                                        "Check domain tests",
-                                        "Check retry/error handling",
-                                        "Check state transition logs"
+                                        "Replace with the first files/logs/tests to inspect"
                                 ],
                                 "source": [
-                                        "example: replace with service layer, job runner, or use-case module"
+                                        "example: replace with project source path"
                                 ],
                                 "source_confidence": "source-backed",
                                 "related": [
                                         "state-store",
-                                        "event-queue",
+                                        "async-work",
                                         "observability"
                                 ]
                         }
                 },
                 {
                         "id": "state-store",
-                        "title": "State Store",
+                        "step": "05",
                         "domain": "data",
                         "owner": "data",
-                        "x": 1060,
-                        "y": 230,
+                        "title": "State Store",
                         "purpose": "Persists canonical product state and read models.",
+                        "chips": [
+                                "database",
+                                "artifact"
+                        ],
+                        "position": {
+                                "x": 2350,
+                                "y": 250
+                        },
                         "details": {
-                                "summary": "Represents databases, object storage, indexes, or durable files that define current state.",
+                                "summary": "Persists canonical product state and read models.",
+                                "what": [
+                                        "Project-specific details for State Store should replace this example text."
+                                ],
+                                "why": [
+                                        "This node marks an architectural responsibility or contract."
+                                ],
                                 "inputs": [
-                                        "Validated writes",
-                                        "Migration scripts"
+                                        "Replace with source-backed inputs"
                                 ],
                                 "outputs": [
-                                        "Current state",
-                                        "Historical records"
+                                        "Replace with source-backed outputs"
                                 ],
-                                "why": "Architecture maps should make durable contracts and ownership explicit.",
                                 "failures": [
-                                        "Check schema migrations",
-                                        "Check connection config",
-                                        "Check data integrity tests"
+                                        "Replace with the first files/logs/tests to inspect"
                                 ],
                                 "source": [
-                                        "example: replace with schema, models, or storage paths"
+                                        "example: replace with project source path"
                                 ],
                                 "source_confidence": "source-backed",
                                 "related": [
-                                        "workflow-engine",
-                                        "reporting-api"
+                                        "reporting-surface"
                                 ]
                         }
                 },
                 {
-                        "id": "event-queue",
-                        "title": "Async Queue",
-                        "domain": "data",
-                        "owner": "data",
-                        "x": 1060,
-                        "y": 500,
+                        "id": "async-work",
+                        "step": "06",
+                        "domain": "runtime",
+                        "owner": "runtime",
+                        "title": "Async Work",
                         "purpose": "Decouples slow side effects from the request path.",
+                        "chips": [
+                                "queue",
+                                "worker"
+                        ],
+                        "position": {
+                                "x": 1730,
+                                "y": 585
+                        },
                         "details": {
-                                "summary": "Represents jobs, queues, streams, or scheduled workers used after core state changes.",
+                                "summary": "Decouples slow side effects from the request path.",
+                                "what": [
+                                        "Project-specific details for Async Work should replace this example text."
+                                ],
+                                "why": [
+                                        "This node marks an architectural responsibility or contract."
+                                ],
                                 "inputs": [
-                                        "Side effect request",
-                                        "Scheduled trigger"
+                                        "Replace with source-backed inputs"
                                 ],
                                 "outputs": [
-                                        "Worker task",
-                                        "Delivery event"
+                                        "Replace with source-backed outputs"
                                 ],
-                                "why": "Async contracts are common failure points and should be explicit.",
                                 "failures": [
-                                        "Check queue depth",
-                                        "Check worker retries",
-                                        "Check dead-letter handling"
+                                        "Replace with the first files/logs/tests to inspect"
                                 ],
                                 "source": [
-                                        "example: replace with queue config, worker code, or workflow files"
+                                        "example: replace with project source path"
                                 ],
                                 "source_confidence": "inferred",
                                 "related": [
-                                        "workflow-engine",
                                         "observability"
                                 ]
                         }
                 },
                 {
-                        "id": "reporting-api",
-                        "title": "Reporting API",
+                        "id": "reporting-surface",
+                        "step": "07",
                         "domain": "interface",
                         "owner": "product",
-                        "x": 100,
-                        "y": 620,
+                        "title": "Reporting Surface",
                         "purpose": "Exposes results, status, and derived views back to users.",
+                        "chips": [
+                                "read model",
+                                "status"
+                        ],
+                        "position": {
+                                "x": 2350,
+                                "y": 585
+                        },
                         "details": {
-                                "summary": "Provides read-side contracts such as dashboards, status endpoints, exports, or CLI output.",
+                                "summary": "Exposes results, status, and derived views back to users.",
+                                "what": [
+                                        "Project-specific details for Reporting Surface should replace this example text."
+                                ],
+                                "why": [
+                                        "This node marks an architectural responsibility or contract."
+                                ],
                                 "inputs": [
-                                        "Current state",
-                                        "Derived result"
+                                        "Replace with source-backed inputs"
                                 ],
                                 "outputs": [
-                                        "User-visible status",
-                                        "Exported artifact"
+                                        "Replace with source-backed outputs"
                                 ],
-                                "why": "The architecture should show how users observe the system after work completes.",
                                 "failures": [
-                                        "Check response serialization",
-                                        "Check cache/index freshness",
-                                        "Check contract tests"
+                                        "Replace with the first files/logs/tests to inspect"
                                 ],
                                 "source": [
-                                        "example: replace with read endpoints, views, or export commands"
+                                        "example: replace with project source path"
                                 ],
                                 "source_confidence": "external",
-                                "related": [
-                                        "state-store"
-                                ]
+                                "related": []
                         }
                 },
                 {
                         "id": "ci-release",
-                        "title": "CI And Release",
+                        "step": "08",
                         "domain": "delivery",
                         "owner": "delivery",
-                        "x": 1380,
-                        "y": 250,
+                        "title": "CI And Release",
                         "purpose": "Builds, tests, packages, and deploys project changes.",
+                        "chips": [
+                                "quality gate",
+                                "deploy"
+                        ],
+                        "position": {
+                                "x": 2900,
+                                "y": 250
+                        },
                         "details": {
-                                "summary": "Represents the delivery path from source change to runnable artifact or environment.",
+                                "summary": "Builds, tests, packages, and deploys project changes.",
+                                "what": [
+                                        "Project-specific details for CI And Release should replace this example text."
+                                ],
+                                "why": [
+                                        "This node marks an architectural responsibility or contract."
+                                ],
                                 "inputs": [
-                                        "Source change",
-                                        "Build config",
-                                        "Test suite"
+                                        "Replace with source-backed inputs"
                                 ],
                                 "outputs": [
-                                        "Validated artifact",
-                                        "Deployment"
+                                        "Replace with source-backed outputs"
                                 ],
-                                "why": "Delivery is part of architecture when it controls runtime behavior and quality gates.",
                                 "failures": [
-                                        "Check workflow logs",
-                                        "Check package metadata",
-                                        "Check environment configuration"
+                                        "Replace with the first files/logs/tests to inspect"
                                 ],
                                 "source": [
-                                        "example: replace with CI workflows, Dockerfiles, or deployment manifests"
+                                        "example: replace with project source path"
                                 ],
                                 "source_confidence": "source-backed",
                                 "related": [
@@ -636,121 +1529,111 @@
                 },
                 {
                         "id": "observability",
-                        "title": "Observability",
+                        "step": "09",
                         "domain": "signal",
                         "owner": "signal",
-                        "x": 1380,
-                        "y": 540,
+                        "title": "Observability",
                         "purpose": "Provides logs, metrics, traces, and operational status for debugging.",
+                        "chips": [
+                                "logs",
+                                "unknown"
+                        ],
+                        "position": {
+                                "x": 2900,
+                                "y": 585
+                        },
                         "details": {
-                                "summary": "Collects runtime and delivery signals that maintainers use when the system breaks.",
+                                "summary": "Provides logs, metrics, traces, and operational status for debugging.",
+                                "what": [
+                                        "Project-specific details for Observability should replace this example text."
+                                ],
+                                "why": [
+                                        "This node marks an architectural responsibility or contract."
+                                ],
                                 "inputs": [
-                                        "Runtime events",
-                                        "Worker status",
-                                        "Deployment status"
+                                        "Replace with source-backed inputs"
                                 ],
                                 "outputs": [
-                                        "Logs",
-                                        "Metrics",
-                                        "Alerts",
-                                        "Dashboards"
+                                        "Replace with source-backed outputs"
                                 ],
-                                "why": "A useful architecture doc points maintainers to the first places to inspect failures.",
                                 "failures": [
-                                        "Check logging config",
-                                        "Check dashboard freshness",
-                                        "Check alert routing"
+                                        "Replace with the first files/logs/tests to inspect"
                                 ],
                                 "source": [
-                                        "example: replace with logging, metrics, status files, or monitoring config"
+                                        "example: replace with project source path"
                                 ],
                                 "source_confidence": "unknown",
-                                "related": [
-                                        "workflow-engine",
-                                        "event-queue",
-                                        "ci-release"
-                                ]
+                                "related": []
                         }
                 }
         ],
         "edges": [
-                {
-                        "id": "user-entry-request-router",
-                        "source": "user-entry",
-                        "target": "request-router",
-                        "label": "request",
-                        "kind": "control"
-                },
-                {
-                        "id": "request-router-auth-policy",
-                        "source": "request-router",
-                        "target": "auth-policy",
-                        "label": "context",
-                        "kind": "control"
-                },
-                {
-                        "id": "auth-policy-workflow-engine",
-                        "source": "auth-policy",
-                        "target": "workflow-engine",
-                        "label": "decision",
-                        "kind": "signal"
-                },
-                {
-                        "id": "request-router-workflow-engine",
-                        "source": "request-router",
-                        "target": "workflow-engine",
-                        "label": "handler",
-                        "kind": "control"
-                },
-                {
-                        "id": "workflow-engine-state-store",
-                        "source": "workflow-engine",
-                        "target": "state-store",
-                        "label": "read/write",
-                        "kind": "data"
-                },
-                {
-                        "id": "workflow-engine-event-queue",
-                        "source": "workflow-engine",
-                        "target": "event-queue",
-                        "label": "job",
-                        "kind": "data"
-                },
-                {
-                        "id": "state-store-reporting-api",
-                        "source": "state-store",
-                        "target": "reporting-api",
-                        "label": "read model",
-                        "kind": "data"
-                },
-                {
-                        "id": "workflow-engine-observability",
-                        "source": "workflow-engine",
-                        "target": "observability",
-                        "label": "logs/metrics",
-                        "kind": "signal"
-                },
-                {
-                        "id": "event-queue-observability",
-                        "source": "event-queue",
-                        "target": "observability",
-                        "label": "worker status",
-                        "kind": "signal"
-                },
-                {
-                        "id": "ci-release-workflow-engine",
-                        "source": "ci-release",
-                        "target": "workflow-engine",
-                        "label": "deploy",
-                        "kind": "dependency"
-                },
-                {
-                        "id": "ci-release-observability",
-                        "source": "ci-release",
-                        "target": "observability",
-                        "label": "check status",
-                        "kind": "signal"
-                }
+                [
+                        "user-entry",
+                        "request-router",
+                        "request",
+                        "control"
+                ],
+                [
+                        "request-router",
+                        "auth-policy",
+                        "context",
+                        "control"
+                ],
+                [
+                        "auth-policy",
+                        "workflow-engine",
+                        "decision",
+                        "signal"
+                ],
+                [
+                        "request-router",
+                        "workflow-engine",
+                        "handler",
+                        "control"
+                ],
+                [
+                        "workflow-engine",
+                        "state-store",
+                        "read/write",
+                        "artifact"
+                ],
+                [
+                        "workflow-engine",
+                        "async-work",
+                        "job",
+                        "artifact"
+                ],
+                [
+                        "state-store",
+                        "reporting-surface",
+                        "read model",
+                        "artifact"
+                ],
+                [
+                        "workflow-engine",
+                        "observability",
+                        "logs/metrics",
+                        "signal"
+                ],
+                [
+                        "async-work",
+                        "observability",
+                        "worker status",
+                        "signal"
+                ],
+                [
+                        "ci-release",
+                        "workflow-engine",
+                        "deploy",
+                        "decision"
+                ],
+                [
+                        "ci-release",
+                        "observability",
+                        "check status",
+                        "signal"
+                ]
         ],
         "views": {
                 "overview": {
@@ -761,8 +1644,8 @@
                                 "auth-policy",
                                 "workflow-engine",
                                 "state-store",
-                                "event-queue",
-                                "reporting-api",
+                                "async-work",
+                                "reporting-surface",
                                 "ci-release",
                                 "observability"
                         ]
@@ -775,8 +1658,8 @@
                                 "auth-policy",
                                 "workflow-engine",
                                 "state-store",
-                                "event-queue",
-                                "reporting-api"
+                                "async-work",
+                                "reporting-surface"
                         ]
                 },
                 "delivery": {
@@ -791,145 +1674,930 @@
                         "label": "Debugging",
                         "focus": [
                                 "workflow-engine",
-                                "event-queue",
+                                "async-work",
                                 "observability",
                                 "ci-release"
                         ]
                 }
         }
 };
-      const { createElement: h, useCallback, useMemo, useState } = React;
-      const { createRoot } = ReactDOM;
-      const { Background, BaseEdge, Controls, EdgeLabelRenderer, MarkerType, ReactFlow, ReactFlowProvider, getBezierPath, useReactFlow } = window.ReactFlow;
-      const byId = Object.fromEntries(ARCHITECTURE_MODEL.nodes.map(node => [node.id, node]));
-      const confidenceLabels = {
-        "source-backed": "Source backed",
-        inferred: "Inferred",
-        external: "External",
-        unknown: "Unknown"
+
+      const GROUP_DETAILS = {
+        "overview": {
+                "title": "Project Architecture",
+                "purpose": "A source-backed map of the major responsibilities and contracts.",
+                "domain": "runtime",
+                "summary": "Use this overview to orient around entrypoints, runtime work, state, delivery, and signal.",
+                "why": "It gives maintainers a first map before they dive into files.",
+                "points": [
+                        "Select a node to inspect its contracts.",
+                        "Use focus modes to narrow the reading path.",
+                        "Source confidence labels should remain visible in chips."
+                ],
+                "focus": [
+                        "user-entry",
+                        "request-router",
+                        "auth-policy",
+                        "workflow-engine",
+                        "state-store",
+                        "async-work",
+                        "reporting-surface",
+                        "ci-release",
+                        "observability"
+                ]
+        },
+        "runtime": {
+                "title": "Runtime Flow",
+                "purpose": "Request handling through core workflow and user-visible result.",
+                "domain": "runtime",
+                "summary": "Highlights the direct path from user entry to durable state and reporting.",
+                "why": "Most debugging starts by finding where the runtime contract broke.",
+                "points": [
+                        "Router and policy decide whether work can start.",
+                        "Workflow engine owns the core transition.",
+                        "State and reporting define externally visible results."
+                ],
+                "focus": [
+                        "user-entry",
+                        "request-router",
+                        "auth-policy",
+                        "workflow-engine",
+                        "state-store",
+                        "async-work",
+                        "reporting-surface"
+                ]
+        },
+        "delivery": {
+                "title": "Delivery Flow",
+                "purpose": "How project changes become runnable behavior.",
+                "domain": "delivery",
+                "summary": "Connects CI/release gates to runtime deployment and operational evidence.",
+                "why": "Build and release systems often explain production behavior drift.",
+                "points": [
+                        "Validate delivery contracts before blaming runtime.",
+                        "Release signals should point back to runtime versions."
+                ],
+                "focus": [
+                        "ci-release",
+                        "workflow-engine",
+                        "observability"
+                ]
+        },
+        "debugging": {
+                "title": "Debugging Flow",
+                "purpose": "The first places to inspect when the system breaks.",
+                "domain": "signal",
+                "summary": "Focuses on runtime, async work, release status, and observability evidence.",
+                "why": "Useful architecture docs shorten incident orientation time.",
+                "points": [
+                        "Start with logs and status.",
+                        "Separate delivery failure from runtime failure.",
+                        "Check async queues when direct requests succeeded but side effects did not."
+                ],
+                "focus": [
+                        "workflow-engine",
+                        "async-work",
+                        "observability",
+                        "ci-release"
+                ]
+        }
+};
+
+      const EDGE_HANDLES = Object.freeze({});
+
+      const NODE_BY_ID = Object.fromEntries(BOARD.nodes.map(node => [node.id, node]));
+      const INCOMING = new Map();
+      const OUTGOING = new Map();
+      BOARD.edges.forEach(([source, target]) => {
+        if (!OUTGOING.has(source)) OUTGOING.set(source, []);
+        if (!INCOMING.has(target)) INCOMING.set(target, []);
+        OUTGOING.get(source).push(target);
+        INCOMING.get(target).push(source);
+      });
+
+      const VIEWPORTS = {
+        overview: { x: 38, y: 160, zoom: 0.7 },
+        runtime: { x: -1220, y: 160, zoom: 0.76 },
+        artifacts: { x: -2660, y: 160, zoom: 0.76 },
+        signal: { x: -3440, y: 160, zoom: 0.76 },
+        decisions: { x: -920, y: 108, zoom: 0.68 }
       };
-      const confidenceColors = {
-        "source-backed": "var(--ok)",
-        inferred: "var(--warn)",
-        external: "#4263be",
-        unknown: "var(--unknown)"
-      };
-      function vars(domainKey) {
-        const domain = ARCHITECTURE_MODEL.domains[domainKey] || ARCHITECTURE_MODEL.domains.system;
-        return { "--accent": domain.color, "--soft": domain.soft };
+
+      Object.assign(VIEWPORTS, {
+        overview: { x: 18, y: 86, zoom: 0.76 },
+        runtime: { x: -805, y: -640, zoom: 0.82 },
+        artifacts: { x: -820, y: -1280, zoom: 0.82 },
+        signal: { x: 18, y: -1960, zoom: 0.84 },
+        decisions: { x: -470, y: 74, zoom: 0.74 }
+      });
+
+      Object.assign(VIEWPORTS, {
+        overview: { x: 10, y: 78, zoom: 0.56 },
+        runtime: { x: -560, y: -280, zoom: 0.78 },
+        artifacts: { x: -360, y: -560, zoom: 0.78 },
+        signal: { x: 8, y: -700, zoom: 0.78 },
+        decisions: { x: -250, y: 60, zoom: 0.66 }
+      });
+
+      function domainVars(domainKey) {
+        const domain = DOMAINS[domainKey] || DOMAINS.infra;
+        return {
+          "--accent": domain.accent,
+          "--soft": domain.soft
+        };
       }
-      function confidenceStyle(value) {
-        return { "--confidence-color": confidenceColors[value] || confidenceColors.unknown };
+
+      function selectionContext(selectedId) {
+        if (!selectedId || !NODE_BY_ID[selectedId]) {
+          return { related: new Set(), upstream: new Set(), downstream: new Set(), activeEdges: new Set() };
+        }
+        const upstream = new Set(INCOMING.get(selectedId) || []);
+        const downstream = new Set(OUTGOING.get(selectedId) || []);
+        const explicit = new Set((NODE_BY_ID[selectedId]?.details.related || []).filter(id => NODE_BY_ID[id]));
+        const related = new Set([selectedId, ...upstream, ...downstream, ...explicit]);
+        const activeEdges = new Set();
+        BOARD.edges.forEach(([source, target]) => {
+          if (source === selectedId || target === selectedId) activeEdges.add(`${source}->${target}`);
+        });
+        return { related, upstream, downstream, activeEdges };
       }
-      function directRelations(id) {
-        return [...new Set(ARCHITECTURE_MODEL.edges.flatMap(edge => edge.source === id ? [edge.target] : edge.target === id ? [edge.source] : []))].filter(Boolean);
+
+      function modeFocus(mode) {
+        return new Set(BOARD.views[mode]?.focus || []);
       }
-      function LaneNode({ data }) {
-        return h("div", { className: "lane", style: { ...vars(data.domain), "--lane-width": `${data.width}px`, "--lane-height": `${data.height}px` } }, h("div", { className: "lane-title" }, data.title));
+
+      function visibleEdgeIds(mode, selectedId, context) {
+        if (selectedId) return context.activeEdges;
+        return VIEW_EDGE_IDS[mode] || MAIN_EDGE_IDS;
       }
-      function ArchitectureNode({ data, selected }) {
-        const domain = ARCHITECTURE_MODEL.domains[data.domain] || ARCHITECTURE_MODEL.domains.system;
-        const confidence = data.details?.source_confidence || "unknown";
-        return h("div", { className: `node ${selected ? "selected" : ""} ${data.dimmed ? "dimmed" : ""}`, style: vars(data.domain) },
-          h("div", { className: "node-domain" }, domain.label),
-          h("span", { className: "confidence", style: confidenceStyle(confidence) }, confidenceLabels[confidence] || "Unknown"),
-          h("h3", null, data.title),
-          h("p", null, data.purpose)
+
+      const NODE_SIZE = { width: 220, height: 100 };
+      const PANEL_RESERVE = 560;
+      const TOPBAR_RESERVE = 96;
+
+      function boundsForIds(ids) {
+        const selected = ids.map(id => NODE_BY_ID[id]).filter(Boolean);
+        const nodes = selected.length ? selected : BOARD.nodes;
+        const minX = Math.min(...nodes.map(node => node.position.x));
+        const minY = Math.min(...nodes.map(node => node.position.y));
+        const maxX = Math.max(...nodes.map(node => node.position.x + NODE_SIZE.width));
+        const maxY = Math.max(...nodes.map(node => node.position.y + NODE_SIZE.height));
+        return { minX, minY, width: maxX - minX, height: maxY - minY };
+      }
+
+      function viewportForIds(ids, options = {}) {
+        const bounds = boundsForIds(ids);
+        const reservePanel = options.reservePanel ?? window.innerWidth >= 980;
+        const availableWidth = Math.max(360, window.innerWidth - (reservePanel ? PANEL_RESERVE : 32) - 48);
+        const availableHeight = Math.max(300, window.innerHeight - TOPBAR_RESERVE - 30);
+        const padding = options.padding ?? 0.28;
+        const paddedWidth = Math.max(1, bounds.width * (1 + padding));
+        const paddedHeight = Math.max(1, bounds.height * (1 + padding));
+        const zoom = Math.max(
+          options.minZoom ?? 0.26,
+          Math.min(options.maxZoom ?? 1.08, availableWidth / paddedWidth, availableHeight / paddedHeight)
         );
+        const left = 24;
+        const top = TOPBAR_RESERVE;
+        return {
+          x: left + (availableWidth - bounds.width * zoom) / 2 - bounds.minX * zoom,
+          y: top + (availableHeight - bounds.height * zoom) / 2 - bounds.minY * zoom,
+          zoom
+        };
       }
-      function ContractEdge(props) {
-        const [path, labelX, labelY] = getBezierPath(props);
-        const edge = props.data || {};
-        const color = edge.color || "#8f887d";
-        return h(React.Fragment, null,
-          h(BaseEdge, { path, markerEnd: props.markerEnd, style: { stroke: color, strokeWidth: edge.active ? 2.8 : 1.8, strokeDasharray: edge.kind === "data" || edge.kind === "dependency" ? "7 7" : undefined, opacity: edge.dimmed ? 0.18 : 0.75 } }),
-          h(EdgeLabelRenderer, null, h("div", { style: { position: "absolute", transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`, border: "1px solid rgba(120,113,100,.18)", borderRadius: "999px", background: "var(--panel)", padding: "4px 8px", fontSize: ".72rem", fontWeight: 850, opacity: edge.dimmed ? 0 : 1 } }, edge.label))
-        );
+
+      function buildNodes(mode, selectedId) {
+        const context = selectionContext(selectedId);
+        const focus = modeFocus(mode);
+        const hasModeFocus = focus.size > 0;
+        const hasSelection = Boolean(selectedId);
+
+        const lanes = BOARD.lanes.map(lane => ({
+          id: lane.id,
+          type: "lane",
+          position: lane.position,
+            data: {
+              title: lane.title,
+              subtitle: lane.subtitle,
+              domain: lane.domain,
+              width: lane.width,
+              height: lane.height,
+              dimmed: hasSelection
+            },
+          draggable: false,
+          selectable: false,
+          focusable: false,
+          zIndex: -2
+        }));
+
+        const nodes = BOARD.nodes.map(node => {
+          const isSelected = node.id === selectedId;
+          const isRelated = context.related.has(node.id);
+          const modeDimmed = hasModeFocus && !focus.has(node.id);
+          const selectionDimmed = hasSelection && !isSelected && !isRelated;
+          return {
+            id: node.id,
+            type: "arch",
+            position: node.position,
+            data: {
+              ...node,
+              domainLabel: DOMAINS[node.domain].label,
+              ownerLabel: OWNERS[node.owner]?.label || OWNERS.suite.label,
+              starter: !INCOMING.has(node.id),
+              selected: isSelected,
+              related: isRelated && !isSelected,
+              dimmed: selectionDimmed || (!hasSelection && modeDimmed),
+              modeDimmed
+            },
+            draggable: false,
+            selectable: true,
+            connectable: false,
+            zIndex: isSelected ? 8 : isRelated ? 6 : 2
+          };
+        });
+
+        return [...lanes, ...nodes];
       }
-      const nodeTypes = { architecture: ArchitectureNode, lane: LaneNode };
-      const edgeTypes = { contract: ContractEdge };
-      function buildNodes(selectedId, viewKey) {
-        const focus = new Set((ARCHITECTURE_MODEL.views[viewKey] || ARCHITECTURE_MODEL.views.overview).focus);
-        const related = new Set(selectedId ? [selectedId, ...directRelations(selectedId)] : focus);
-        return [
-          ...ARCHITECTURE_MODEL.lanes.map(lane => ({ id: lane.id, type: "lane", position: { x: lane.x, y: lane.y }, data: lane, selectable: false, draggable: false })),
-          ...ARCHITECTURE_MODEL.nodes.map(node => ({ id: node.id, type: "architecture", position: { x: node.x, y: node.y }, data: { ...node, dimmed: selectedId ? !related.has(node.id) : !focus.has(node.id) }, draggable: false }))
-        ];
+
+      function buildEdges(mode, selectedId) {
+        const context = selectionContext(selectedId);
+        const hasSelection = Boolean(selectedId);
+        const visible = visibleEdgeIds(mode, selectedId, context);
+
+        return BOARD.edges.filter(([source, target]) => visible.has(`${source}->${target}`)).map(([source, target, label, kind]) => {
+          const id = `${source}->${target}`;
+          const [sourceHandle, targetHandle] = EDGE_HANDLES[id] || ["out-right", "in-left"];
+          const primary = MAIN_EDGE_IDS.has(id);
+          const color = selectedId
+            ? DOMAINS[NODE_BY_ID[selectedId]?.domain || "infra"].accent
+            : edgeColor(kind);
+          return {
+            id,
+            source,
+            target,
+            sourceHandle,
+            targetHandle,
+            type: "contract",
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: dimmed ? "#c7c1b6" : color
+              color
+            },
+            data: {
+              label,
+              kind,
+              showLabel: hasSelection || mode !== "overview",
+              dimmed: false,
+              active: true,
+              primary,
+              color
+            }
+          };
+        });
       }
-      function matchesQuery(node, query) {
-        if (!query) return true;
-        const haystack = [
-          node.title,
-          node.purpose,
-          node.domain,
-          node.owner,
-          node.details?.summary,
-          ...(node.details?.source || [])
-        ].join(" ").toLowerCase();
-        return haystack.includes(query.toLowerCase());
+
+      function edgeColor(kind) {
+        if (kind === "artifact") return DOMAINS.storage.accent;
+        if (kind === "signal") return DOMAINS.signal.accent;
+        if (kind === "decision") return DOMAINS.decision.accent;
+        return DOMAINS.runtime.accent;
       }
-      function buildEdges(selectedId) {
-        const related = new Set(selectedId ? [selectedId, ...directRelations(selectedId)] : []);
-        return ARCHITECTURE_MODEL.edges.map(edge => ({ id: edge.id, source: edge.source, target: edge.target, type: "contract", markerEnd: { type: MarkerType.ArrowClosed }, data: { ...edge, active: selectedId && (edge.source === selectedId || edge.target === selectedId), dimmed: selectedId && !(related.has(edge.source) && related.has(edge.target)) } }));
-      }
-      function Drawer({ selectedId }) {
-        const node = byId[selectedId] || ARCHITECTURE_MODEL.nodes[0];
-        const domain = ARCHITECTURE_MODEL.domains[node.domain] || ARCHITECTURE_MODEL.domains.system;
-        const owner = ARCHITECTURE_MODEL.owners[node.owner] || { label: node.owner, description: "" };
-        const details = node.details;
-        return h("aside", { className: "drawer", style: vars(node.domain) },
-          h("div", { className: "drawer-head" }, h("span", { className: "kicker" }, `${owner.label} / ${domain.label}`), h("h2", null, node.title), h("p", null, node.purpose)),
-          h("div", { className: "drawer-body" },
-            h("section", { className: "section" }, h("h3", null, "What it does"), h("p", null, details.summary)),
-            h("section", { className: "section" }, h("h3", null, "Reads"), h("ul", null, details.inputs.map(item => h("li", { key: item }, item)))),
-            h("section", { className: "section" }, h("h3", null, "Writes"), h("ul", null, details.outputs.map(item => h("li", { key: item }, item)))),
-            h("section", { className: "section" }, h("h3", null, "Why it exists"), h("p", null, details.why)),
-            h("section", { className: "section" }, h("h3", null, "Source confidence"), h("p", null, confidenceLabels[details.source_confidence] || "Unknown")),
-            h("section", { className: "section" }, h("h3", null, "Check first if it fails"), h("ul", null, details.failures.map(item => h("li", { key: item }, item)))),
-            h("section", { className: "section" }, h("h3", null, "Where to look"), h("div", { className: "sources" }, details.source.map(item => h("span", { key: item, className: "source" }, item))))
+
+      function BmtNode(props) {
+        const data = props.data;
+        const className = [
+          "arch-node",
+          data.selected ? "is-selected" : "",
+          data.related ? "is-related" : "",
+          data.dimmed ? "is-dimmed" : ""
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        return h(
+          "div",
+          {
+            className,
+            style: domainVars(data.domain)
+          },
+          h(Handle, { id: "in-left", type: "target", position: Position.Left }),
+          h(Handle, { id: "out-left", type: "source", position: Position.Left }),
+          h(Handle, { id: "in-right", type: "target", position: Position.Right }),
+          h(Handle, { id: "out-right", type: "source", position: Position.Right }),
+          h(Handle, { id: "in-top", type: "target", position: Position.Top }),
+          h(Handle, { id: "out-top", type: "source", position: Position.Top }),
+          h(Handle, { id: "in-bottom", type: "target", position: Position.Bottom }),
+          h(Handle, { id: "out-bottom", type: "source", position: Position.Bottom }),
+          h(
+            "div",
+            { className: "node-head" },
+            h("span", { className: "node-domain" }, data.ownerLabel),
+            h("span", { className: "node-step" }, data.step)
+          ),
+          h(
+            "div",
+            { className: "node-body" },
+            data.starter ? h("span", { className: "node-start" }, "starts here") : null,
+            h("h2", { className: "node-title" }, data.title),
+            h("p", { className: "node-purpose" }, data.purpose)
           )
         );
       }
-      function Board() {
-        const [view, setView] = useState("overview");
-        const [selectedId, setSelectedId] = useState(ARCHITECTURE_MODEL.nodes[0]?.id);
-        const [query, setQuery] = useState("");
-        const reactFlow = useReactFlow();
-        const nodes = useMemo(() => buildNodes(selectedId, view).map(node => byId[node.id] && !matchesQuery(byId[node.id], query) ? { ...node, data: { ...node.data, dimmed: true } } : node), [selectedId, view, query]);
-        const edges = useMemo(() => buildEdges(selectedId), [selectedId]);
-        const fit = useCallback(() => reactFlow.fitView({ padding: 0.18, duration: 260 }), [reactFlow]);
-        const theme = useCallback(() => {
-          document.documentElement.dataset.theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-        }, []);
-        return h("div", { className: "app" },
-          h("div", { className: "topbar" },
-            h("div", null, h("span", { className: "kicker" }, "Visual architecture"), h("span", { className: "title" }, ARCHITECTURE_MODEL.title), h("span", { className: "subtitle" }, ARCHITECTURE_MODEL.subtitle || "")),
-            h("div", { className: "tabs" }, Object.entries(ARCHITECTURE_MODEL.views).map(([key, value]) => h("button", { key, className: `button ${view === key ? "active" : ""}`, onClick: () => { setView(key); setSelectedId(value.focus[0]); setTimeout(fit, 0); } }, value.label))),
-            h("div", { className: "actions" },
-              h("input", { className: "search", type: "search", value: query, placeholder: "Search map", "aria-label": "Search architecture map", onChange: event => setQuery(event.target.value) }),
-              h("button", { className: "button icon", title: "Fit all", "aria-label": "Fit all", onClick: fit }, "□"),
-              h("button", { className: "button icon", title: "Toggle theme", "aria-label": "Toggle theme", onClick: theme }, "◐")
-            )
-          ),
-          h("div", { className: "flow" }, h(ReactFlow, { nodes, edges, nodeTypes, edgeTypes, fitView: true, minZoom: 0.25, maxZoom: 1.5, nodesDraggable: false, nodesConnectable: false, onNodeClick: (_event, node) => byId[node.id] && setSelectedId(node.id), defaultEdgeOptions: { type: "contract" }, proOptions: { hideAttribution: true } }, h(Background, { variant: "lines", gap: 34, size: 0.75, color: "var(--grid)" }), h(Controls, { position: "bottom-left", showInteractive: false }))),
-          h("div", { className: "legend", "aria-label": "Source confidence legend" },
-            Object.entries(confidenceLabels).map(([key, label]) => h("span", { key, className: "legend-item" }, h("span", { className: "legend-swatch", style: { "--legend-color": confidenceColors[key] } }), label))
-          ),
-          h(Drawer, { selectedId })
+
+      function LaneNode(props) {
+        const data = props.data;
+        return h(
+          "div",
+          {
+            className: "lane-node",
+            style: {
+              ...domainVars(data.domain),
+              "--lane-width": data.width ? `${data.width}px` : undefined,
+              "--lane-height": data.height ? `${data.height}px` : undefined,
+              opacity: data.dimmed ? 0.45 : 1
+            }
+          },
+          h("div", { className: "lane-title" }, data.title),
+          h("div", { className: "lane-subtitle" }, data.subtitle)
         );
       }
-      function App() { return h(ReactFlowProvider, null, h(Board)); }
-      window.addEventListener("error", error => {
-        const fallback = document.querySelector("#boot-fallback .fallback-card");
-        if (fallback && !fallback.dataset.enhanced) {
-          fallback.dataset.enhanced = "true";
-          const detail = document.createElement("p");
-          detail.textContent = `Load error: ${error.message || "unknown error"}`;
-          fallback.append(detail);
+
+      function ContractEdge(props) {
+        const [edgePath, labelX, labelY] = getBezierPath(props);
+        const dimmed = props.data?.dimmed;
+        const active = props.data?.active;
+        const kind = props.data?.kind;
+        const color = props.data?.color || "#9b9589";
+        const label = props.data?.showLabel ? props.data?.label : null;
+        const style = {
+          stroke: color,
+          strokeWidth: active ? 2.8 : 1.8,
+          strokeDasharray: kind === "control" || kind === "signal" ? undefined : "7 7",
+          opacity: dimmed ? 0.18 : kind === "control" || kind === "signal" ? 0.82 : 0.48
+        };
+
+        return h(
+          React.Fragment,
+          null,
+          h(BaseEdge, {
+            id: props.id,
+            path: edgePath,
+            markerEnd: props.markerEnd,
+            className: "contract-edge",
+            style
+          }),
+          label
+            ? h(
+                EdgeLabelRenderer,
+                null,
+                h(
+                  "div",
+                  {
+                    className: "edge-label",
+                    style: {
+                      opacity: dimmed ? 0 : 1,
+                      transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`
+                    }
+                  },
+                  label
+                )
+              )
+            : null
+        );
+      }
+
+      const nodeTypes = { arch: BmtNode, lane: LaneNode };
+      const edgeTypes = { contract: ContractEdge };
+
+      function GroupDetailDrawer({ mode, onSelect }) {
+        const group = GROUP_DETAILS[mode] || GROUP_DETAILS.overview;
+        const domain = DOMAINS[group.domain] || DOMAINS.runtime;
+        const focus = group.focus || [];
+
+        return h(
+          "aside",
+          {
+            className: "detail-drawer",
+            "aria-live": "polite",
+            style: domainVars(group.domain)
+          },
+          h(
+            "div",
+            { className: "drawer-head" },
+            h("span", { className: "drawer-kicker" }, `Group overview / ${domain.label}`),
+            h("h2", { className: "drawer-title" }, group.title),
+            h("p", { className: "drawer-purpose" }, group.purpose)
+          ),
+          h(
+            "div",
+            { className: "drawer-body" },
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "What this shows"),
+              h("p", null, group.summary)
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Why it matters"),
+              h("p", null, group.why)
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Good to know"),
+              h("ul", null, group.points.map(item => h("li", { key: item }, item)))
+            ),
+            mode === "overview"
+              ? null
+              : h(
+                  "section",
+                  { className: "detail-section" },
+                  h("h3", null, "Highlighted nodes"),
+                  h(
+                    "div",
+                    { className: "related-list" },
+                    focus
+                      .filter(id => NODE_BY_ID[id])
+                      .map(id =>
+                        h(
+                          "button",
+                          {
+                            key: id,
+                            type: "button",
+                            className: "related-pill",
+                            onClick: () => onSelect(id)
+                          },
+                          NODE_BY_ID[id].title
+                        )
+                      )
+                  )
+                )
+          )
+        );
+      }
+
+      function DetailDrawer({ mode, selectedId, onSelect, onClose }) {
+        const node = selectedId ? NODE_BY_ID[selectedId] : null;
+        if (!node) {
+          return mode === "overview" ? null : h(GroupDetailDrawer, { mode, onSelect });
         }
-      });
+
+        const domain = DOMAINS[node.domain];
+        const owner = OWNERS[node.owner] || OWNERS.suite;
+        const summary = node.details.summary || node.details.what?.[0] || node.purpose;
+        const why = Array.isArray(node.details.why) ? node.details.why.join(" ") : node.details.why;
+        const directRelated = directRelations(node.id);
+
+        return h(
+          "aside",
+          {
+            className: "detail-drawer",
+            "aria-live": "polite",
+            style: domainVars(node.domain)
+          },
+          h(
+            "div",
+            { className: "drawer-head" },
+            h(
+              "div",
+              { className: "drawer-head-top" },
+              h("span", { className: "drawer-kicker" }, `${owner.label} / ${domain.label}`),
+              h(
+                "button",
+                { type: "button", className: "drawer-close", onClick: onClose, "aria-label": "Close details", title: "Close details" },
+                h(X, { "aria-hidden": true })
+              )
+            ),
+            h("h2", { className: "drawer-title" }, node.title),
+            h("p", { className: "drawer-purpose" }, node.purpose)
+          ),
+          h(
+            "div",
+            { className: "drawer-body" },
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "What it does"),
+              h("p", null, summary)
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Owned by"),
+              h("p", null, owner.description)
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Source confidence"),
+              h("p", null, node.details.source_confidence || "unknown")
+            ),
+            h(
+              "section",
+              { className: "detail-section io-grid" },
+              h(
+                "div",
+                { className: "io-card" },
+                h("h3", null, "Reads"),
+                h("ul", null, node.details.inputs.map(item => h("li", { key: item }, item)))
+              ),
+              h(
+                "div",
+                { className: "io-card" },
+                h("h3", null, "Writes"),
+                h("ul", null, node.details.outputs.map(item => h("li", { key: item }, item)))
+              )
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Why it exists"),
+              h("p", null, why)
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Check first if it fails"),
+              h("ul", null, node.details.failures.map(item => h("li", { key: item }, item)))
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Where to look"),
+              h(
+                "div",
+                { className: "source-list" },
+                node.details.source.map(item => h("span", { key: item, className: "source-chip" }, item))
+              )
+            ),
+            h(
+              "section",
+              { className: "detail-section" },
+              h("h3", null, "Connected steps"),
+              h(
+                "div",
+                { className: "related-list" },
+                directRelated.map(id =>
+                  h(
+                    "button",
+                    {
+                      key: id,
+                      type: "button",
+                      className: "related-pill",
+                      onClick: () => onSelect(id)
+                    },
+                    NODE_BY_ID[id].title
+                  )
+                )
+              )
+            )
+          )
+        );
+      }
+
+      function directRelations(id) {
+        return [...new Set([...(INCOMING.get(id) || []), ...(OUTGOING.get(id) || []), ...(NODE_BY_ID[id]?.details.related || [])])].filter(
+          relatedId => NODE_BY_ID[relatedId]
+        );
+      }
+
+      function Toolbar({
+        mode,
+        selectedId,
+        theme,
+        onModeChange,
+        onFitAll,
+        onResetLayout,
+        onClearSelection,
+        onThemeToggle
+      }) {
+        const reactFlow = useReactFlow();
+        const modes = Object.entries(BOARD.views);
+        const zoomIn = useCallback(() => reactFlow.zoomIn({ duration: 180 }), [reactFlow]);
+        const zoomOut = useCallback(() => reactFlow.zoomOut({ duration: 180 }), [reactFlow]);
+
+        return h(
+          "div",
+          { className: "topbar" },
+          h(
+            "div",
+            { className: "brand" },
+            h("span", { className: "brand-kicker" }, "Visual architecture"),
+            h("span", { className: "brand-title" }, "Project Architecture")
+          ),
+          h(
+            "div",
+            { className: "toolbar-cluster" },
+            h("span", { className: "toolbar-label" }, "Highlight"),
+            h(
+              "div",
+              { className: "mode-tabs", role: "group", "aria-label": "Highlight a pipeline group" },
+              modes.map(([key, value]) =>
+                h(
+                  "button",
+                  {
+                    key,
+                    type: "button",
+                    className: `toolbar-button ${mode === key && !selectedId ? "is-active" : ""}`,
+                    "aria-pressed": String(mode === key && !selectedId),
+                    onClick: () => onModeChange(key)
+                  },
+                  value.label
+                )
+              )
+            )
+          ),
+          h(
+            "div",
+            { className: "view-actions" },
+            h(
+              "button",
+              { type: "button", className: "toolbar-button is-icon", onClick: onFitAll, "aria-label": "Fit all", title: "Fit all" },
+              h(Maximize2, { "aria-hidden": true })
+            ),
+            h(
+              "button",
+              { type: "button", className: "toolbar-button is-icon", onClick: onResetLayout, "aria-label": "Reset view", title: "Reset view" },
+              h(RotateCcw, { "aria-hidden": true })
+            ),
+            h(
+              "button",
+              {
+                type: "button",
+                className: "toolbar-button is-icon",
+                onClick: onThemeToggle,
+                "aria-label": theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
+                title: theme === "dark" ? "Light mode" : "Dark mode"
+              },
+              theme === "dark" ? h(Sun, { "aria-hidden": true }) : h(Moon, { "aria-hidden": true })
+            ),
+            h("button", { type: "button", className: "toolbar-button is-icon", onClick: zoomOut, "aria-label": "Zoom out", title: "Zoom out" }, h(Minus, { "aria-hidden": true })),
+            h("button", { type: "button", className: "toolbar-button is-icon", onClick: zoomIn, "aria-label": "Zoom in", title: "Zoom in" }, h(Plus, { "aria-hidden": true })),
+            selectedId
+              ? h(
+                  "button",
+                  { type: "button", className: "toolbar-button is-icon", onClick: onClearSelection, "aria-label": "Clear selection", title: "Clear selection" },
+                  h(X, { "aria-hidden": true })
+                )
+              : null
+          )
+        );
+      }
+
+      function initialTheme() {
+        try {
+          const saved = window.localStorage.getItem("visual-arch-theme");
+          if (saved === "light" || saved === "dark") return saved;
+        } catch (_error) {
+          // Ignore storage failures; the system preference is a fine fallback.
+        }
+        return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+
+      function replaceUrlHash(id) {
+        try {
+          if (!window.history?.replaceState) return;
+          const baseUrl = window.location.href.replace(/#.*$/, "");
+          const nextUrl = id ? `${baseUrl}#${encodeURIComponent(id)}` : baseUrl;
+          window.history.replaceState(null, "", nextUrl);
+        } catch (_error) {
+          // Some browsers block history mutation for local files. The board works without URL state.
+        }
+      }
+
+      function hashSelectionId() {
+        try {
+          const id = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+          return NODE_BY_ID[id] ? id : null;
+        } catch (_error) {
+          return null;
+        }
+      }
+
+      function FlowBoard() {
+        const [mode, setMode] = useState("overview");
+        const [selectedId, setSelectedId] = useState(null);
+        const [resetNonce, setResetNonce] = useState(0);
+        const [theme, setTheme] = useState(initialTheme);
+        const [isNavigating, setIsNavigating] = useState(false);
+        const navigationTimer = useRef(null);
+        const didInitialFit = useRef(false);
+        const reactFlow = useReactFlow();
+
+        const nodes = useMemo(() => buildNodes(mode, selectedId), [mode, selectedId, resetNonce]);
+        const edges = useMemo(() => buildEdges(mode, selectedId), [mode, selectedId]);
+
+        const setViewportForIds = useCallback(
+          (ids, options = {}) => {
+            requestAnimationFrame(() => {
+              reactFlow.setViewport(viewportForIds(ids, options), { duration: options.duration ?? 450 });
+            });
+          },
+          [reactFlow]
+        );
+
+        const centerNode = useCallback(id => {
+          if (!NODE_BY_ID[id]) return;
+          setViewportForIds([id], { padding: 0.95, maxZoom: 1.05, duration: 420 });
+        }, [setViewportForIds]);
+
+        const selectNode = useCallback(
+          id => {
+            if (!NODE_BY_ID[id]) return;
+            setSelectedId(id);
+            replaceUrlHash(id);
+            centerNode(id);
+          },
+          [centerNode]
+        );
+
+        const focusMode = useCallback(
+          nextMode => {
+            const view = BOARD.views[nextMode] || BOARD.views.overview;
+            setMode(nextMode);
+            setSelectedId(null);
+            replaceUrlHash(null);
+            if (nextMode === "overview") {
+              setViewportForIds(view.focus, { padding: 0.24, maxZoom: 0.68, reservePanel: false });
+            } else {
+              setViewportForIds(view.focus, { padding: 0.34, maxZoom: 1.05 });
+            }
+          },
+          [setViewportForIds]
+        );
+
+        const fitAll = useCallback(() => {
+          focusMode("overview");
+        }, [focusMode]);
+
+        const clearSelection = useCallback(() => {
+          setSelectedId(null);
+          replaceUrlHash(null);
+          if (mode === "overview") {
+            setViewportForIds(BOARD.views.overview.focus, { padding: 0.24, maxZoom: 0.68, reservePanel: false });
+          } else {
+            setViewportForIds((BOARD.views[mode] || BOARD.views.overview).focus, { padding: 0.34, maxZoom: 1.05 });
+          }
+        }, [mode, setViewportForIds]);
+
+        const resetLayout = useCallback(() => {
+          setResetNonce(value => value + 1);
+          focusMode("overview");
+        }, [focusMode]);
+
+        const toggleTheme = useCallback(() => {
+          setTheme(value => (value === "dark" ? "light" : "dark"));
+        }, []);
+
+        const beginCanvasNavigation = useCallback(event => {
+          if (event?.target?.closest?.(".react-flow__controls")) return;
+          if (navigationTimer.current) window.clearTimeout(navigationTimer.current);
+          setIsNavigating(true);
+        }, []);
+
+        const endCanvasNavigation = useCallback(() => {
+          if (navigationTimer.current) window.clearTimeout(navigationTimer.current);
+          navigationTimer.current = window.setTimeout(() => setIsNavigating(false), 180);
+        }, []);
+
+        useEffect(() => {
+          document.body.classList.add("app-ready");
+          return () => document.body.classList.remove("app-ready");
+        }, []);
+
+        useEffect(() => {
+          document.documentElement.dataset.theme = theme;
+          try {
+            window.localStorage.setItem("visual-arch-theme", theme);
+          } catch (_error) {
+            // Storage is optional for a static document.
+          }
+        }, [theme]);
+
+        useEffect(() => {
+          return () => {
+            if (navigationTimer.current) window.clearTimeout(navigationTimer.current);
+          };
+        }, []);
+
+        useEffect(() => {
+          const onHashChange = () => {
+            const id = hashSelectionId();
+            if (NODE_BY_ID[id]) {
+              setSelectedId(id);
+              centerNode(id);
+            } else {
+              setSelectedId(null);
+            }
+          };
+          window.addEventListener("hashchange", onHashChange);
+          return () => window.removeEventListener("hashchange", onHashChange);
+        }, [centerNode]);
+
+        useEffect(() => {
+          if (didInitialFit.current) return;
+          didInitialFit.current = true;
+          replaceUrlHash(null);
+          window.setTimeout(
+            () => setViewportForIds(BOARD.views.overview.focus, { padding: 0.24, maxZoom: 0.68, reservePanel: false, duration: 0 }),
+            0
+          );
+        }, [setViewportForIds]);
+
+        return h(
+          "div",
+          { className: `app-shell ${isNavigating ? "is-navigating" : ""}` },
+          h(Toolbar, {
+            mode,
+            selectedId,
+            theme,
+            onModeChange: focusMode,
+            onFitAll: fitAll,
+            onResetLayout: resetLayout,
+            onClearSelection: clearSelection,
+            onThemeToggle: toggleTheme
+          }),
+          h(
+            "div",
+            {
+              className: "flow-wrap",
+              onPointerDown: beginCanvasNavigation,
+              onPointerUp: endCanvasNavigation,
+              onPointerLeave: endCanvasNavigation,
+              onPointerCancel: endCanvasNavigation
+            },
+            h(
+              ReactFlow,
+              {
+                nodes,
+                edges,
+                nodeTypes,
+                edgeTypes,
+                defaultViewport: viewportForIds(BOARD.views.overview.focus, { padding: 0.24, maxZoom: 0.68, reservePanel: false }),
+                minZoom: 0.28,
+                maxZoom: 1.45,
+                nodesDraggable: false,
+                nodesConnectable: false,
+                nodesFocusable: true,
+                edgesFocusable: false,
+                elementsSelectable: true,
+                panOnDrag: true,
+                panOnScroll: false,
+                zoomOnScroll: true,
+                zoomOnPinch: true,
+                zoomOnDoubleClick: false,
+                preventScrolling: true,
+                selectionOnDrag: false,
+                deleteKeyCode: null,
+                connectOnClick: false,
+                onNodeClick: (_event, node) => {
+                  if (NODE_BY_ID[node.id]) selectNode(node.id);
+                },
+                onInit: instance => {
+                  window.setTimeout(() => {
+                    instance.setViewport(
+                      viewportForIds(BOARD.views.overview.focus, { padding: 0.24, maxZoom: 0.68, reservePanel: false }),
+                      { duration: 0 }
+                    );
+                  }, 0);
+                },
+                onPaneClick: clearSelection,
+                onMoveEnd: endCanvasNavigation,
+                defaultEdgeOptions: {
+                  type: "contract",
+                  markerEnd: { type: MarkerType.ArrowClosed }
+                },
+                proOptions: { hideAttribution: true }
+              },
+              h(Background, { variant: "lines", gap: 34, size: 0.75, color: "var(--grid)" }),
+              h(Controls, { position: "bottom-left", showInteractive: false })
+            )
+          ),
+          h(DetailDrawer, { mode, selectedId, onSelect: selectNode, onClose: clearSelection })
+        );
+      }
+
+      function App() {
+        return h(ReactFlowProvider, null, h(FlowBoard));
+      }
+
+      function showBootError(error) {
+        document.body.classList.remove("app-ready");
+        const fallback = document.querySelector("#boot-fallback .fallback-card");
+        if (!fallback || fallback.dataset.enhanced) return;
+        fallback.dataset.enhanced = "true";
+        const message = error?.reason?.message || error?.message || "The interactive module failed to load.";
+        const detail = document.createElement("p");
+        detail.textContent = `Load error: ${message}`;
+        fallback.append(detail);
+      }
+
+      window.addEventListener("error", showBootError);
+      window.addEventListener("unhandledrejection", showBootError);
+
       createRoot(document.getElementById("root")).render(h(App));
-      document.body.classList.add("app-ready");
     </script>
   </body>
 </html>

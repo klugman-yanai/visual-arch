@@ -10,8 +10,8 @@ import sys
 from pathlib import Path
 
 
-MODEL_RE = re.compile(
-    r"const\s+ARCHITECTURE_MODEL\s*=\s*(\{.*?\});\s*(?:const|function)\s",
+BOARD_RE = re.compile(
+    r"const\s+BOARD\s*=\s*(\{.*?\});\s*const\s+GROUP_DETAILS\s*=",
     re.DOTALL,
 )
 CONFIDENCE_VALUES = {"source-backed", "inferred", "external", "unknown"}
@@ -28,13 +28,13 @@ def load_model(path: Path) -> dict:
         fail("document is not an HTML document with a doctype")
     if "ReactFlow" not in text:
         fail("document does not appear to include the React Flow renderer")
-    match = MODEL_RE.search(text)
+    match = BOARD_RE.search(text)
     if not match:
-        fail("could not find React Flow `const ARCHITECTURE_MODEL = {...};`")
+        fail("could not find React Flow `const BOARD = {...};` model")
     try:
         return json.loads(match.group(1))
     except json.JSONDecodeError as error:
-        fail(f"ARCHITECTURE_MODEL is not valid JSON: {error}")
+        fail(f"BOARD is not valid JSON: {error}")
 
 
 def require_keys(obj: dict, keys: set[str], label: str) -> None:
@@ -45,7 +45,7 @@ def require_keys(obj: dict, keys: set[str], label: str) -> None:
 
 def validate(path: Path) -> None:
     model = load_model(path)
-    require_keys(model, {"title", "domains", "owners", "lanes", "nodes", "edges", "views"}, "model")
+    require_keys(model, {"lanes", "nodes", "edges", "views"}, "model")
 
     nodes = model["nodes"]
     edges = model["edges"]
@@ -58,7 +58,7 @@ def validate(path: Path) -> None:
 
     node_ids: set[str] = set()
     for index, node in enumerate(nodes):
-        require_keys(node, {"id", "title", "domain", "owner", "x", "y", "purpose", "details"}, f"node[{index}]")
+        require_keys(node, {"id", "title", "domain", "owner", "position", "purpose", "details"}, f"node[{index}]")
         node_id = node["id"]
         if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", node_id):
             fail(f"node id is not kebab-case: {node_id!r}")
@@ -73,11 +73,15 @@ def validate(path: Path) -> None:
             fail(f"node {node_id} has invalid source_confidence {details['source_confidence']!r}")
 
     for index, edge in enumerate(edges):
-        require_keys(edge, {"id", "source", "target", "label"}, f"edge[{index}]")
-        if edge["source"] not in node_ids:
-            fail(f"edge {edge['id']} has unknown source {edge['source']}")
-        if edge["target"] not in node_ids:
-            fail(f"edge {edge['id']} has unknown target {edge['target']}")
+        if not isinstance(edge, list) or len(edge) < 3:
+            fail(f"edge[{index}] must be [source, target, label, kind?]")
+        source, target, label = edge[:3]
+        if not label:
+            fail(f"edge[{index}] has empty label")
+        if source not in node_ids:
+            fail(f"edge[{index}] has unknown source {source}")
+        if target not in node_ids:
+            fail(f"edge[{index}] has unknown target {target}")
 
     for key, view in model["views"].items():
         require_keys(view, {"label", "focus"}, f"view[{key}]")
@@ -91,7 +95,7 @@ def validate(path: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Validate standalone visual-arch HTML generated from the bundled React Flow template."
+            "Validate standalone visual-arch HTML generated from the bundled production-style React Flow template."
         )
     )
     parser.add_argument("html", type=Path)
