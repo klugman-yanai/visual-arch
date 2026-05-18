@@ -4,7 +4,7 @@ Use these prompts when the user explicitly allows or requests subagents/delegati
 
 ## Stack Selector
 
-You are the stack selector for a visual architecture document for `[target]`. Decide the most relevant rendering/document stack for this project and output constraints. Do not assume React Flow just because a reference document used it. Consider standalone HTML, existing docs/app stack, Mermaid, D3/SVG, Cytoscape.js, React Flow/XYFlow, Three.js, or other local project conventions. Return: recommended stack, why it fits, rejected alternatives with reasons, dependencies/CDN/build implications, verification approach, and any constraints the implementation agent must honor. Use evidence paths when project conventions influence the choice.
+You are the stack selector for a visual architecture document for `[target]`. Start from React Flow/XYFlow as the primary bundled stack for rich interactive architecture maps, then decide whether project or user constraints require something else. Consider standalone HTML, existing docs/app stack, Mermaid only for explicit text-native/Markdown-adjacent/no-React/highly diffable requests, D3/SVG, Cytoscape.js, Three.js, or local project conventions. Return: recommended stack, why it fits, rejected alternatives with reasons, dependencies/CDN/build implications, verification approach, and any constraints the implementation agent must honor. Use evidence paths when project conventions influence the choice.
 
 ## Project Cartographer
 

@@ -14,6 +14,6 @@ For a targeted non-interactive install:
 
 ## Use
 
-    Use visual-arch to create an interactive visual architecture document for this project.
+    First explore the project, then use $visual-arch to create an interactive visual architecture document for this project.
 
-The skill uses specialized discovery, stack-selection, content, and verification passes to choose an appropriate architecture-document stack for each project. It includes standalone React Flow and Mermaid HTML templates plus a validator for generated documents.
+The skill uses specialized discovery, stack-selection, content, and verification passes to create a source-backed architecture document. React Flow is the primary bundled template for rich interactive maps. Mermaid is included only for constrained cases where the user explicitly wants a text-native, Markdown-adjacent, or no-React document.

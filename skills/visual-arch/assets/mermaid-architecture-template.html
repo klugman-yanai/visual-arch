@@ -78,14 +78,48 @@
       document.getElementById("subtitle").textContent = model.subtitle || "";
       const nodeById = Object.fromEntries(model.nodes.map(node => [node.id, node]));
       const label = value => String(value).replaceAll('"', "'");
+      const appendText = (parent, tag, text) => {
+        const element = document.createElement(tag);
+        element.textContent = text;
+        parent.append(element);
+        return element;
+      };
+      const appendListText = (parent, title, items) => {
+        const paragraph = document.createElement("p");
+        const strong = document.createElement("strong");
+        strong.textContent = `${title}: `;
+        paragraph.append(strong, items.join(", "));
+        parent.append(paragraph);
+      };
       const lines = ["flowchart LR"];
       for (const node of model.nodes) lines.push(`  ${node.id}["${label(node.title)}"]`);
       for (const edge of model.edges) lines.push(`  ${edge.source} -->|"${label(edge.label)}"| ${edge.target}`);
       document.getElementById("diagram").textContent = lines.join("\n");
-      document.getElementById("details").innerHTML = `<h2>Architecture Details</h2>${model.nodes.map(node => {
+      const detailsPanel = document.getElementById("details");
+      detailsPanel.replaceChildren();
+      appendText(detailsPanel, "h2", "Architecture Details");
+      for (const node of model.nodes) {
         const details = node.details;
-        return `<details open><summary>${label(node.title)}</summary><p>${label(details.summary)}</p><p><strong>Reads:</strong> ${details.inputs.map(label).join(", ")}</p><p><strong>Writes:</strong> ${details.outputs.map(label).join(", ")}</p><p><strong>Why:</strong> ${label(details.why)}</p><p><strong>Check first:</strong> ${details.failures.map(label).join(", ")}</p><p><strong>Sources:</strong> ${details.source.map(item => `<code>${label(item)}</code>`).join(" ")}</p></details>`;
-      }).join("")}`;
+        const section = document.createElement("details");
+        section.open = true;
+        appendText(section, "summary", node.title);
+        appendText(section, "p", details.summary);
+        appendListText(section, "Reads", details.inputs);
+        appendListText(section, "Writes", details.outputs);
+        appendListText(section, "Why", [details.why]);
+        appendListText(section, "Check first", details.failures);
+        const sources = document.createElement("p");
+        const strong = document.createElement("strong");
+        strong.textContent = "Sources: ";
+        sources.append(strong);
+        for (const source of details.source) {
+          const code = document.createElement("code");
+          code.textContent = source;
+          sources.append(code, " ");
+        }
+        section.append(sources);
+        detailsPanel.append(section);
+      }
       mermaid.initialize({ startOnLoad: true, securityLevel: "strict", theme: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default" });
       await mermaid.run();
     </script>

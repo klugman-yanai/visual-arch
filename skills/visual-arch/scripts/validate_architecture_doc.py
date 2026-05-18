@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 
-MODEL_RE = re.compile(
+REACT_MODEL_RE = re.compile(
     r"const\s+ARCHITECTURE_MODEL\s*=\s*(\{.*?\});\s*(?:const|function)\s",
     re.DOTALL,
 )
@@ -29,13 +29,17 @@ def load_model(path: Path) -> dict:
     renderer_found = "ReactFlow" in text or "mermaid" in text.lower()
     if not renderer_found:
         fail("document does not appear to include a supported flow renderer")
-    match = MODEL_RE.search(text) or MERMAID_RE.search(text)
+    match = REACT_MODEL_RE.search(text)
+    model_label = "React Flow `const ARCHITECTURE_MODEL = {...};`"
     if not match:
-        fail("could not find `const ARCHITECTURE_MODEL = {...};`")
+        match = MERMAID_RE.search(text)
+        model_label = "Mermaid `<script type=\"application/json\" id=\"architecture-model\">`"
+    if not match:
+        fail("could not find a supported architecture model: React Flow `ARCHITECTURE_MODEL` or Mermaid `#architecture-model` JSON script")
     try:
         return json.loads(match.group(1))
     except json.JSONDecodeError as error:
-        fail(f"ARCHITECTURE_MODEL is not valid JSON: {error}")
+        fail(f"{model_label} is not valid JSON: {error}")
 
 
 def require_keys(obj: dict, keys: set[str], label: str) -> None:
@@ -88,7 +92,12 @@ def validate(path: Path) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=(
+            "Validate standalone visual-arch HTML generated from the bundled React Flow "
+            "or constrained Mermaid templates."
+        )
+    )
     parser.add_argument("html", type=Path)
     args = parser.parse_args()
     if not args.html.exists():

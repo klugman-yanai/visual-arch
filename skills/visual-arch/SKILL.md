@@ -1,6 +1,6 @@
 ---
 name: visual-arch
-description: "Create robust, project-agnostic interactive visual architecture documents as standalone HTML files. Use when Codex needs to analyze any codebase, system, repository, service, product, or technical project and produce a visual architecture document similar to docs/visual-architecture.html: navigable nodes, flows, lanes/groups, detail drawer content, source references, and verification. Especially useful for architecture maps, onboarding docs, system overviews, pipeline diagrams, service maps, repo maps, and dependency/workflow visualizations."
+description: "Create robust, project-agnostic visual architecture documents for codebases, systems, repositories, services, products, and technical projects. Produces source-backed standalone HTML architecture maps with graph views, navigable nodes, lanes/groups, detail content, stack selection, and verification. Use for architecture maps, onboarding docs, system overviews, pipeline diagrams, service maps, repo maps, and dependency/workflow visualizations."
 ---
 
 # Visual Arch
@@ -27,7 +27,7 @@ Create a self-contained, interactive architecture HTML document from any project
 
 4. Generate the document.
    - Use the stack selector's recommendation when it fits the project and constraints.
-   - Use `assets/visual-architecture-template.html` as the portable default, not as a universal requirement.
+   - Use `assets/visual-architecture-template.html` as the primary bundled template for rich interactive architecture maps.
    - Replace the `ARCHITECTURE_MODEL` object with project-specific data.
    - Preserve the chosen artifact's standalone behavior unless the user explicitly wants integration into an app: no private runtime services, useful fallback content, accessible controls, responsive layout.
 
@@ -79,12 +79,12 @@ Merge results yourself. Resolve contradictions by checking source. Do not let su
 
 ## Stack Selection Guidance
 
-The reference document uses React Flow in a standalone HTML file. That is often a good choice for dense node/edge architecture maps, but it is not always right.
+React Flow is the primary bundled stack because this skill is meant to produce a rich interactive maintainer tool: clickable nodes, detail drawers, grouped lanes, focus views, and navigable source-backed contracts.
 
 Prefer:
 
-- React Flow or XYFlow for interactive node graphs with detail drawers, filters, lanes, and many cross-links.
-- Mermaid for simple, static diagrams that should remain Markdown-adjacent or easy to diff.
+- React Flow or XYFlow for the normal case: interactive node graphs with detail drawers, filters, lanes, focus views, and many cross-links.
+- Mermaid only when the user explicitly wants a text-native, Markdown-adjacent, no-React, or highly diffable artifact and accepts reduced interactivity.
 - D3/SVG for custom hierarchical, radial, matrix, or timeline visuals.
 - Cytoscape.js for large dependency graphs, clusters, and graph algorithms.
 - Three.js only when spatial/3D structure is central to understanding the system.
@@ -94,8 +94,8 @@ Make the selector justify the recommendation using project evidence, output cons
 
 ## Resources
 
-- `assets/visual-architecture-template.html`: standalone React Flow HTML template. Copy or adapt it when the stack selector chooses React Flow or when no better local stack exists.
-- `assets/mermaid-architecture-template.html`: standalone Mermaid HTML template for simpler graphs where diffability matters more than rich graph interaction.
+- `assets/visual-architecture-template.html`: primary standalone React Flow HTML template. Copy or adapt it unless constraints point to another stack.
+- `assets/mermaid-architecture-template.html`: constrained standalone Mermaid HTML template for explicit text-native, Markdown-adjacent, no-React, or highly diffable output requests.
 - `references/content-model.md`: expected model structure and authoring rules.
 - `references/agent-prompts.md`: copy-ready prompts for specialized subagents.
 - `scripts/validate_architecture_doc.py`: lightweight structural validator for generated HTML.
