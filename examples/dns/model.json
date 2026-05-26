@@ -1,12 +1,12 @@
 {
   "domains": {
-    "interface": { "label": "Application", "accent": "#5c5fb8", "soft": "#ececfe" },
-    "runtime": { "label": "Local Resolver", "accent": "#0f8b72", "soft": "#e2f5ef" },
-    "data": { "label": "Cache + Records", "accent": "#b77b1b", "soft": "#f8efd9" },
-    "delivery": { "label": "DNS Hierarchy", "accent": "#7a5a25", "soft": "#f4ead9" },
-    "signal": { "label": "Network + Validation", "accent": "#bf3b5f", "soft": "#fae5ec" },
-    "external": { "label": "External Authority", "accent": "#59636f", "soft": "#eceff2" },
-    "infra": { "label": "Infrastructure", "accent": "#59636f", "soft": "#eceff2" }
+    "interface": { "label": "Application Query", "accent": "#7c83ff", "soft": "#e9eaff" },
+    "runtime": { "label": "Stub + Local Resolver", "accent": "#18b6a4", "soft": "#dff8f3" },
+    "data": { "label": "TTL Cache + Records", "accent": "#f3b23c", "soft": "#fff1cf" },
+    "delivery": { "label": "DNS Hierarchy", "accent": "#38a8ff", "soft": "#dff1ff" },
+    "signal": { "label": "Transport + Trust", "accent": "#fb5f87", "soft": "#ffe5ed" },
+    "external": { "label": "External Authority", "accent": "#8a96a8", "soft": "#eef1f5" },
+    "infra": { "label": "Infrastructure", "accent": "#8a96a8", "soft": "#eef1f5" }
   },
   "owners": {
     "product": { "label": "Application", "description": "Browser, CLI, service, or library that needs an address for a name." },
@@ -18,10 +18,10 @@
   },
   "board": {
     "lanes": [
-      { "id": "lane-app", "title": "Application", "subtitle": "The caller, resolver API, and connection attempt.", "domain": "interface", "position": { "x": 40, "y": 150 }, "width": 270, "height": 1530 },
-      { "id": "lane-local", "title": "Local Resolution", "subtitle": "Hosts files, search domains, stub resolver, and cache.", "domain": "runtime", "position": { "x": 340, "y": 150 }, "width": 270, "height": 1530 },
-      { "id": "lane-recursive", "title": "Recursive Service", "subtitle": "Cache lookup, iterative traversal, validation, and retry policy.", "domain": "signal", "position": { "x": 640, "y": 150 }, "width": 270, "height": 1530 },
-      { "id": "lane-authority", "title": "Authority", "subtitle": "Root, TLD, authoritative zones, records, and TTLs.", "domain": "delivery", "position": { "x": 940, "y": 150 }, "width": 270, "height": 1530 }
+      { "id": "lane-app", "title": "Application", "subtitle": "The caller, resolver API, and connection attempt.", "domain": "interface", "position": { "x": 40, "y": 150 }, "width": 340, "height": 1530 },
+      { "id": "lane-local", "title": "Local Resolution", "subtitle": "Hosts files, search domains, stub resolver, and cache.", "domain": "runtime", "position": { "x": 410, "y": 150 }, "width": 340, "height": 1530 },
+      { "id": "lane-recursive", "title": "Recursive Service", "subtitle": "Cache lookup, iterative traversal, validation, and retry policy.", "domain": "signal", "position": { "x": 780, "y": 150 }, "width": 340, "height": 1530 },
+      { "id": "lane-authority", "title": "Authority", "subtitle": "Root, TLD, authoritative zones, records, and TTLs.", "domain": "delivery", "position": { "x": 1150, "y": 150 }, "width": 340, "height": 1530 }
     ],
     "nodes": [
       {
@@ -32,7 +32,7 @@
         "title": "Name Needed",
         "purpose": "An application needs network endpoints for a human-readable host name.",
         "chips": ["hostname", "A/AAAA"],
-        "position": { "x": 90, "y": 245 },
+        "position": { "x": 70, "y": 245 },
         "details": {
           "summary": "A browser, CLI, or service starts with a host name and asks for records that can lead to an address.",
           "what": ["The caller may request A, AAAA, HTTPS, SRV, MX, TXT, or other record types depending on protocol.", "Modern clients often race IPv6 and IPv4 connection attempts after resolution."],
@@ -53,7 +53,7 @@
         "title": "Resolver API",
         "purpose": "The application delegates name lookup to the OS or language resolver.",
         "chips": ["getaddrinfo", "library"],
-        "position": { "x": 90, "y": 395 },
+        "position": { "x": 70, "y": 395 },
         "details": {
           "summary": "Most applications call a resolver API rather than constructing DNS packets themselves.",
           "what": ["The API may combine DNS with local host databases and policy.", "It can return multiple candidate addresses ordered by local preference."],
@@ -74,7 +74,7 @@
         "title": "Local Policy",
         "purpose": "Hosts files, search suffixes, split DNS, and caches may answer before public DNS.",
         "chips": ["hosts", "search"],
-        "position": { "x": 390, "y": 395 },
+        "position": { "x": 440, "y": 395 },
         "details": {
           "summary": "The local resolver applies host mappings, name-service order, search domains, VPN or enterprise policy, and local cache.",
           "what": ["Short names may expand through search domains.", "Hosts files can override DNS.", "VPNs and containers can route specific zones to different resolvers."],
@@ -95,7 +95,7 @@
         "title": "Stub Query",
         "purpose": "The client resolver sends a compact DNS question to a recursive resolver.",
         "chips": ["stub", "UDP/TCP"],
-        "position": { "x": 390, "y": 545 },
+        "position": { "x": 440, "y": 545 },
         "details": {
           "summary": "The stub resolver asks a configured recursive resolver to resolve the name on its behalf.",
           "what": ["Queries usually use UDP first, with TCP for truncation or policy.", "Encrypted transports such as DoT or DoH may be used depending on the client and network."],
@@ -116,7 +116,7 @@
         "title": "Recursive Cache",
         "purpose": "The recursive resolver answers immediately when it has a valid cached result.",
         "chips": ["cache", "TTL"],
-        "position": { "x": 690, "y": 545 },
+        "position": { "x": 810, "y": 545 },
         "details": {
           "summary": "Recursive resolvers cache positive and negative answers until TTL or negative-cache policy expires.",
           "what": ["A cache hit avoids root, TLD, and authoritative queries.", "A cache miss starts iterative resolution through the DNS hierarchy."],
@@ -137,7 +137,7 @@
         "title": "Root Referral",
         "purpose": "Root name servers point the resolver toward the relevant top-level domain.",
         "chips": ["root", "referral"],
-        "position": { "x": 990, "y": 545 },
+        "position": { "x": 1180, "y": 545 },
         "details": {
           "summary": "On a cache miss, the recursive resolver starts from known root hints and receives a referral to the TLD servers.",
           "what": ["Root servers do not know every host record.", "They delegate responsibility to TLD name servers such as .com, .org, or country-code TLDs."],
@@ -158,7 +158,7 @@
         "title": "TLD Referral",
         "purpose": "The TLD points the resolver to the domain's authoritative name servers.",
         "chips": ["TLD", "NS"],
-        "position": { "x": 990, "y": 695 },
+        "position": { "x": 1180, "y": 695 },
         "details": {
           "summary": "The TLD zone delegates a registered domain to its authoritative name servers.",
           "what": ["The response commonly includes NS records and glue for in-bailiwick name servers.", "The resolver follows the delegation to the zone authority."],
@@ -179,7 +179,7 @@
         "title": "Authoritative Answer",
         "purpose": "The zone's authoritative server returns the requested records or a negative answer.",
         "chips": ["zone", "record"],
-        "position": { "x": 990, "y": 845 },
+        "position": { "x": 1180, "y": 845 },
         "details": {
           "summary": "The authoritative server for the zone answers with records such as A, AAAA, CNAME, MX, TXT, or NXDOMAIN/NODATA.",
           "what": ["CNAME responses may require additional lookups for the target name.", "Responses include TTLs that guide cache lifetime."],
@@ -200,7 +200,7 @@
         "title": "Alias Chain",
         "purpose": "CNAME records may redirect the resolver to another canonical name.",
         "chips": ["CNAME", "alias"],
-        "position": { "x": 690, "y": 845 },
+        "position": { "x": 810, "y": 845 },
         "details": {
           "summary": "A CNAME response says the requested name is an alias, so the resolver must resolve the canonical target.",
           "what": ["The final answer may include both the alias chain and address records.", "Long or looping alias chains can cause failures."],
@@ -221,7 +221,7 @@
         "title": "DNSSEC Validation",
         "purpose": "Validating resolvers check cryptographic proof for signed zones.",
         "chips": ["DNSSEC", "trust"],
-        "position": { "x": 690, "y": 995 },
+        "position": { "x": 810, "y": 995 },
         "details": {
           "summary": "When enabled, DNSSEC validation verifies that signed responses chain back to trusted keys.",
           "what": ["The resolver checks signatures and denial-of-existence proofs.", "Validation failure converts a seemingly present answer into an error for clients."],
@@ -242,7 +242,7 @@
         "title": "Answer Package",
         "purpose": "The recursive resolver assembles the response returned to the client.",
         "chips": ["records", "TTL"],
-        "position": { "x": 690, "y": 1145 },
+        "position": { "x": 810, "y": 1145 },
         "details": {
           "summary": "The response includes the requested records, aliases, TTLs, response code, and sometimes additional records.",
           "what": ["Positive answers carry record TTLs.", "Negative answers may be cached according to SOA-derived policy.", "The resolver may set flags indicating recursion and validation status."],
@@ -263,7 +263,7 @@
         "title": "Negative Cache",
         "purpose": "NXDOMAIN and no-data results can be cached too.",
         "chips": ["NXDOMAIN", "NODATA"],
-        "position": { "x": 390, "y": 1145 },
+        "position": { "x": 440, "y": 1145 },
         "details": {
           "summary": "Resolvers cache some negative answers so repeated lookups for missing names do not hammer authoritative servers.",
           "what": ["NXDOMAIN means the name does not exist.", "NODATA means the name exists but lacks the requested record type."],
@@ -284,7 +284,7 @@
         "title": "Client Cache",
         "purpose": "The OS, browser, or application may reuse the answer locally.",
         "chips": ["browser", "OS cache"],
-        "position": { "x": 390, "y": 1295 },
+        "position": { "x": 440, "y": 1295 },
         "details": {
           "summary": "After the recursive response returns, local layers may cache the answer according to TTL or their own policy.",
           "what": ["Browsers and runtimes may maintain separate caches from the OS.", "Some applications pin resolved addresses for connection pools."],
@@ -305,7 +305,7 @@
         "title": "Connect To Address",
         "purpose": "The application uses resolved endpoints to start the actual protocol connection.",
         "chips": ["TCP", "TLS"],
-        "position": { "x": 90, "y": 1295 },
+        "position": { "x": 70, "y": 1295 },
         "details": {
           "summary": "DNS resolution ends by handing candidate addresses back to the application, which then connects using its application protocol.",
           "what": ["The client may try IPv6 and IPv4 candidates in parallel or sequence.", "TLS and HTTP still validate host names even after DNS returns an address."],
@@ -326,7 +326,7 @@
         "title": "Transport Retry",
         "purpose": "DNS transport handles packet loss, truncation, and alternate resolver attempts.",
         "chips": ["timeout", "TCP fallback"],
-        "position": { "x": 690, "y": 395 },
+        "position": { "x": 810, "y": 395 },
         "details": {
           "summary": "Resolvers retry queries, switch servers, or fall back to TCP when responses are lost or too large.",
           "what": ["UDP responses can be truncated.", "Clients may try multiple configured recursive resolvers.", "DoH and DoT use different connection failure modes."],
@@ -347,7 +347,7 @@
         "title": "Debugging DNS",
         "purpose": "Separates naming failures from resolver, authority, cache, transport, and application failures.",
         "chips": ["dig", "cache", "trace"],
-        "position": { "x": 990, "y": 1295 },
+        "position": { "x": 1180, "y": 1295 },
         "details": {
           "summary": "Good DNS debugging identifies which layer answered, whether the result was cached, and whether the failure is DNS or post-DNS connection behavior.",
           "what": ["Compare local resolver results with direct authoritative or public recursive queries.", "Check TTLs, CNAME chains, DNSSEC validation, split DNS, and negative cache state.", "Confirm that a resolved address actually accepts the intended protocol."],

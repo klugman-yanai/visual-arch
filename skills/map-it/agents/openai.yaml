@@ -1,0 +1,4 @@
+interface:
+  display_name: "Map It"
+  short_description: "Create interactive architecture maps"
+  default_prompt: "Use $map-it to create an interactive architecture map for this project."

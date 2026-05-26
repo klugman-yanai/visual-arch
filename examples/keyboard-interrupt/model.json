@@ -18,10 +18,10 @@
   },
   "board": {
     "lanes": [
-      { "id": "lane-user", "title": "User + Terminal", "subtitle": "Keystroke, line discipline, and session foreground state.", "domain": "interface", "position": { "x": 40, "y": 150 }, "width": 270, "height": 1320 },
-      { "id": "lane-kernel", "title": "Kernel Runtime", "subtitle": "TTY driver, process groups, signal queues, and scheduling.", "domain": "runtime", "position": { "x": 340, "y": 150 }, "width": 270, "height": 1320 },
-      { "id": "lane-process", "title": "Process Boundary", "subtitle": "Handlers, masks, language runtimes, and child processes.", "domain": "signal", "position": { "x": 640, "y": 150 }, "width": 270, "height": 1320 },
-      { "id": "lane-outcome", "title": "Outcome", "subtitle": "Cleanup, exit status, shells, and debugging evidence.", "domain": "delivery", "position": { "x": 940, "y": 150 }, "width": 270, "height": 1320 }
+      { "id": "lane-user", "title": "User + Terminal", "subtitle": "Keystroke, line discipline, and session foreground state.", "domain": "interface", "position": { "x": 40, "y": 150 }, "width": 340, "height": 1320 },
+      { "id": "lane-kernel", "title": "Kernel Runtime", "subtitle": "TTY driver, process groups, signal queues, and scheduling.", "domain": "runtime", "position": { "x": 410, "y": 150 }, "width": 340, "height": 1320 },
+      { "id": "lane-process", "title": "Process Boundary", "subtitle": "Handlers, masks, language runtimes, and child processes.", "domain": "signal", "position": { "x": 780, "y": 150 }, "width": 340, "height": 1320 },
+      { "id": "lane-outcome", "title": "Outcome", "subtitle": "Cleanup, exit status, shells, and debugging evidence.", "domain": "delivery", "position": { "x": 1150, "y": 150 }, "width": 340, "height": 1320 }
     ],
     "nodes": [
       {
@@ -32,7 +32,7 @@
         "title": "Active Terminal",
         "purpose": "A terminal session owns the keyboard input stream for a foreground job.",
         "chips": ["tty", "session"],
-        "position": { "x": 90, "y": 245 },
+        "position": { "x": 70, "y": 245 },
         "details": {
           "summary": "The user is attached to a terminal or pseudo-terminal that has a foreground process group.",
           "what": ["Interactive shells put jobs into foreground and background process groups.", "Only the foreground process group normally receives terminal-generated interrupt signals."],
@@ -53,7 +53,7 @@
         "title": "Interrupt Character",
         "purpose": "Ctrl+C is interpreted as the terminal interrupt character in canonical mode.",
         "chips": ["Ctrl+C", "VINTR"],
-        "position": { "x": 90, "y": 395 },
+        "position": { "x": 70, "y": 395 },
         "details": {
           "summary": "The terminal line discipline maps the configured VINTR character, commonly Ctrl+C, to an interrupt event.",
           "what": ["The mapping is configurable with terminal settings such as stty.", "Programs that enter raw mode may receive Ctrl+C as ordinary input instead."],
@@ -74,7 +74,7 @@
         "title": "TTY Line Discipline",
         "purpose": "The kernel terminal driver converts the interrupt event into SIGINT.",
         "chips": ["kernel", "line discipline"],
-        "position": { "x": 390, "y": 395 },
+        "position": { "x": 440, "y": 395 },
         "details": {
           "summary": "The terminal driver handles the interrupt character before normal input delivery and prepares a SIGINT for the foreground process group.",
           "what": ["Input already buffered for the line may be discarded depending on terminal flags.", "The driver does not need cooperation from the target program to send the signal."],
@@ -95,7 +95,7 @@
         "title": "Foreground Group",
         "purpose": "Identifies every process that should receive the terminal interrupt.",
         "chips": ["pgid", "job control"],
-        "position": { "x": 390, "y": 545 },
+        "position": { "x": 440, "y": 545 },
         "details": {
           "summary": "The signal targets the foreground process group, which may include a shell pipeline rather than a single process.",
           "what": ["A pipeline like `cmd1 | cmd2` is usually one foreground process group.", "Shells manage process groups when launching and resuming jobs."],
@@ -116,7 +116,7 @@
         "title": "SIGINT Delivery",
         "purpose": "The kernel marks SIGINT pending or invokes signal handling when the process can observe it.",
         "chips": ["async", "pending"],
-        "position": { "x": 690, "y": 545 },
+        "position": { "x": 810, "y": 545 },
         "details": {
           "summary": "Each target process receives SIGINT according to its signal disposition, mask, and current execution state.",
           "what": ["If SIGINT is blocked, it remains pending until unblocked.", "If the default disposition is active, the process terminates.", "If a handler is installed, the process runs that handler at a safe delivery point."],
@@ -137,7 +137,7 @@
         "title": "Default Termination",
         "purpose": "Processes without a custom SIGINT handler terminate.",
         "chips": ["default", "terminate"],
-        "position": { "x": 990, "y": 545 },
+        "position": { "x": 1180, "y": 545 },
         "details": {
           "summary": "The default SIGINT action terminates the process and makes signal termination visible to the parent.",
           "what": ["The shell waits for the foreground job and observes that it ended because of SIGINT.", "Many shells expose a status convention equivalent to 128 plus the signal number."],
@@ -158,7 +158,7 @@
         "title": "Custom Handler",
         "purpose": "Programs can intercept SIGINT to start orderly cancellation.",
         "chips": ["handler", "cancel"],
-        "position": { "x": 690, "y": 695 },
+        "position": { "x": 810, "y": 695 },
         "details": {
           "summary": "A custom handler can set a flag, request shutdown, forward signals to children, or let a runtime raise an exception.",
           "what": ["Native signal handlers must avoid unsafe work and usually set minimal state.", "High-level runtimes often defer user-visible handling to their event loop or interpreter checkpoints."],
@@ -179,7 +179,7 @@
         "title": "Runtime Checkpoint",
         "purpose": "Language runtimes translate SIGINT at controlled execution points.",
         "chips": ["Python", "event loop"],
-        "position": { "x": 390, "y": 845 },
+        "position": { "x": 440, "y": 845 },
         "details": {
           "summary": "Runtimes such as Python record the signal and raise KeyboardInterrupt in the main thread at a safe point.",
           "what": ["The runtime avoids running arbitrary language code in the low-level signal context.", "Async runtimes may convert interruption into task cancellation or loop shutdown."],
@@ -200,7 +200,7 @@
         "title": "Children + Pipelines",
         "purpose": "Child processes may receive SIGINT directly or need explicit forwarding.",
         "chips": ["pipeline", "subprocess"],
-        "position": { "x": 690, "y": 845 },
+        "position": { "x": 810, "y": 845 },
         "details": {
           "summary": "Process group membership determines whether children are interrupted with the parent or survive as separate work.",
           "what": ["Shell pipelines usually receive the same SIGINT together.", "Supervisors and applications that create new sessions may need to forward cancellation."],
@@ -221,7 +221,7 @@
         "title": "Cleanup Path",
         "purpose": "The program unwinds and releases resources before exiting.",
         "chips": ["finally", "defer"],
-        "position": { "x": 990, "y": 845 },
+        "position": { "x": 1180, "y": 845 },
         "details": {
           "summary": "Graceful interruption runs cleanup code for files, locks, temporary directories, terminal modes, network connections, and child processes.",
           "what": ["High-level `finally` or defer blocks can run during exception unwinding.", "Programs may restore terminal mode and flush logs before returning status."],
@@ -242,7 +242,7 @@
         "title": "Shell Observes Status",
         "purpose": "The parent shell reports cancellation and decides the next prompt state.",
         "chips": ["wait", "status"],
-        "position": { "x": 90, "y": 1045 },
+        "position": { "x": 70, "y": 1045 },
         "details": {
           "summary": "The shell waits for the foreground job, records status, updates job-control state, and returns control to the user.",
           "what": ["Interactive shells may print a new prompt or job status message.", "Scripts can branch based on the command's non-zero status."],
@@ -263,7 +263,7 @@
         "title": "Debugging Evidence",
         "purpose": "Shows where to inspect when Ctrl+C does not behave as expected.",
         "chips": ["stty", "ps", "logs"],
-        "position": { "x": 690, "y": 1045 },
+        "position": { "x": 810, "y": 1045 },
         "details": {
           "summary": "Terminal settings, process groups, signal handlers, blocked system calls, and child-process policy explain most surprising interrupt behavior.",
           "what": ["Check terminal mode and VINTR mapping.", "Inspect process group membership and foreground job state.", "Look for broad exception handlers, ignored SIGINT, or child processes outside the foreground group."],

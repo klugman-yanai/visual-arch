@@ -1,0 +1,303 @@
+{
+  "domains": {
+    "client": { "label": "Clients", "accent": "#2563eb", "soft": "#dbeafe" },
+    "edge": { "label": "API Edge", "accent": "#0891b2", "soft": "#cffafe" },
+    "service": { "label": "Service Core", "accent": "#16a34a", "soft": "#dcfce7" },
+    "storage": { "label": "State", "accent": "#ca8a04", "soft": "#fef3c7" },
+    "async": { "label": "Async Work", "accent": "#9333ea", "soft": "#f3e8ff" },
+    "external": { "label": "External Boundary", "accent": "#64748b", "soft": "#e2e8f0" },
+    "observability": { "label": "Operations", "accent": "#dc2626", "soft": "#fee2e2" }
+  },
+  "owners": {
+    "frontend": { "label": "Frontend", "description": "Client applications and browser-facing behavior." },
+    "platform": { "label": "Platform", "description": "Ingress, identity integration, shared infrastructure, and telemetry." },
+    "backend": { "label": "Backend", "description": "Application services, domain logic, and asynchronous workers." },
+    "data": { "label": "Data", "description": "Databases, caches, object storage, and schema contracts." },
+    "external": { "label": "External Provider", "description": "Identity or third-party services outside the repository boundary." }
+  },
+  "board": {
+    "layout": {
+      "orientation": "topology",
+      "design_basis": "service-topology"
+    },
+    "lanes": [],
+    "nodes": [
+      {
+        "id": "web-client",
+        "step": "01",
+        "domain": "client",
+        "owner": "frontend",
+        "title": "Web Client",
+        "purpose": "The browser client initiates user actions and renders service responses.",
+        "chips": ["browser", "session"],
+        "position": { "x": 80, "y": 310 },
+        "details": {
+          "summary": "A user-facing client calls the service through the public API edge and holds only presentation/session state.",
+          "what": ["Submits user requests over HTTPS.", "Receives domain responses and error states."],
+          "why": ["Separates user interaction from service state and server-side authorization."],
+          "inputs": ["User events", "Session token", "Rendered app bundle"],
+          "outputs": ["HTTPS requests", "Telemetry events"],
+          "failures": ["Authentication redirects, stale cached assets, and network failures are the first client-side checks."],
+          "source": ["external: topology example client boundary"],
+          "source_confidence": "external",
+          "related": ["api-gateway", "identity-provider"]
+        }
+      },
+      {
+        "id": "api-gateway",
+        "step": "02",
+        "domain": "edge",
+        "owner": "platform",
+        "title": "API Gateway",
+        "purpose": "The public ingress validates requests and routes them to the application service.",
+        "chips": ["ingress", "routing"],
+        "position": { "x": 350, "y": 310 },
+        "details": {
+          "summary": "The gateway is the service boundary for TLS termination, request routing, rate policy, and identity handoff.",
+          "what": ["Accepts HTTPS requests.", "Applies edge policy before forwarding to the service."],
+          "why": ["Keeps public ingress concerns out of domain service code."],
+          "inputs": ["HTTPS request", "Bearer token", "Route configuration"],
+          "outputs": ["Authorized service request", "Rejected request", "Access telemetry"],
+          "failures": ["Check route tables, token validation policy, rate limits, and gateway logs."],
+          "source": ["external: topology example ingress boundary"],
+          "source_confidence": "external",
+          "related": ["identity-provider", "application-service"]
+        }
+      },
+      {
+        "id": "identity-provider",
+        "step": "03",
+        "domain": "external",
+        "owner": "external",
+        "title": "Identity Provider",
+        "purpose": "An external identity service issues and validates user identity claims.",
+        "chips": ["OIDC", "external"],
+        "position": { "x": 340, "y": 95 },
+        "details": {
+          "summary": "The identity provider is outside the service boundary but affects every authenticated request.",
+          "what": ["Issues login tokens.", "Publishes signing keys and identity metadata."],
+          "why": ["Centralized identity avoids embedding credential management in the application service."],
+          "inputs": ["Login challenge", "Client credentials", "Token validation metadata"],
+          "outputs": ["ID/access token", "Signing key set", "Authentication errors"],
+          "failures": ["Expired keys, clock skew, tenant misconfiguration, and callback URL drift commonly break auth."],
+          "source": ["external: topology example identity boundary"],
+          "source_confidence": "external",
+          "related": ["web-client", "api-gateway"]
+        }
+      },
+      {
+        "id": "application-service",
+        "step": "04",
+        "domain": "service",
+        "owner": "backend",
+        "title": "Application Service",
+        "purpose": "The core service enforces domain rules and coordinates stateful dependencies.",
+        "chips": ["domain", "API"],
+        "position": { "x": 650, "y": 310 },
+        "details": {
+          "summary": "The application service owns request handling, authorization decisions, domain validation, persistence coordination, and async job creation.",
+          "what": ["Runs domain logic.", "Reads cached or durable state.", "Publishes work when requests require background processing."],
+          "why": ["Centralizes the business contract behind one API boundary."],
+          "inputs": ["Authorized request", "Configuration", "Cached data", "Database records"],
+          "outputs": ["API response", "Database writes", "Queued jobs", "Metrics and logs"],
+          "failures": ["Inspect request logs, dependency latency, schema errors, authorization branches, and queue publication failures."],
+          "source": ["external: topology example service boundary"],
+          "source_confidence": "external",
+          "related": ["primary-database", "cache", "job-queue", "telemetry"]
+        }
+      },
+      {
+        "id": "cache",
+        "step": "05",
+        "domain": "storage",
+        "owner": "data",
+        "title": "Cache",
+        "purpose": "A low-latency store keeps hot reads and derived state close to the service.",
+        "chips": ["hot path", "TTL"],
+        "position": { "x": 650, "y": 95 },
+        "details": {
+          "summary": "The cache accelerates repeated reads and shields the database from avoidable hot-path load.",
+          "what": ["Stores short-lived values keyed by service queries.", "Expires entries according to TTL or invalidation rules."],
+          "why": ["Improves latency while keeping durable truth in the database."],
+          "inputs": ["Cache key", "TTL policy", "Invalidation event"],
+          "outputs": ["Cache hit", "Cache miss", "Eviction"],
+          "failures": ["Stale keys, stampedes, oversized values, and missing invalidation create hard-to-debug state drift."],
+          "source": ["external: topology example cache dependency"],
+          "source_confidence": "external",
+          "related": ["application-service", "primary-database"]
+        }
+      },
+      {
+        "id": "primary-database",
+        "step": "06",
+        "domain": "storage",
+        "owner": "data",
+        "title": "Primary Database",
+        "purpose": "Durable application state is stored behind the service contract.",
+        "chips": ["durable", "schema"],
+        "position": { "x": 960, "y": 310 },
+        "details": {
+          "summary": "The database is the system of record for entities, transactions, and constraints that must survive restarts.",
+          "what": ["Stores normalized or document state.", "Enforces schema and transactional constraints."],
+          "why": ["Separates durable truth from cache and background processing artifacts."],
+          "inputs": ["Queries", "Writes", "Schema migrations"],
+          "outputs": ["Records", "Transactions", "Constraint errors"],
+          "failures": ["Check migrations, lock contention, slow queries, connection pools, and backup/restore posture."],
+          "source": ["external: topology example durable storage"],
+          "source_confidence": "external",
+          "related": ["application-service", "cache", "worker"]
+        }
+      },
+      {
+        "id": "job-queue",
+        "step": "07",
+        "domain": "async",
+        "owner": "backend",
+        "title": "Job Queue",
+        "purpose": "The queue buffers work that should not block the user-facing request.",
+        "chips": ["async", "buffer"],
+        "position": { "x": 650, "y": 540 },
+        "details": {
+          "summary": "The queue decouples request latency from slower or retryable background operations.",
+          "what": ["Receives jobs from the application service.", "Delivers jobs to workers with retry and visibility semantics."],
+          "why": ["Protects the request path from long-running work and transient downstream failures."],
+          "inputs": ["Job payload", "Retry policy", "Worker subscription"],
+          "outputs": ["Queued message", "Delivery attempt", "Dead-letter event"],
+          "failures": ["Backlog growth, poison messages, retry storms, and dead-letter volume indicate async health issues."],
+          "source": ["external: topology example asynchronous contract"],
+          "source_confidence": "external",
+          "related": ["application-service", "worker"]
+        }
+      },
+      {
+        "id": "worker",
+        "step": "08",
+        "domain": "async",
+        "owner": "backend",
+        "title": "Worker",
+        "purpose": "Background workers consume queued jobs and update durable or external state.",
+        "chips": ["consumer", "retry"],
+        "position": { "x": 960, "y": 540 },
+        "details": {
+          "summary": "Workers execute asynchronous jobs, write results, and isolate retry-heavy work from user-facing APIs.",
+          "what": ["Consumes messages.", "Reads and writes durable state.", "Stores large artifacts when needed."],
+          "why": ["Keeps slow processing and retries out of the synchronous request path."],
+          "inputs": ["Queued job", "Database state", "Object storage credentials"],
+          "outputs": ["Processed result", "Database update", "Stored artifact", "Failure event"],
+          "failures": ["Check worker concurrency, queue visibility timeout, idempotency, and dead-letter handling."],
+          "source": ["external: topology example worker boundary"],
+          "source_confidence": "external",
+          "related": ["job-queue", "primary-database", "object-storage"]
+        }
+      },
+      {
+        "id": "object-storage",
+        "step": "09",
+        "domain": "storage",
+        "owner": "data",
+        "title": "Object Storage",
+        "purpose": "Large immutable artifacts live outside the primary transactional database.",
+        "chips": ["artifacts", "blob"],
+        "position": { "x": 1250, "y": 540 },
+        "details": {
+          "summary": "Object storage keeps generated files, uploads, exports, and other large artifacts referenced by database metadata.",
+          "what": ["Stores byte streams by key.", "Returns object URLs or metadata to the service."],
+          "why": ["Avoids putting large binary payloads into the transactional database."],
+          "inputs": ["Object key", "Artifact bytes", "Retention policy"],
+          "outputs": ["Stored object", "Object metadata", "Read URL"],
+          "failures": ["Permission drift, lifecycle expiration, and orphaned metadata can break artifact reads."],
+          "source": ["external: topology example artifact storage"],
+          "source_confidence": "external",
+          "related": ["worker", "application-service"]
+        }
+      },
+      {
+        "id": "telemetry",
+        "step": "10",
+        "domain": "observability",
+        "owner": "platform",
+        "title": "Telemetry",
+        "purpose": "Logs, metrics, and traces connect user symptoms to service and dependency behavior.",
+        "chips": ["logs", "traces"],
+        "position": { "x": 350, "y": 540 },
+        "details": {
+          "summary": "Telemetry receives signals from client, edge, service, worker, and dependency paths for diagnosis and operations.",
+          "what": ["Collects logs, metrics, traces, and structured events.", "Supports dashboards, alerts, and incident investigation."],
+          "why": ["Provides the cross-cutting view needed when failures span multiple nodes."],
+          "inputs": ["Application logs", "Metrics", "Distributed traces", "Audit events"],
+          "outputs": ["Dashboards", "Alerts", "Trace search", "Error correlation"],
+          "failures": ["Sampling gaps, missing correlation IDs, noisy alerts, and dropped events reduce debugging confidence."],
+          "source": ["external: topology example observability boundary"],
+          "source_confidence": "external",
+          "related": ["api-gateway", "application-service", "worker"]
+        }
+      }
+    ],
+    "edges": [
+      ["web-client", "api-gateway", "HTTPS request", "control"],
+      ["web-client", "identity-provider", "login redirect", "control"],
+      ["identity-provider", "api-gateway", "token metadata", "dependency"],
+      ["api-gateway", "application-service", "authorized request", "control"],
+      ["application-service", "cache", "hot read/write", "artifact"],
+      ["application-service", "primary-database", "transaction", "artifact"],
+      ["application-service", "job-queue", "queued job", "artifact"],
+      ["job-queue", "worker", "delivery attempt", "control"],
+      ["worker", "primary-database", "state update", "artifact"],
+      ["worker", "object-storage", "artifact write", "artifact"],
+      ["application-service", "telemetry", "logs/traces", "signal"],
+      ["worker", "telemetry", "worker signals", "signal"],
+      ["api-gateway", "telemetry", "access signals", "signal"]
+    ],
+    "edgeHandles": {
+      "web-client->api-gateway": ["out-right", "in-left"],
+      "web-client->identity-provider": ["out-top", "in-left"],
+      "identity-provider->api-gateway": ["out-bottom", "in-top"],
+      "api-gateway->application-service": ["out-right", "in-left"],
+      "application-service->cache": ["out-top", "in-bottom"],
+      "application-service->primary-database": ["out-right", "in-left"],
+      "application-service->job-queue": ["out-bottom", "in-top"],
+      "job-queue->worker": ["out-right", "in-left"],
+      "worker->primary-database": ["out-top", "in-bottom"],
+      "worker->object-storage": ["out-right", "in-left"],
+      "application-service->telemetry": ["out-left", "in-right"],
+      "worker->telemetry": ["out-left", "in-right"],
+      "api-gateway->telemetry": ["out-bottom", "in-top"]
+    },
+    "views": {
+      "overview": {
+        "label": "Overview",
+        "focus": ["web-client", "api-gateway", "identity-provider", "application-service", "cache", "primary-database", "job-queue", "worker", "object-storage", "telemetry"]
+      },
+      "request-path": {
+        "label": "Request path",
+        "focus": ["web-client", "api-gateway", "identity-provider", "application-service", "cache", "primary-database", "telemetry"]
+      },
+      "async-path": {
+        "label": "Async path",
+        "focus": ["application-service", "job-queue", "worker", "primary-database", "object-storage", "telemetry"]
+      },
+      "operations": {
+        "label": "Operations",
+        "focus": ["api-gateway", "application-service", "job-queue", "worker", "telemetry"]
+      }
+    }
+  },
+  "groupDetails": {
+    "overview": {
+      "title": "Service Topology Overview",
+      "summary": "A non-swimlane service map showing clients, public edge, domain service, stateful dependencies, async workers, artifact storage, identity, and observability."
+    },
+    "request-path": {
+      "title": "Request Path",
+      "summary": "The synchronous path starts at the web client, crosses the API edge, validates identity context, and reaches the service with cache and database dependencies."
+    },
+    "async-path": {
+      "title": "Async Path",
+      "summary": "The asynchronous path moves non-blocking work through a queue to workers that update durable state and object artifacts."
+    },
+    "operations": {
+      "title": "Operations View",
+      "summary": "Operational signals from the edge, service, queue, and worker converge in telemetry for debugging and incident response."
+    }
+  }
+}

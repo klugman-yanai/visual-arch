@@ -1226,1214 +1226,754 @@
 
       const VISUAL_ARCH_DATA = {
         "domains": {
-                "interface": {
-                        "label": "Application Query",
-                        "accent": "#7c83ff",
-                        "soft": "#e9eaff"
+                "client": {
+                        "label": "Clients",
+                        "accent": "#2563eb",
+                        "soft": "#dbeafe"
                 },
-                "runtime": {
-                        "label": "Stub + Local Resolver",
-                        "accent": "#18b6a4",
-                        "soft": "#dff8f3"
+                "edge": {
+                        "label": "API Edge",
+                        "accent": "#0891b2",
+                        "soft": "#cffafe"
                 },
-                "data": {
-                        "label": "TTL Cache + Records",
-                        "accent": "#f3b23c",
-                        "soft": "#fff1cf"
+                "service": {
+                        "label": "Service Core",
+                        "accent": "#16a34a",
+                        "soft": "#dcfce7"
                 },
-                "delivery": {
-                        "label": "DNS Hierarchy",
-                        "accent": "#38a8ff",
-                        "soft": "#dff1ff"
+                "storage": {
+                        "label": "State",
+                        "accent": "#ca8a04",
+                        "soft": "#fef3c7"
                 },
-                "signal": {
-                        "label": "Transport + Trust",
-                        "accent": "#fb5f87",
-                        "soft": "#ffe5ed"
+                "async": {
+                        "label": "Async Work",
+                        "accent": "#9333ea",
+                        "soft": "#f3e8ff"
                 },
                 "external": {
-                        "label": "External Authority",
-                        "accent": "#8a96a8",
-                        "soft": "#eef1f5"
+                        "label": "External Boundary",
+                        "accent": "#64748b",
+                        "soft": "#e2e8f0"
                 },
-                "infra": {
-                        "label": "Infrastructure",
-                        "accent": "#8a96a8",
-                        "soft": "#eef1f5"
+                "observability": {
+                        "label": "Operations",
+                        "accent": "#dc2626",
+                        "soft": "#fee2e2"
                 }
         },
         "owners": {
-                "product": {
-                        "label": "Application",
-                        "description": "Browser, CLI, service, or library that needs an address for a name."
+                "frontend": {
+                        "label": "Frontend",
+                        "description": "Client applications and browser-facing behavior."
                 },
-                "runtime": {
-                        "label": "Client Resolver",
-                        "description": "Operating system resolver, hosts policy, local cache, and configured recursive resolver."
+                "platform": {
+                        "label": "Platform",
+                        "description": "Ingress, identity integration, shared infrastructure, and telemetry."
+                },
+                "backend": {
+                        "label": "Backend",
+                        "description": "Application services, domain logic, and asynchronous workers."
                 },
                 "data": {
-                        "label": "DNS Data",
-                        "description": "Resource records, TTLs, aliases, negative answers, and cache entries."
+                        "label": "Data",
+                        "description": "Databases, caches, object storage, and schema contracts."
                 },
-                "delivery": {
-                        "label": "DNS Authority",
-                        "description": "Recursive, root, TLD, and authoritative name servers."
-                },
-                "signal": {
-                        "label": "Network + Trust",
-                        "description": "UDP/TCP transport, retries, DNSSEC, errors, and observability."
-                },
-                "suite": {
-                        "label": "DNS Example",
-                        "description": "Deep visual architecture example for DNS name resolution."
+                "external": {
+                        "label": "External Provider",
+                        "description": "Identity or third-party services outside the repository boundary."
                 }
         },
         "board": {
-                "lanes": [
-                        {
-                                "id": "lane-app",
-                                "title": "Application",
-                                "subtitle": "The caller, resolver API, and connection attempt.",
-                                "domain": "interface",
-                                "position": {
-                                        "x": 40,
-                                        "y": 150
-                                },
-                                "width": 340,
-                                "height": 1530
-                        },
-                        {
-                                "id": "lane-local",
-                                "title": "Local Resolution",
-                                "subtitle": "Hosts files, search domains, stub resolver, and cache.",
-                                "domain": "runtime",
-                                "position": {
-                                        "x": 410,
-                                        "y": 150
-                                },
-                                "width": 340,
-                                "height": 1530
-                        },
-                        {
-                                "id": "lane-recursive",
-                                "title": "Recursive Service",
-                                "subtitle": "Cache lookup, iterative traversal, validation, and retry policy.",
-                                "domain": "signal",
-                                "position": {
-                                        "x": 780,
-                                        "y": 150
-                                },
-                                "width": 340,
-                                "height": 1530
-                        },
-                        {
-                                "id": "lane-authority",
-                                "title": "Authority",
-                                "subtitle": "Root, TLD, authoritative zones, records, and TTLs.",
-                                "domain": "delivery",
-                                "position": {
-                                        "x": 1150,
-                                        "y": 150
-                                },
-                                "width": 340,
-                                "height": 1530
-                        }
-                ],
+                "layout": {
+                        "orientation": "topology",
+                        "design_basis": "service-topology"
+                },
+                "lanes": [],
                 "nodes": [
                         {
-                                "id": "name-needed",
+                                "id": "web-client",
                                 "step": "01",
-                                "domain": "interface",
-                                "owner": "product",
-                                "title": "Name Needed",
-                                "purpose": "An application needs network endpoints for a human-readable host name.",
-                                "chips": [
-                                        "hostname",
-                                        "A/AAAA"
-                                ],
-                                "position": {
-                                        "x": 70,
-                                        "y": 245
-                                },
-                                "details": {
-                                        "summary": "A browser, CLI, or service starts with a host name and asks for records that can lead to an address.",
-                                        "what": [
-                                                "The caller may request A, AAAA, HTTPS, SRV, MX, TXT, or other record types depending on protocol.",
-                                                "Modern clients often race IPv6 and IPv4 connection attempts after resolution."
-                                        ],
-                                        "why": [
-                                                "DNS decouples service names from changing network addresses and hosting providers."
-                                        ],
-                                        "inputs": [
-                                                "Host name",
-                                                "Record type",
-                                                "Network family preference",
-                                                "Application timeout budget"
-                                        ],
-                                        "outputs": [
-                                                "Resolver API request"
-                                        ],
-                                        "failures": [
-                                                "Literal IPs bypass most DNS behavior; malformed names, IDNA conversion, or search-suffix rules can change the queried name."
-                                        ],
-                                        "source": [
-                                                "external: DNS resource record model",
-                                                "external: application resolver APIs"
-                                        ],
-                                        "source_confidence": "source-backed",
-                                        "related": [
-                                                "resolver-api"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "resolver-api",
-                                "step": "02",
-                                "domain": "interface",
-                                "owner": "runtime",
-                                "title": "Resolver API",
-                                "purpose": "The application delegates name lookup to the OS or language resolver.",
-                                "chips": [
-                                        "getaddrinfo",
-                                        "library"
-                                ],
-                                "position": {
-                                        "x": 70,
-                                        "y": 395
-                                },
-                                "details": {
-                                        "summary": "Most applications call a resolver API rather than constructing DNS packets themselves.",
-                                        "what": [
-                                                "The API may combine DNS with local host databases and policy.",
-                                                "It can return multiple candidate addresses ordered by local preference."
-                                        ],
-                                        "why": [
-                                                "Centralizing resolution lets the OS enforce local policy, enterprise configuration, VPN rules, and address-family preferences."
-                                        ],
-                                        "inputs": [
-                                                "Host name",
-                                                "Service or port",
-                                                "Address family hints",
-                                                "Resolver configuration"
-                                        ],
-                                        "outputs": [
-                                                "Canonical query name or local answer"
-                                        ],
-                                        "failures": [
-                                                "Language runtimes and containers may use different resolver stacks than the host, so observed behavior can differ from system tools."
-                                        ],
-                                        "source": [
-                                                "external: getaddrinfo behavior",
-                                                "external: OS resolver configuration"
-                                        ],
-                                        "source_confidence": "source-backed",
-                                        "related": [
-                                                "local-policy"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "local-policy",
-                                "step": "03",
-                                "domain": "runtime",
-                                "owner": "runtime",
-                                "title": "Local Policy",
-                                "purpose": "Hosts files, search suffixes, split DNS, and caches may answer before public DNS.",
-                                "chips": [
-                                        "hosts",
-                                        "search"
-                                ],
-                                "position": {
-                                        "x": 440,
-                                        "y": 395
-                                },
-                                "details": {
-                                        "summary": "The local resolver applies host mappings, name-service order, search domains, VPN or enterprise policy, and local cache.",
-                                        "what": [
-                                                "Short names may expand through search domains.",
-                                                "Hosts files can override DNS.",
-                                                "VPNs and containers can route specific zones to different resolvers."
-                                        ],
-                                        "why": [
-                                                "Local policy supports private networks, development overrides, and operational control."
-                                        ],
-                                        "inputs": [
-                                                "Resolver API request",
-                                                "Hosts database",
-                                                "Search domains",
-                                                "Name-service switch or platform equivalent",
-                                                "Local cache"
-                                        ],
-                                        "outputs": [
-                                                "Local answer or DNS question for a recursive resolver"
-                                        ],
-                                        "failures": [
-                                                "A stale local override can make one machine disagree with everyone else."
-                                        ],
-                                        "source": [
-                                                "external: hosts file behavior",
-                                                "external: resolver search domain behavior",
-                                                "external: split DNS concepts"
-                                        ],
-                                        "source_confidence": "source-backed",
-                                        "related": [
-                                                "stub-query",
-                                                "negative-cache"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "stub-query",
-                                "step": "04",
-                                "domain": "runtime",
-                                "owner": "runtime",
-                                "title": "Stub Query",
-                                "purpose": "The client resolver sends a compact DNS question to a recursive resolver.",
-                                "chips": [
-                                        "stub",
-                                        "UDP/TCP"
-                                ],
-                                "position": {
-                                        "x": 440,
-                                        "y": 545
-                                },
-                                "details": {
-                                        "summary": "The stub resolver asks a configured recursive resolver to resolve the name on its behalf.",
-                                        "what": [
-                                                "Queries usually use UDP first, with TCP for truncation or policy.",
-                                                "Encrypted transports such as DoT or DoH may be used depending on the client and network."
-                                        ],
-                                        "why": [
-                                                "Stub resolvers keep clients simple and let recursive resolvers provide shared caching and policy."
-                                        ],
-                                        "inputs": [
-                                                "Question name",
-                                                "Record type",
-                                                "Recursive resolver address",
-                                                "Timeout and retry policy"
-                                        ],
-                                        "outputs": [
-                                                "DNS packet or encrypted DNS request"
-                                        ],
-                                        "failures": [
-                                                "Blocked UDP, captive portals, DNS interception, or misconfigured resolvers can fail before the DNS hierarchy is reached."
-                                        ],
-                                        "source": [
-                                                "external: DNS transport behavior",
-                                                "external: recursive resolver configuration"
-                                        ],
-                                        "source_confidence": "source-backed",
-                                        "related": [
-                                                "recursive-cache"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "recursive-cache",
-                                "step": "05",
-                                "domain": "signal",
-                                "owner": "delivery",
-                                "title": "Recursive Cache",
-                                "purpose": "The recursive resolver answers immediately when it has a valid cached result.",
-                                "chips": [
-                                        "cache",
-                                        "TTL"
-                                ],
-                                "position": {
-                                        "x": 810,
-                                        "y": 545
-                                },
-                                "details": {
-                                        "summary": "Recursive resolvers cache positive and negative answers until TTL or negative-cache policy expires.",
-                                        "what": [
-                                                "A cache hit avoids root, TLD, and authoritative queries.",
-                                                "A cache miss starts iterative resolution through the DNS hierarchy."
-                                        ],
-                                        "why": [
-                                                "Shared caching makes DNS fast and dramatically reduces authoritative server load."
-                                        ],
-                                        "inputs": [
-                                                "DNS question",
-                                                "Cache entries",
-                                                "TTL remaining",
-                                                "Validation state"
-                                        ],
-                                        "outputs": [
-                                                "Cached response or iterative lookup plan"
-                                        ],
-                                        "failures": [
-                                                "Stale caches, poisoned responses, or aggressive negative caching can make DNS changes appear delayed."
-                                        ],
-                                        "source": [
-                                                "external: DNS TTL caching",
-                                                "external: recursive resolver behavior"
-                                        ],
-                                        "source_confidence": "source-backed",
-                                        "related": [
-                                                "root-referral",
-                                                "answer-package",
-                                                "negative-cache"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "root-referral",
-                                "step": "06",
-                                "domain": "delivery",
-                                "owner": "delivery",
-                                "title": "Root Referral",
-                                "purpose": "Root name servers point the resolver toward the relevant top-level domain.",
-                                "chips": [
-                                        "root",
-                                        "referral"
-                                ],
-                                "position": {
-                                        "x": 1180,
-                                        "y": 545
-                                },
-                                "details": {
-                                        "summary": "On a cache miss, the recursive resolver starts from known root hints and receives a referral to the TLD servers.",
-                                        "what": [
-                                                "Root servers do not know every host record.",
-                                                "They delegate responsibility to TLD name servers such as .com, .org, or country-code TLDs."
-                                        ],
-                                        "why": [
-                                                "Delegation lets DNS scale globally without a single database answering all names."
-                                        ],
-                                        "inputs": [
-                                                "Question for a fully qualified domain name",
-                                                "Root hints or cached root NS set"
-                                        ],
-                                        "outputs": [
-                                                "NS records and glue addresses for the TLD"
-                                        ],
-                                        "failures": [
-                                                "Root reachability issues are rare, but broken local networks or blocked DNS can prevent this first referral."
-                                        ],
-                                        "source": [
-                                                "external: DNS root zone delegation",
-                                                "external: root hints"
-                                        ],
-                                        "source_confidence": "source-backed",
-                                        "related": [
-                                                "tld-referral"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "tld-referral",
-                                "step": "07",
-                                "domain": "delivery",
-                                "owner": "delivery",
-                                "title": "TLD Referral",
-                                "purpose": "The TLD points the resolver to the domain's authoritative name servers.",
-                                "chips": [
-                                        "TLD",
-                                        "NS"
-                                ],
-                                "position": {
-                                        "x": 1180,
-                                        "y": 695
-                                },
-                                "details": {
-                                        "summary": "The TLD zone delegates a registered domain to its authoritative name servers.",
-                                        "what": [
-                                                "The response commonly includes NS records and glue for in-bailiwick name servers.",
-                                                "The resolver follows the delegation to the zone authority."
-                                        ],
-                                        "why": [
-                                                "Registries can delegate each domain while domain owners control their own zone records."
-                                        ],
-                                        "inputs": [
-                                                "Query from recursive resolver",
-                                                "TLD zone delegation data"
-                                        ],
-                                        "outputs": [
-                                                "Authoritative name server referral"
-                                        ],
-                                        "failures": [
-                                                "Bad delegation, missing glue, or mismatched registrar and zone settings can break resolution before the authoritative zone answers."
-                                        ],
-                                        "source": [
-                                                "external: DNS delegation",
-                                                "external: NS and glue record behavior"
-                                        ],
-                                        "source_confidence": "source-backed",
-                                        "related": [
-                                                "authoritative-answer"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "authoritative-answer",
-                                "step": "08",
-                                "domain": "delivery",
-                                "owner": "delivery",
-                                "title": "Authoritative Answer",
-                                "purpose": "The zone's authoritative server returns the requested records or a negative answer.",
-                                "chips": [
-                                        "zone",
-                                        "record"
-                                ],
-                                "position": {
-                                        "x": 1180,
-                                        "y": 845
-                                },
-                                "details": {
-                                        "summary": "The authoritative server for the zone answers with records such as A, AAAA, CNAME, MX, TXT, or NXDOMAIN/NODATA.",
-                                        "what": [
-                                                "CNAME responses may require additional lookups for the target name.",
-                                                "Responses include TTLs that guide cache lifetime."
-                                        ],
-                                        "why": [
-                                                "The authoritative zone is the source of truth for names delegated to that domain."
-                                        ],
-                                        "inputs": [
-                                                "Question name",
-                                                "Record type",
-                                                "Zone data"
-                                        ],
-                                        "outputs": [
-                                                "Resource records, CNAME chain, delegation, or negative response"
-                                        ],
-                                        "failures": [
-                                                "Incorrect zone records, expired DNSSEC signatures, or missing CNAME targets can make authoritative data unusable."
-                                        ],
-                                        "source": [
-                                                "external: RFC 1034 and RFC 1035 concepts",
-                                                "external: authoritative DNS server behavior"
-                                        ],
-                                        "source_confidence": "source-backed",
-                                        "related": [
-                                                "cname-chain",
-                                                "dnssec-validation",
-                                                "answer-package"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "cname-chain",
-                                "step": "09",
-                                "domain": "data",
-                                "owner": "data",
-                                "title": "Alias Chain",
-                                "purpose": "CNAME records may redirect the resolver to another canonical name.",
-                                "chips": [
-                                        "CNAME",
-                                        "alias"
-                                ],
-                                "position": {
-                                        "x": 810,
-                                        "y": 845
-                                },
-                                "details": {
-                                        "summary": "A CNAME response says the requested name is an alias, so the resolver must resolve the canonical target.",
-                                        "what": [
-                                                "The final answer may include both the alias chain and address records.",
-                                                "Long or looping alias chains can cause failures."
-                                        ],
-                                        "why": [
-                                                "Aliases let services move between providers or consolidate naming without changing callers."
-                                        ],
-                                        "inputs": [
-                                                "CNAME record",
-                                                "Target canonical name"
-                                        ],
-                                        "outputs": [
-                                                "Follow-up DNS question or completed answer chain"
-                                        ],
-                                        "failures": [
-                                                "CNAME loops, excessive chain length, and missing target records prevent usable resolution."
-                                        ],
-                                        "source": [
-                                                "external: CNAME record behavior",
-                                                "external: resolver alias handling"
-                                        ],
-                                        "source_confidence": "source-backed",
-                                        "related": [
-                                                "authoritative-answer",
-                                                "answer-package"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "dnssec-validation",
-                                "step": "10",
-                                "domain": "signal",
-                                "owner": "signal",
-                                "title": "DNSSEC Validation",
-                                "purpose": "Validating resolvers check cryptographic proof for signed zones.",
-                                "chips": [
-                                        "DNSSEC",
-                                        "trust"
-                                ],
-                                "position": {
-                                        "x": 810,
-                                        "y": 995
-                                },
-                                "details": {
-                                        "summary": "When enabled, DNSSEC validation verifies that signed responses chain back to trusted keys.",
-                                        "what": [
-                                                "The resolver checks signatures and denial-of-existence proofs.",
-                                                "Validation failure converts a seemingly present answer into an error for clients."
-                                        ],
-                                        "why": [
-                                                "DNSSEC defends against forged DNS data for signed zones."
-                                        ],
-                                        "inputs": [
-                                                "Signed DNS records",
-                                                "Delegation signer data",
-                                                "Trust anchors"
-                                        ],
-                                        "outputs": [
-                                                "Validated answer or validation failure"
-                                        ],
-                                        "failures": [
-                                                "Clock skew, expired signatures, bad DS records, and middleboxes can cause validation failures."
-                                        ],
-                                        "source": [
-                                                "external: DNSSEC validation model",
-                                                "external: signed denial of existence"
-                                        ],
-                                        "source_confidence": "source-backed",
-                                        "related": [
-                                                "answer-package",
-                                                "transport-retry"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "answer-package",
-                                "step": "11",
-                                "domain": "data",
-                                "owner": "data",
-                                "title": "Answer Package",
-                                "purpose": "The recursive resolver assembles the response returned to the client.",
-                                "chips": [
-                                        "records",
-                                        "TTL"
-                                ],
-                                "position": {
-                                        "x": 810,
-                                        "y": 1145
-                                },
-                                "details": {
-                                        "summary": "The response includes the requested records, aliases, TTLs, response code, and sometimes additional records.",
-                                        "what": [
-                                                "Positive answers carry record TTLs.",
-                                                "Negative answers may be cached according to SOA-derived policy.",
-                                                "The resolver may set flags indicating recursion and validation status."
-                                        ],
-                                        "why": [
-                                                "The client needs both the data and the metadata that controls reuse and trust."
-                                        ],
-                                        "inputs": [
-                                                "Authoritative response",
-                                                "Alias resolution results",
-                                                "Validation result",
-                                                "Cache policy"
-                                        ],
-                                        "outputs": [
-                                                "Client-facing DNS response",
-                                                "Recursive cache update"
-                                        ],
-                                        "failures": [
-                                                "Large responses may be truncated over UDP and retried over TCP."
-                                        ],
-                                        "source": [
-                                                "external: DNS message format",
-                                                "external: TTL and negative caching behavior"
-                                        ],
-                                        "source_confidence": "source-backed",
-                                        "related": [
-                                                "negative-cache",
-                                                "client-cache"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "negative-cache",
-                                "step": "12",
-                                "domain": "data",
-                                "owner": "data",
-                                "title": "Negative Cache",
-                                "purpose": "NXDOMAIN and no-data results can be cached too.",
-                                "chips": [
-                                        "NXDOMAIN",
-                                        "NODATA"
-                                ],
-                                "position": {
-                                        "x": 440,
-                                        "y": 1145
-                                },
-                                "details": {
-                                        "summary": "Resolvers cache some negative answers so repeated lookups for missing names do not hammer authoritative servers.",
-                                        "what": [
-                                                "NXDOMAIN means the name does not exist.",
-                                                "NODATA means the name exists but lacks the requested record type."
-                                        ],
-                                        "why": [
-                                                "Negative caching protects DNS infrastructure and speeds repeated failed lookups."
-                                        ],
-                                        "inputs": [
-                                                "Negative authoritative response",
-                                                "SOA-derived cache timing"
-                                        ],
-                                        "outputs": [
-                                                "Cached negative answer"
-                                        ],
-                                        "failures": [
-                                                "After adding a missing record, clients may still see failure until negative cache state expires."
-                                        ],
-                                        "source": [
-                                                "external: DNS negative caching",
-                                                "external: NXDOMAIN and NODATA semantics"
-                                        ],
-                                        "source_confidence": "source-backed",
-                                        "related": [
-                                                "client-cache"
-                                        ]
-                                }
-                        },
-                        {
-                                "id": "client-cache",
-                                "step": "13",
-                                "domain": "runtime",
-                                "owner": "runtime",
-                                "title": "Client Cache",
-                                "purpose": "The OS, browser, or application may reuse the answer locally.",
+                                "domain": "client",
+                                "owner": "frontend",
+                                "title": "Web Client",
+                                "purpose": "The browser client initiates user actions and renders service responses.",
                                 "chips": [
                                         "browser",
-                                        "OS cache"
+                                        "session"
                                 ],
                                 "position": {
-                                        "x": 440,
-                                        "y": 1295
+                                        "x": 80,
+                                        "y": 310
                                 },
                                 "details": {
-                                        "summary": "After the recursive response returns, local layers may cache the answer according to TTL or their own policy.",
+                                        "summary": "A user-facing client calls the service through the public API edge and holds only presentation/session state.",
                                         "what": [
-                                                "Browsers and runtimes may maintain separate caches from the OS.",
-                                                "Some applications pin resolved addresses for connection pools."
+                                                "Submits user requests over HTTPS.",
+                                                "Receives domain responses and error states."
                                         ],
                                         "why": [
-                                                "Local caching reduces latency for repeated connections and smooths short network interruptions."
+                                                "Separates user interaction from service state and server-side authorization."
                                         ],
                                         "inputs": [
-                                                "DNS response",
-                                                "TTL",
-                                                "Local cache policy"
+                                                "User events",
+                                                "Session token",
+                                                "Rendered app bundle"
                                         ],
                                         "outputs": [
-                                                "Address list for the application",
-                                                "Local cache entry"
+                                                "HTTPS requests",
+                                                "Telemetry events"
                                         ],
                                         "failures": [
-                                                "Multiple cache layers explain why flushing one cache may not change application behavior."
+                                                "Authentication redirects, stale cached assets, and network failures are the first client-side checks."
                                         ],
                                         "source": [
-                                                "external: browser and OS DNS cache behavior",
-                                                "external: application connection pooling concepts"
+                                                "external: topology example client boundary"
                                         ],
-                                        "source_confidence": "source-backed",
+                                        "source_confidence": "external",
                                         "related": [
-                                                "connect-endpoint",
-                                                "debugging-dns"
+                                                "api-gateway",
+                                                "identity-provider"
                                         ]
                                 }
                         },
                         {
-                                "id": "connect-endpoint",
-                                "step": "14",
-                                "domain": "interface",
-                                "owner": "product",
-                                "title": "Connect To Address",
-                                "purpose": "The application uses resolved endpoints to start the actual protocol connection.",
+                                "id": "api-gateway",
+                                "step": "02",
+                                "domain": "edge",
+                                "owner": "platform",
+                                "title": "API Gateway",
+                                "purpose": "The public ingress validates requests and routes them to the application service.",
                                 "chips": [
-                                        "TCP",
-                                        "TLS"
+                                        "ingress",
+                                        "routing"
                                 ],
                                 "position": {
-                                        "x": 70,
-                                        "y": 1295
+                                        "x": 350,
+                                        "y": 310
                                 },
                                 "details": {
-                                        "summary": "DNS resolution ends by handing candidate addresses back to the application, which then connects using its application protocol.",
+                                        "summary": "The gateway is the service boundary for TLS termination, request routing, rate policy, and identity handoff.",
                                         "what": [
-                                                "The client may try IPv6 and IPv4 candidates in parallel or sequence.",
-                                                "TLS and HTTP still validate host names even after DNS returns an address."
+                                                "Accepts HTTPS requests.",
+                                                "Applies edge policy before forwarding to the service."
                                         ],
                                         "why": [
-                                                "DNS only finds candidate network locations; it does not prove the application service is healthy or authorized."
+                                                "Keeps public ingress concerns out of domain service code."
                                         ],
                                         "inputs": [
-                                                "Address records",
-                                                "Port and protocol",
-                                                "Connection policy"
+                                                "HTTPS request",
+                                                "Bearer token",
+                                                "Route configuration"
                                         ],
                                         "outputs": [
-                                                "Network connection attempt"
+                                                "Authorized service request",
+                                                "Rejected request",
+                                                "Access telemetry"
                                         ],
                                         "failures": [
-                                                "Successful DNS can still lead to connection refusal, TLS mismatch, routing failure, or application-level errors."
+                                                "Check route tables, token validation policy, rate limits, and gateway logs."
                                         ],
                                         "source": [
-                                                "external: Happy Eyeballs concepts",
-                                                "external: TLS hostname validation"
+                                                "external: topology example ingress boundary"
                                         ],
-                                        "source_confidence": "source-backed",
+                                        "source_confidence": "external",
                                         "related": [
-                                                "debugging-dns"
+                                                "identity-provider",
+                                                "application-service"
                                         ]
                                 }
                         },
                         {
-                                "id": "transport-retry",
-                                "step": "15",
-                                "domain": "signal",
-                                "owner": "signal",
-                                "title": "Transport Retry",
-                                "purpose": "DNS transport handles packet loss, truncation, and alternate resolver attempts.",
+                                "id": "identity-provider",
+                                "step": "03",
+                                "domain": "external",
+                                "owner": "external",
+                                "title": "Identity Provider",
+                                "purpose": "An external identity service issues and validates user identity claims.",
                                 "chips": [
-                                        "timeout",
-                                        "TCP fallback"
+                                        "OIDC",
+                                        "external"
                                 ],
                                 "position": {
-                                        "x": 810,
-                                        "y": 395
+                                        "x": 340,
+                                        "y": 95
                                 },
                                 "details": {
-                                        "summary": "Resolvers retry queries, switch servers, or fall back to TCP when responses are lost or too large.",
+                                        "summary": "The identity provider is outside the service boundary but affects every authenticated request.",
                                         "what": [
-                                                "UDP responses can be truncated.",
-                                                "Clients may try multiple configured recursive resolvers.",
-                                                "DoH and DoT use different connection failure modes."
+                                                "Issues login tokens.",
+                                                "Publishes signing keys and identity metadata."
                                         ],
                                         "why": [
-                                                "DNS must work across unreliable networks without making applications own every retry detail."
+                                                "Centralized identity avoids embedding credential management in the application service."
                                         ],
                                         "inputs": [
-                                                "Timeouts",
-                                                "Truncated responses",
-                                                "Resolver server list",
-                                                "Transport policy"
+                                                "Login challenge",
+                                                "Client credentials",
+                                                "Token validation metadata"
                                         ],
                                         "outputs": [
-                                                "Retry, alternate resolver query, TCP fallback, or failure"
+                                                "ID/access token",
+                                                "Signing key set",
+                                                "Authentication errors"
                                         ],
                                         "failures": [
-                                                "Firewalls and middleboxes can make one transport fail while another succeeds."
+                                                "Expired keys, clock skew, tenant misconfiguration, and callback URL drift commonly break auth."
                                         ],
                                         "source": [
-                                                "external: DNS UDP/TCP behavior",
-                                                "external: encrypted DNS transport concepts"
+                                                "external: topology example identity boundary"
                                         ],
-                                        "source_confidence": "source-backed",
+                                        "source_confidence": "external",
                                         "related": [
-                                                "stub-query",
-                                                "debugging-dns"
+                                                "web-client",
+                                                "api-gateway"
                                         ]
                                 }
                         },
                         {
-                                "id": "debugging-dns",
-                                "step": "16",
-                                "domain": "signal",
-                                "owner": "signal",
-                                "title": "Debugging DNS",
-                                "purpose": "Separates naming failures from resolver, authority, cache, transport, and application failures.",
+                                "id": "application-service",
+                                "step": "04",
+                                "domain": "service",
+                                "owner": "backend",
+                                "title": "Application Service",
+                                "purpose": "The core service enforces domain rules and coordinates stateful dependencies.",
                                 "chips": [
-                                        "dig",
-                                        "cache",
-                                        "trace"
+                                        "domain",
+                                        "API"
                                 ],
                                 "position": {
-                                        "x": 1180,
-                                        "y": 1295
+                                        "x": 650,
+                                        "y": 310
                                 },
                                 "details": {
-                                        "summary": "Good DNS debugging identifies which layer answered, whether the result was cached, and whether the failure is DNS or post-DNS connection behavior.",
+                                        "summary": "The application service owns request handling, authorization decisions, domain validation, persistence coordination, and async job creation.",
                                         "what": [
-                                                "Compare local resolver results with direct authoritative or public recursive queries.",
-                                                "Check TTLs, CNAME chains, DNSSEC validation, split DNS, and negative cache state.",
-                                                "Confirm that a resolved address actually accepts the intended protocol."
+                                                "Runs domain logic.",
+                                                "Reads cached or durable state.",
+                                                "Publishes work when requests require background processing."
                                         ],
                                         "why": [
-                                                "Many outages blamed on DNS are really cache, delegation, validation, network, or application endpoint problems."
+                                                "Centralizes the business contract behind one API boundary."
                                         ],
                                         "inputs": [
-                                                "Observed error",
-                                                "Resolver used",
-                                                "Trace output",
-                                                "Authoritative records",
-                                                "Application connection logs"
+                                                "Authorized request",
+                                                "Configuration",
+                                                "Cached data",
+                                                "Database records"
                                         ],
                                         "outputs": [
-                                                "Likely failing layer and next diagnostic step"
+                                                "API response",
+                                                "Database writes",
+                                                "Queued jobs",
+                                                "Metrics and logs"
                                         ],
                                         "failures": [
-                                                "Using only one lookup tool can hide differences between OS resolver behavior and raw DNS queries."
+                                                "Inspect request logs, dependency latency, schema errors, authorization branches, and queue publication failures."
                                         ],
                                         "source": [
-                                                "external: dig/drill/nslookup diagnostics",
-                                                "generated example guidance"
+                                                "external: topology example service boundary"
                                         ],
-                                        "source_confidence": "inferred",
-                                        "related": []
+                                        "source_confidence": "external",
+                                        "related": [
+                                                "primary-database",
+                                                "cache",
+                                                "job-queue",
+                                                "telemetry"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "cache",
+                                "step": "05",
+                                "domain": "storage",
+                                "owner": "data",
+                                "title": "Cache",
+                                "purpose": "A low-latency store keeps hot reads and derived state close to the service.",
+                                "chips": [
+                                        "hot path",
+                                        "TTL"
+                                ],
+                                "position": {
+                                        "x": 650,
+                                        "y": 95
+                                },
+                                "details": {
+                                        "summary": "The cache accelerates repeated reads and shields the database from avoidable hot-path load.",
+                                        "what": [
+                                                "Stores short-lived values keyed by service queries.",
+                                                "Expires entries according to TTL or invalidation rules."
+                                        ],
+                                        "why": [
+                                                "Improves latency while keeping durable truth in the database."
+                                        ],
+                                        "inputs": [
+                                                "Cache key",
+                                                "TTL policy",
+                                                "Invalidation event"
+                                        ],
+                                        "outputs": [
+                                                "Cache hit",
+                                                "Cache miss",
+                                                "Eviction"
+                                        ],
+                                        "failures": [
+                                                "Stale keys, stampedes, oversized values, and missing invalidation create hard-to-debug state drift."
+                                        ],
+                                        "source": [
+                                                "external: topology example cache dependency"
+                                        ],
+                                        "source_confidence": "external",
+                                        "related": [
+                                                "application-service",
+                                                "primary-database"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "primary-database",
+                                "step": "06",
+                                "domain": "storage",
+                                "owner": "data",
+                                "title": "Primary Database",
+                                "purpose": "Durable application state is stored behind the service contract.",
+                                "chips": [
+                                        "durable",
+                                        "schema"
+                                ],
+                                "position": {
+                                        "x": 960,
+                                        "y": 310
+                                },
+                                "details": {
+                                        "summary": "The database is the system of record for entities, transactions, and constraints that must survive restarts.",
+                                        "what": [
+                                                "Stores normalized or document state.",
+                                                "Enforces schema and transactional constraints."
+                                        ],
+                                        "why": [
+                                                "Separates durable truth from cache and background processing artifacts."
+                                        ],
+                                        "inputs": [
+                                                "Queries",
+                                                "Writes",
+                                                "Schema migrations"
+                                        ],
+                                        "outputs": [
+                                                "Records",
+                                                "Transactions",
+                                                "Constraint errors"
+                                        ],
+                                        "failures": [
+                                                "Check migrations, lock contention, slow queries, connection pools, and backup/restore posture."
+                                        ],
+                                        "source": [
+                                                "external: topology example durable storage"
+                                        ],
+                                        "source_confidence": "external",
+                                        "related": [
+                                                "application-service",
+                                                "cache",
+                                                "worker"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "job-queue",
+                                "step": "07",
+                                "domain": "async",
+                                "owner": "backend",
+                                "title": "Job Queue",
+                                "purpose": "The queue buffers work that should not block the user-facing request.",
+                                "chips": [
+                                        "async",
+                                        "buffer"
+                                ],
+                                "position": {
+                                        "x": 650,
+                                        "y": 540
+                                },
+                                "details": {
+                                        "summary": "The queue decouples request latency from slower or retryable background operations.",
+                                        "what": [
+                                                "Receives jobs from the application service.",
+                                                "Delivers jobs to workers with retry and visibility semantics."
+                                        ],
+                                        "why": [
+                                                "Protects the request path from long-running work and transient downstream failures."
+                                        ],
+                                        "inputs": [
+                                                "Job payload",
+                                                "Retry policy",
+                                                "Worker subscription"
+                                        ],
+                                        "outputs": [
+                                                "Queued message",
+                                                "Delivery attempt",
+                                                "Dead-letter event"
+                                        ],
+                                        "failures": [
+                                                "Backlog growth, poison messages, retry storms, and dead-letter volume indicate async health issues."
+                                        ],
+                                        "source": [
+                                                "external: topology example asynchronous contract"
+                                        ],
+                                        "source_confidence": "external",
+                                        "related": [
+                                                "application-service",
+                                                "worker"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "worker",
+                                "step": "08",
+                                "domain": "async",
+                                "owner": "backend",
+                                "title": "Worker",
+                                "purpose": "Background workers consume queued jobs and update durable or external state.",
+                                "chips": [
+                                        "consumer",
+                                        "retry"
+                                ],
+                                "position": {
+                                        "x": 960,
+                                        "y": 540
+                                },
+                                "details": {
+                                        "summary": "Workers execute asynchronous jobs, write results, and isolate retry-heavy work from user-facing APIs.",
+                                        "what": [
+                                                "Consumes messages.",
+                                                "Reads and writes durable state.",
+                                                "Stores large artifacts when needed."
+                                        ],
+                                        "why": [
+                                                "Keeps slow processing and retries out of the synchronous request path."
+                                        ],
+                                        "inputs": [
+                                                "Queued job",
+                                                "Database state",
+                                                "Object storage credentials"
+                                        ],
+                                        "outputs": [
+                                                "Processed result",
+                                                "Database update",
+                                                "Stored artifact",
+                                                "Failure event"
+                                        ],
+                                        "failures": [
+                                                "Check worker concurrency, queue visibility timeout, idempotency, and dead-letter handling."
+                                        ],
+                                        "source": [
+                                                "external: topology example worker boundary"
+                                        ],
+                                        "source_confidence": "external",
+                                        "related": [
+                                                "job-queue",
+                                                "primary-database",
+                                                "object-storage"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "object-storage",
+                                "step": "09",
+                                "domain": "storage",
+                                "owner": "data",
+                                "title": "Object Storage",
+                                "purpose": "Large immutable artifacts live outside the primary transactional database.",
+                                "chips": [
+                                        "artifacts",
+                                        "blob"
+                                ],
+                                "position": {
+                                        "x": 1250,
+                                        "y": 540
+                                },
+                                "details": {
+                                        "summary": "Object storage keeps generated files, uploads, exports, and other large artifacts referenced by database metadata.",
+                                        "what": [
+                                                "Stores byte streams by key.",
+                                                "Returns object URLs or metadata to the service."
+                                        ],
+                                        "why": [
+                                                "Avoids putting large binary payloads into the transactional database."
+                                        ],
+                                        "inputs": [
+                                                "Object key",
+                                                "Artifact bytes",
+                                                "Retention policy"
+                                        ],
+                                        "outputs": [
+                                                "Stored object",
+                                                "Object metadata",
+                                                "Read URL"
+                                        ],
+                                        "failures": [
+                                                "Permission drift, lifecycle expiration, and orphaned metadata can break artifact reads."
+                                        ],
+                                        "source": [
+                                                "external: topology example artifact storage"
+                                        ],
+                                        "source_confidence": "external",
+                                        "related": [
+                                                "worker",
+                                                "application-service"
+                                        ]
+                                }
+                        },
+                        {
+                                "id": "telemetry",
+                                "step": "10",
+                                "domain": "observability",
+                                "owner": "platform",
+                                "title": "Telemetry",
+                                "purpose": "Logs, metrics, and traces connect user symptoms to service and dependency behavior.",
+                                "chips": [
+                                        "logs",
+                                        "traces"
+                                ],
+                                "position": {
+                                        "x": 350,
+                                        "y": 540
+                                },
+                                "details": {
+                                        "summary": "Telemetry receives signals from client, edge, service, worker, and dependency paths for diagnosis and operations.",
+                                        "what": [
+                                                "Collects logs, metrics, traces, and structured events.",
+                                                "Supports dashboards, alerts, and incident investigation."
+                                        ],
+                                        "why": [
+                                                "Provides the cross-cutting view needed when failures span multiple nodes."
+                                        ],
+                                        "inputs": [
+                                                "Application logs",
+                                                "Metrics",
+                                                "Distributed traces",
+                                                "Audit events"
+                                        ],
+                                        "outputs": [
+                                                "Dashboards",
+                                                "Alerts",
+                                                "Trace search",
+                                                "Error correlation"
+                                        ],
+                                        "failures": [
+                                                "Sampling gaps, missing correlation IDs, noisy alerts, and dropped events reduce debugging confidence."
+                                        ],
+                                        "source": [
+                                                "external: topology example observability boundary"
+                                        ],
+                                        "source_confidence": "external",
+                                        "related": [
+                                                "api-gateway",
+                                                "application-service",
+                                                "worker"
+                                        ]
                                 }
                         }
                 ],
                 "edges": [
                         [
-                                "name-needed",
-                                "resolver-api",
-                                "lookup request",
+                                "web-client",
+                                "api-gateway",
+                                "HTTPS request",
                                 "control"
                         ],
                         [
-                                "resolver-api",
-                                "local-policy",
-                                "policy check",
+                                "web-client",
+                                "identity-provider",
+                                "login redirect",
                                 "control"
                         ],
                         [
-                                "local-policy",
-                                "stub-query",
-                                "cache miss",
-                                "signal"
+                                "identity-provider",
+                                "api-gateway",
+                                "token metadata",
+                                "dependency"
                         ],
                         [
-                                "stub-query",
-                                "transport-retry",
-                                "network send",
-                                "signal"
-                        ],
-                        [
-                                "transport-retry",
-                                "recursive-cache",
-                                "query",
-                                "signal"
-                        ],
-                        [
-                                "recursive-cache",
-                                "root-referral",
-                                "miss",
-                                "signal"
-                        ],
-                        [
-                                "root-referral",
-                                "tld-referral",
-                                "TLD NS",
-                                "signal"
-                        ],
-                        [
-                                "tld-referral",
-                                "authoritative-answer",
-                                "zone NS",
-                                "signal"
-                        ],
-                        [
-                                "authoritative-answer",
-                                "cname-chain",
-                                "alias",
-                                "artifact"
-                        ],
-                        [
-                                "cname-chain",
-                                "authoritative-answer",
-                                "follow target",
+                                "api-gateway",
+                                "application-service",
+                                "authorized request",
                                 "control"
                         ],
                         [
-                                "authoritative-answer",
-                                "dnssec-validation",
-                                "signed data",
-                                "decision"
-                        ],
-                        [
-                                "dnssec-validation",
-                                "answer-package",
-                                "validated",
+                                "application-service",
+                                "cache",
+                                "hot read/write",
                                 "artifact"
                         ],
                         [
-                                "authoritative-answer",
-                                "answer-package",
-                                "unsigned/accepted",
+                                "application-service",
+                                "primary-database",
+                                "transaction",
                                 "artifact"
                         ],
                         [
-                                "answer-package",
-                                "negative-cache",
-                                "negative result",
+                                "application-service",
+                                "job-queue",
+                                "queued job",
                                 "artifact"
                         ],
                         [
-                                "answer-package",
-                                "client-cache",
-                                "positive result",
+                                "job-queue",
+                                "worker",
+                                "delivery attempt",
+                                "control"
+                        ],
+                        [
+                                "worker",
+                                "primary-database",
+                                "state update",
                                 "artifact"
                         ],
                         [
-                                "negative-cache",
-                                "client-cache",
-                                "cached miss",
+                                "worker",
+                                "object-storage",
+                                "artifact write",
                                 "artifact"
                         ],
                         [
-                                "client-cache",
-                                "connect-endpoint",
-                                "addresses",
-                                "artifact"
-                        ],
-                        [
-                                "connect-endpoint",
-                                "debugging-dns",
-                                "post-DNS outcome",
+                                "application-service",
+                                "telemetry",
+                                "logs/traces",
                                 "signal"
                         ],
                         [
-                                "transport-retry",
-                                "debugging-dns",
-                                "timeout evidence",
+                                "worker",
+                                "telemetry",
+                                "worker signals",
+                                "signal"
+                        ],
+                        [
+                                "api-gateway",
+                                "telemetry",
+                                "access signals",
                                 "signal"
                         ]
                 ],
+                "edgeHandles": {
+                        "web-client->api-gateway": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "web-client->identity-provider": [
+                                "out-top",
+                                "in-left"
+                        ],
+                        "identity-provider->api-gateway": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "api-gateway->application-service": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "application-service->cache": [
+                                "out-top",
+                                "in-bottom"
+                        ],
+                        "application-service->primary-database": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "application-service->job-queue": [
+                                "out-bottom",
+                                "in-top"
+                        ],
+                        "job-queue->worker": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "worker->primary-database": [
+                                "out-top",
+                                "in-bottom"
+                        ],
+                        "worker->object-storage": [
+                                "out-right",
+                                "in-left"
+                        ],
+                        "application-service->telemetry": [
+                                "out-left",
+                                "in-right"
+                        ],
+                        "worker->telemetry": [
+                                "out-left",
+                                "in-right"
+                        ],
+                        "api-gateway->telemetry": [
+                                "out-bottom",
+                                "in-top"
+                        ]
+                },
                 "views": {
                         "overview": {
                                 "label": "Overview",
                                 "focus": [
-                                        "name-needed",
-                                        "resolver-api",
-                                        "local-policy",
-                                        "stub-query",
-                                        "transport-retry",
-                                        "recursive-cache",
-                                        "root-referral",
-                                        "tld-referral",
-                                        "authoritative-answer",
-                                        "cname-chain",
-                                        "dnssec-validation",
-                                        "answer-package",
-                                        "negative-cache",
-                                        "client-cache",
-                                        "connect-endpoint",
-                                        "debugging-dns"
+                                        "web-client",
+                                        "api-gateway",
+                                        "identity-provider",
+                                        "application-service",
+                                        "cache",
+                                        "primary-database",
+                                        "job-queue",
+                                        "worker",
+                                        "object-storage",
+                                        "telemetry"
                                 ]
                         },
-                        "client": {
-                                "label": "Client Side",
+                        "request-path": {
+                                "label": "Request path",
                                 "focus": [
-                                        "name-needed",
-                                        "resolver-api",
-                                        "local-policy",
-                                        "stub-query",
-                                        "client-cache",
-                                        "connect-endpoint"
+                                        "web-client",
+                                        "api-gateway",
+                                        "identity-provider",
+                                        "application-service",
+                                        "cache",
+                                        "primary-database",
+                                        "telemetry"
                                 ]
                         },
-                        "authority": {
-                                "label": "Authority Walk",
+                        "async-path": {
+                                "label": "Async path",
                                 "focus": [
-                                        "recursive-cache",
-                                        "root-referral",
-                                        "tld-referral",
-                                        "authoritative-answer",
-                                        "cname-chain",
-                                        "answer-package"
+                                        "application-service",
+                                        "job-queue",
+                                        "worker",
+                                        "primary-database",
+                                        "object-storage",
+                                        "telemetry"
                                 ]
                         },
-                        "debugging": {
-                                "label": "Debugging",
+                        "operations": {
+                                "label": "Operations",
                                 "focus": [
-                                        "local-policy",
-                                        "stub-query",
-                                        "transport-retry",
-                                        "recursive-cache",
-                                        "authoritative-answer",
-                                        "dnssec-validation",
-                                        "negative-cache",
-                                        "client-cache",
-                                        "debugging-dns"
+                                        "api-gateway",
+                                        "application-service",
+                                        "job-queue",
+                                        "worker",
+                                        "telemetry"
                                 ]
                         }
-                },
-                "layout": {
-                        "orientation": "vertical",
-                        "reading_path": "top-to-bottom DNS lookup flow from application request to endpoint connection"
-                },
-                "edgeHandles": {
-                        "name-needed->resolver-api": [
-                                "out-bottom",
-                                "in-top"
-                        ],
-                        "resolver-api->local-policy": [
-                                "out-right",
-                                "in-left"
-                        ],
-                        "local-policy->stub-query": [
-                                "out-bottom",
-                                "in-top"
-                        ],
-                        "stub-query->transport-retry": [
-                                "out-right",
-                                "in-left"
-                        ],
-                        "transport-retry->recursive-cache": [
-                                "out-bottom",
-                                "in-top"
-                        ],
-                        "recursive-cache->root-referral": [
-                                "out-right",
-                                "in-left"
-                        ],
-                        "root-referral->tld-referral": [
-                                "out-bottom",
-                                "in-top"
-                        ],
-                        "tld-referral->authoritative-answer": [
-                                "out-bottom",
-                                "in-top"
-                        ],
-                        "authoritative-answer->cname-chain": [
-                                "out-left",
-                                "in-right"
-                        ],
-                        "cname-chain->authoritative-answer": [
-                                "out-right",
-                                "in-left"
-                        ],
-                        "authoritative-answer->dnssec-validation": [
-                                "out-left",
-                                "in-right"
-                        ],
-                        "dnssec-validation->answer-package": [
-                                "out-bottom",
-                                "in-top"
-                        ],
-                        "authoritative-answer->answer-package": [
-                                "out-left",
-                                "in-right"
-                        ],
-                        "answer-package->negative-cache": [
-                                "out-left",
-                                "in-right"
-                        ],
-                        "answer-package->client-cache": [
-                                "out-left",
-                                "in-right"
-                        ],
-                        "negative-cache->client-cache": [
-                                "out-bottom",
-                                "in-top"
-                        ],
-                        "client-cache->connect-endpoint": [
-                                "out-left",
-                                "in-right"
-                        ],
-                        "connect-endpoint->debugging-dns": [
-                                "out-right",
-                                "in-left"
-                        ],
-                        "transport-retry->debugging-dns": [
-                                "out-right",
-                                "in-left"
-                        ]
                 }
         },
         "groupDetails": {
                 "overview": {
-                        "title": "How DNS Works",
-                        "purpose": "A deep visual map of name resolution from application request to network connection.",
-                        "domain": "delivery",
-                        "summary": "DNS resolution starts with an application asking a local resolver for a name, passes through local policy and recursive caching, walks DNS delegation from root to TLD to authoritative servers when needed, validates and packages the answer, then returns records that the application uses to connect.",
-                        "why": "DNS is familiar but layered; this example shows how visual architecture docs make protocol boundaries, caches, and failure modes visible.",
-                        "points": [
-                                "Local policy and cache may answer before public DNS is involved.",
-                                "Recursive resolvers hide iterative root-to-TLD-to-authority traversal from clients.",
-                                "TTL, CNAMEs, DNSSEC, negative caching, and transport retries explain many surprising behaviors."
-                        ],
-                        "focus": [
-                                "name-needed",
-                                "resolver-api",
-                                "local-policy",
-                                "stub-query",
-                                "transport-retry",
-                                "recursive-cache",
-                                "root-referral",
-                                "tld-referral",
-                                "authoritative-answer",
-                                "cname-chain",
-                                "dnssec-validation",
-                                "answer-package",
-                                "negative-cache",
-                                "client-cache",
-                                "connect-endpoint",
-                                "debugging-dns"
-                        ]
+                        "title": "Service Topology Overview",
+                        "summary": "A non-swimlane service map showing clients, public edge, domain service, stateful dependencies, async workers, artifact storage, identity, and observability."
                 },
-                "client": {
-                        "title": "Client-Side Resolution",
-                        "purpose": "Show what happens before a recursive resolver walks the public DNS hierarchy.",
-                        "domain": "runtime",
-                        "summary": "Applications usually call an OS or runtime resolver, which applies local policy, host overrides, search suffixes, cache state, and recursive resolver configuration.",
-                        "why": "Many DNS surprises are local: the public authoritative record can be correct while one client still sees a different answer.",
-                        "points": [
-                                "Hosts files and split DNS can override public records.",
-                                "Language and container resolver behavior may differ from host tools.",
-                                "Local cache and connection pools can outlive record changes."
-                        ],
-                        "focus": [
-                                "name-needed",
-                                "resolver-api",
-                                "local-policy",
-                                "stub-query",
-                                "client-cache",
-                                "connect-endpoint"
-                        ]
+                "request-path": {
+                        "title": "Request Path",
+                        "summary": "The synchronous path starts at the web client, crosses the API edge, validates identity context, and reaches the service with cache and database dependencies."
                 },
-                "authority": {
-                        "title": "Authority Walk",
-                        "purpose": "Trace the recursive resolver's path to the source of truth.",
-                        "domain": "delivery",
-                        "summary": "On a cache miss, the recursive resolver follows delegation from root to TLD to authoritative zone, resolving aliases and collecting records with TTL metadata.",
-                        "why": "The hierarchy explains both DNS scalability and where domain configuration errors enter the flow.",
-                        "points": [
-                                "Root servers delegate to TLDs.",
-                                "TLDs delegate registered domains to authoritative name servers.",
-                                "Authoritative zones return records, aliases, or negative answers."
-                        ],
-                        "focus": [
-                                "recursive-cache",
-                                "root-referral",
-                                "tld-referral",
-                                "authoritative-answer",
-                                "cname-chain",
-                                "answer-package"
-                        ]
+                "async-path": {
+                        "title": "Async Path",
+                        "summary": "The asynchronous path moves non-blocking work through a queue to workers that update durable state and object artifacts."
                 },
-                "debugging": {
-                        "title": "Debugging DNS",
-                        "purpose": "Identify whether failure belongs to local policy, cache, transport, authority, validation, or the application connection.",
-                        "domain": "signal",
-                        "summary": "DNS debugging works best when each lookup is tied to the resolver used, cache state, TTLs, authority data, validation status, and the post-DNS connection attempt.",
-                        "why": "A correct DNS answer can still lead to a failed service connection, while an incorrect client answer may come from a cache or split-DNS rule.",
-                        "points": [
-                                "Compare OS resolver behavior with direct DNS queries.",
-                                "Check CNAME chains, TTLs, negative caches, and DNSSEC validation.",
-                                "Separate DNS resolution success from TCP, TLS, and application-layer success."
-                        ],
-                        "focus": [
-                                "local-policy",
-                                "stub-query",
-                                "transport-retry",
-                                "recursive-cache",
-                                "authoritative-answer",
-                                "dnssec-validation",
-                                "negative-cache",
-                                "client-cache",
-                                "debugging-dns"
-                        ]
+                "operations": {
+                        "title": "Operations View",
+                        "summary": "Operational signals from the edge, service, queue, and worker converge in telemetry for debugging and incident response."
                 }
         }
 };

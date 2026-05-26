@@ -25,9 +25,9 @@ Required top-level fields:
 
 `owners`: map of owner key to `{ "label": "...", "description": "..." }`. Use functional ownership if people/teams are unknown, such as `runtime`, `build`, `storage`, `external`.
 
-`board.layout`: optional board metadata. Prefer `{ "orientation": "vertical", "design_basis": "swimlane-process-flow" }` for a modern process/sequence reading path across tall responsibility lanes unless the project or user asks for another shape.
+`board.layout`: optional board metadata, such as `{ "orientation": "left-to-right", "design_basis": "service-topology" }` or `{ "orientation": "vertical", "design_basis": "process-flow" }`. Choose the orientation and design basis from the user prompt, repo evidence, and reader task.
 
-`lanes`: large background columns/rows. Each lane needs `{ "id", "title", "domain", "position", "width", "height" }`. For process systems, lanes are responsibility regions, not rigid grid constraints. Stagger nodes inside lanes when strict alignment makes the flow harder to follow.
+`lanes`: optional large background columns/rows. Each lane needs `{ "id", "title", "domain", "position", "width", "height" }`. Use lanes when responsibility, lifecycle, geography, or ownership regions clarify the map. Omit lanes for topology, hierarchy, matrix, or compact dependency maps where columns would add visual noise.
 
 `nodes`: primary architecture elements. Each node needs:
 
@@ -99,9 +99,10 @@ Every node and important claim must use one of:
 - Every node should have at least one source reference.
 - Every node should have `details.source_confidence`.
 - Every important edge should name the contract, not just "uses".
-- Every polished output should set edge handles for nontrivial layouts; do not leave React Flow to guess connector placement when edges would cross or wander.
-- Use coordinates that create a top-to-bottom reading path by default. Use left-to-right only when that better matches the user's goal or the system's shape.
-- Use vertical swimlanes for process flows that cross responsibilities. Lanes must orient the reader without turning the board into a spreadsheet.
+- Every polished output should set edge handles or equivalent routing metadata for nontrivial layouts; do not leave the renderer to guess connector placement when edges would cross or wander.
+- Use coordinates that create the clearest reading path for the target system. Top-to-bottom, left-to-right, clustered topology, lifecycle bands, matrix, and radial arrangements are all acceptable when they match the reader task.
+- Use swimlanes for process flows that cross responsibilities only when they orient the reader without turning the board into a spreadsheet.
+- Choose domain colors and labels for the target project. Do not reuse example palettes or labels unless they match the generated model.
 - Keep overview nodes and edges sparse enough that the main flow can be traced without opening the drawer. Move supporting mechanics into focus views, hidden detail nodes, or the detail drawer.
 - Hidden/detail nodes should never be required to understand the overview.
 - Keep external systems as nodes when they affect architecture.

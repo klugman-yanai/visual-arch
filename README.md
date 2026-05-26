@@ -1,122 +1,92 @@
-# visual-arch
+# map-it
 
-Create polished, interactive visual architecture documents for codebases, systems,
-services, pipelines, and technical products.
+Create interactive architecture maps for codebases, systems, services,
+workflows, protocols, and technical products.
 
-`visual-arch` helps Codex and Claude turn a repo or system description into a
-source-backed standalone HTML architecture map. The output is not a static
-Mermaid diagram: it is a navigable React Flow document with lanes, focused
-views, clickable nodes, detail panels, edge labels, source references, confidence
-labels, and validation scripts.
-
-Use it when you want a maintainer-friendly architecture map for onboarding,
-review, incident orientation, system explanation, or technical planning.
+`map-it` turns a repo or system description into an evidence-labeled portable
+HTML map with focused views, clickable nodes, detail panels, edge labels, source
+references, and confidence labels.
 
 ## Install
 
-Run the interactive installer and choose your agent/harness:
+```bash
+npx skills add klugman-yanai/map-it
+```
 
-    npx skills add klugman-yanai/visual-arch
+Target specific agents if needed:
 
-For a targeted non-interactive install:
-
-    npx skills add klugman-yanai/visual-arch --skill visual-arch -a codex -a claude-code
+```bash
+npx skills add klugman-yanai/map-it --skill map-it -a codex -a claude-code
+```
 
 ## Use
 
-    First explore the project, then use $visual-arch to create an interactive visual architecture document for this project.
+```text
+Use $map-it to map this repo for a new maintainer.
+```
 
-You can also point it at a specific system, service, workflow, or question:
+```text
+Use $map-it to explain how the authentication flow works.
+```
 
-    Use $visual-arch to explain how the authentication flow works.
-
-    Use $visual-arch to create a visual architecture doc for the build and release pipeline.
-
-    Use $visual-arch to map this repo for a new maintainer.
+```text
+Use $map-it to create an architecture map for the build and release pipeline.
+```
 
 ## What It Creates
 
-- A standalone `visual-architecture.html` file you can open in a browser.
-- A research-backed swimlane/process-flow architecture graph with deliberate edge routing.
-- Clickable nodes with summaries, inputs, outputs, failure modes, and "why this exists" notes.
-- Focus modes for runtime, data flow, debugging, deployment, or other relevant slices.
-- Source references and source-confidence labels so inferred claims stay visible.
-- Local structural validation and optional browser render checks.
+- A portable `visual-architecture.html` file.
+- Context-sensitive architecture structure: topology, flow, lifecycle, ownership, dependency map, or another fit.
+- Focus views and clickable nodes with summaries, inputs, outputs, failure modes, and "why this exists" notes.
+- Source references and confidence labels: `source-backed`, `inferred`, `external`, or `unknown`.
+- Local validation scripts, optional render checks, and an evidence-audit checklist.
 
-The default design follows the same pattern used by BPMN-style swimlanes and
-interactive visualization practice: overview first, focused views next, details
-on node selection, and semantic colors/icons that support the flow rather than
-drive the layout. The source-backed checklist lives in
-`skills/visual-arch/references/design-principles.md`.
+## Modes
 
-## Design Benchmark
+- **Online**: CDN-backed HTML with React and XYFlow for richer graph interaction.
+- **Offline**: pure HTML/CSS/JS with no CDN, bundled runtime libraries, or downloaded packages.
+- **Integrated**: uses an existing docs/app stack when the project calls for it.
 
-This skill is based on the evolving production document at
-`kardome-bmt-suite/docs/visual-architecture.html`. When maintaining this repo,
-compare the template and example against that document's current design
-language: grouped lanes, clean tracks, deliberate edge handles, polished detail
-panels, and a first viewport that feels like a usable architecture tool rather
-than a generic diagram.
+Trust levels:
 
-Keep the public skill project-agnostic. Do not copy Kardome-specific names into
-the skill description or example model unless they are only mentioned here as
-maintainer context.
+- **Draft**: structural validation and stated assumptions.
+- **Reviewable**: validation, render/browser check when available, and representative evidence audit.
+- **Shareable**: validation, render/browser check, and audit of every `source-backed` node.
+
+Agents using this skill must ask before downloading, installing, or prompting the
+user to install dependencies such as Playwright, browser binaries, npm packages,
+runtime libraries, or vendored assets.
 
 ## Examples
 
-The repo includes two deeper example documents that show the intended shape and
-level of detail:
-
-- `examples/keyboard-interrupt/visual-architecture.html` - what happens when a
-  keyboard interrupt occurs, from Ctrl+C through terminal handling, SIGINT,
-  runtime interruption, cleanup, shell status, and debugging.
-- `examples/dns/visual-architecture.html` - how DNS works, from application
-  lookup through local resolver policy, recursive resolution, authority
-  traversal, DNSSEC, TTLs, caching, endpoint connection, and debugging.
-
-Regenerate all examples with:
-
-    python scripts/build_example.py
-
-Validate generated documents with:
-
-    python skills/visual-arch/scripts/validate_architecture_doc.py examples/dns/visual-architecture.html
-
-## When To Use It
-
-Use this skill for:
-
-- Architecture maps for unfamiliar repos.
-- Runtime flow explanations.
-- Service, pipeline, or protocol walkthroughs.
-- Debugging-oriented system maps.
-- Source-backed onboarding docs.
-- Interactive alternatives to large static diagrams.
-
-It is especially useful when the important knowledge is spread across code,
-configuration, tests, docs, workflows, and operational conventions.
-
-## How It Works
-
-The skill guides the agent through a structured architecture pass:
-
-1. Identify the target, audience, and output path.
-2. Inspect source files, docs, tests, workflows, and configuration.
-3. Build a content model with domains, owners, nodes, edges, views, details, and source confidence.
-4. Render that model into the bundled standalone React Flow HTML template.
-5. Validate the generated document and optionally run browser render checks.
-
-The default output path is `docs/visual-architecture.html` when a `docs/`
-directory exists, otherwise `visual-architecture.html`.
-
-## Trust And Runtime Notes
-
-- The skill itself does not send project code anywhere.
-- Agents using the skill inspect local project files to build the document.
-- The bundled HTML template loads React, React DOM, and XYFlow from public CDNs.
-- The validator scripts run locally.
-- Generated documents should be reviewed before publishing when they include private paths, internal system names, or inferred architecture claims.
+- `examples/keyboard-interrupt/visual-architecture.html` - pure offline map of Ctrl+C through terminal handling, signal delivery, runtime interruption, cleanup, and debugging.
+- `examples/dns/visual-architecture.html` - online protocol map of DNS lookup, recursive resolution, authority traversal, DNSSEC, TTLs, caching, connection, and debugging.
+- `examples/service-topology/visual-architecture.html` - online non-swimlane service topology with clients, API edge, service core, storage, async workers, external identity, and telemetry.
 
 ## Development
+
+Regenerate examples:
+
+```bash
+python scripts/build_example.py
+```
+
+Run release checks:
+
+```bash
+python scripts/release_check.py
+```
+
+Run individual validation:
+
+```bash
+python skills/map-it/scripts/validate_architecture_doc.py examples/dns/visual-architecture.html --source-root examples/dns
+```
+
+Generate an evidence-audit checklist:
+
+```bash
+python skills/map-it/scripts/audit_claims.py examples/dns/visual-architecture.html --source-root examples/dns --output /tmp/dns-evidence-audit.md
+```
 
 Maintainer notes live in `docs/maintainer-notes.md`.

@@ -4,7 +4,7 @@ Load this when choosing layout, interaction, or visual hierarchy for a generated
 
 ## Source-Backed Direction
 
-- **Use swimlanes for process flows across responsibilities.** BPMN uses pools and lanes to organize process participants and responsibilities; IBM's BPMN guidance frames swimlanes as the way to show who does what in a process. Default architecture flow maps should therefore read as a process flow through responsibility lanes, not as a freeform narrative map.
+- **Use swimlanes only when the project is a process flow across responsibilities.** BPMN uses pools and lanes to organize process participants and responsibilities, and IBM's BPMN guidance frames swimlanes as a way to show who does what in a process. For architecture documents, choose the map structure from the reader's task and the repository evidence: topology, lifecycle, ownership, dependency, capability, journey, and process-flow maps are all valid.
 - **Use overview, focus/filter, details on demand.** Shneiderman's visual-information mantra is still the right interaction model for complex diagrams: overview first, then filtering/zooming, then detail when requested. The default view should not expose every supporting node or edge.
 - **Make relationships and contracts explicit.** Microsoft Azure architecture diagram guidance emphasizes diagrams as a way to communicate components, relationships, and design decisions. Edge labels should name contracts such as API, artifact, event, queue, file, status, handoff, or storage path.
 - **Use color as semantic support, not layout.** IBM data visualization guidance treats color as a way to encode meaning and aid comparison, not as decoration. Domains/colors should help readers scan after the structure is already clear.
@@ -14,26 +14,27 @@ Load this when choosing layout, interaction, or visual hierarchy for a generated
 
 ## Design Defaults
 
-- Default layout: vertical swimlane process flow with a top-to-bottom reading path.
-- Lanes are broad responsibility regions, not a rigid grid. Stagger nodes inside a lane and allow limited cross-lane or lower-band nodes when that makes the story clearer.
-- First viewport: title, view controls, primary flow, and enough lane context to orient the reader. Avoid splash/landing pages.
+- Default layout: the clearest architecture map for the target project, with a stable reading path and explicit grouping only where it clarifies comprehension.
+- Lanes are optional broad responsibility regions, not a rigid grid. Use them only when columns clarify ownership, lifecycle stage, or handoff; otherwise use clustering, topology, hierarchy, timeline, or focus-filtered graph structure.
+- First viewport: title, view controls, primary map, and enough grouping context to orient the reader. Avoid splash/landing pages.
 - Overview view: primary happy path plus a small number of essential branches. Target 8-18 primary nodes; hide or dim supporting mechanics until focus/selection/details.
 - Focus views: same coordinates, filtered/highlighted subsets. Do not re-layout the system when switching views.
 - Details: use the drawer for explanation, sources, failures, and "why this exists"; use optional hidden/detail nodes only when they clarify selected context.
 - Edges: solid high-contrast control flow; quieter dashed artifact/data/dependency flow; distinct signal/reporting/status flow. Labels should be short and contract-specific.
 - Legend: compact and outside the main reading path. Remove it if labels and details already explain the notation.
 - Icons: secondary orientation aids. Do not make icon zones or domain color bands the primary navigation system.
+- Controls: each visible control should do one distinct thing. Remove duplicate viewport/actions such as separate "fit all" and "reset view" buttons when they lead to the same state.
 
-## When Not To Use Swimlanes
+## When To Use Another Structure
 
-Use another layout only when the reader's core task is not process comprehension:
+Use a non-swimlane layout when the reader's core task is not process comprehension:
 
 - topology or dependency graph: force-directed or clustered graph may be better.
 - ownership matrix or capability comparison: matrix/table may be better.
 - hierarchy/package tree: tree or nested containment may be better.
 - timeline-only story: timeline may be better.
 
-If choosing a non-swimlane layout, write the reason into the working summary and keep overview/focus/details interactions.
+Write the chosen structure and its reason into the working summary, and keep overview/focus/details interactions.
 
 ## Layout Review Checklist
 

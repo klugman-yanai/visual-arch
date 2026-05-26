@@ -3,94 +3,103 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Visual Architecture</title>
+    <title>Architecture Map</title>
     <link rel="stylesheet" href="https://unpkg.com/@xyflow/react@12.10.2/dist/style.css" />
     <style>
       :root {
-        color-scheme: light;
-        --canvas: #f7f6f2;
-        --canvas-strong: #ece9df;
-        --surface: #fffefa;
-        --surface-2: #f2f0e8;
-        --ink: #171717;
-        --muted: #65625c;
-        --quiet: #918d84;
-        --line: #d8d4c8;
-        --grid: rgba(93, 88, 76, 0.09);
-        --swim-line: rgba(93, 88, 76, 0.16);
-        --shadow: 0 22px 60px rgba(34, 31, 24, 0.13);
-        --github: #5c5fb8;
-        --package: #2f6f91;
-        --runtime: #0f8b72;
-        --storage: #b77b1b;
-        --signal: #bf3b5f;
-        --decision: #7a5a25;
-        --infra: #59636f;
-        --panel-bg: rgba(255, 254, 250, 0.9);
-        --panel-border: rgba(78, 74, 65, 0.16);
-        --button-hover-bg: rgba(23, 23, 23, 0.04);
-        --button-active-bg: #171717;
-        --button-active-fg: #fffefa;
-        --card-bg: #f7f4ed;
-        --chip-bg: #f6f3eb;
+        color-scheme: dark;
+        --canvas: #1a1d28;
+        --canvas-strong: #202434;
+        --surface: #252a39;
+        --surface-2: #2d3344;
+        --ink: #ecf2f8;
+        --muted: #9aa7b8;
+        --quiet: #79869a;
+        --line: #3c4558;
+        --grid: rgba(160, 174, 194, 0.13);
+        --swim-line: rgba(160, 174, 194, 0.18);
+        --shadow: 0 18px 40px rgba(4, 9, 18, 0.34);
+        --github: #9b8cff;
+        --package: #72b7dc;
+        --runtime: #59d2b4;
+        --storage: #e0bb63;
+        --signal: #ef8eac;
+        --decision: #cfaa70;
+        --infra: #a9b3c2;
+        --panel-bg: rgba(37, 42, 57, 0.82);
+        --panel-border: rgba(160, 174, 194, 0.22);
+        --button-hover-bg: rgba(236, 242, 248, 0.08);
+        --button-active-bg: #ecf2f8;
+        --button-active-fg: #171a24;
+        --card-bg: rgba(45, 51, 68, 0.86);
+        --chip-bg: rgba(45, 51, 68, 0.94);
+        --map-accent-a: rgba(155, 140, 255, 0.12);
+        --map-accent-b: rgba(89, 210, 180, 0.1);
+        --map-accent-c: rgba(224, 187, 99, 0.08);
       }
 
       :root[data-theme="dark"] {
         color-scheme: dark;
-        --canvas: #24231f;
-        --canvas-strong: #302e29;
-        --surface: #302f2a;
-        --surface-2: #3a3832;
-        --ink: #f3eee4;
-        --muted: #c8c0b1;
-        --quiet: #a89f91;
-        --line: #565247;
-        --grid: rgba(228, 220, 205, 0.08);
-        --swim-line: rgba(228, 220, 205, 0.13);
-        --shadow: 0 22px 64px rgba(0, 0, 0, 0.32);
-        --github: #9a8dff;
-        --package: #63a8ca;
-        --runtime: #4cc7aa;
-        --storage: #e1b85a;
-        --signal: #f08aa3;
-        --decision: #d0aa70;
-        --infra: #a8b0b8;
-        --panel-bg: rgba(48, 47, 42, 0.9);
-        --panel-border: rgba(243, 238, 228, 0.13);
-        --button-hover-bg: rgba(243, 238, 228, 0.07);
-        --button-active-bg: #f3eee4;
-        --button-active-fg: #24231f;
-        --card-bg: #38362f;
-        --chip-bg: #38362f;
+        --canvas: #1a1d28;
+        --canvas-strong: #202434;
+        --surface: #252a39;
+        --surface-2: #2d3344;
+        --ink: #ecf2f8;
+        --muted: #9aa7b8;
+        --quiet: #79869a;
+        --line: #3c4558;
+        --grid: rgba(160, 174, 194, 0.13);
+        --swim-line: rgba(160, 174, 194, 0.18);
+        --shadow: 0 18px 40px rgba(4, 9, 18, 0.34);
+        --github: #9b8cff;
+        --package: #72b7dc;
+        --runtime: #59d2b4;
+        --storage: #e0bb63;
+        --signal: #ef8eac;
+        --decision: #cfaa70;
+        --infra: #a9b3c2;
+        --panel-bg: rgba(37, 42, 57, 0.82);
+        --panel-border: rgba(160, 174, 194, 0.22);
+        --button-hover-bg: rgba(236, 242, 248, 0.08);
+        --button-active-bg: #ecf2f8;
+        --button-active-fg: #171a24;
+        --card-bg: rgba(45, 51, 68, 0.86);
+        --chip-bg: rgba(45, 51, 68, 0.94);
+        --map-accent-a: rgba(155, 140, 255, 0.12);
+        --map-accent-b: rgba(89, 210, 180, 0.1);
+        --map-accent-c: rgba(224, 187, 99, 0.08);
       }
 
       :root[data-theme="light"] {
         color-scheme: light;
-        --canvas: #f7f6f2;
-        --canvas-strong: #ece9df;
-        --surface: #fffefa;
-        --surface-2: #f2f0e8;
-        --ink: #171717;
-        --muted: #65625c;
-        --quiet: #918d84;
-        --line: #d8d4c8;
-        --grid: rgba(93, 88, 76, 0.09);
-        --swim-line: rgba(93, 88, 76, 0.16);
-        --shadow: 0 22px 60px rgba(34, 31, 24, 0.13);
-        --github: #5c5fb8;
-        --package: #2f6f91;
-        --runtime: #0f8b72;
-        --storage: #b77b1b;
-        --signal: #bf3b5f;
-        --decision: #7a5a25;
-        --infra: #59636f;
-        --panel-bg: rgba(255, 254, 250, 0.9);
-        --panel-border: rgba(78, 74, 65, 0.16);
-        --button-hover-bg: rgba(23, 23, 23, 0.04);
-        --button-active-bg: #171717;
-        --button-active-fg: #fffefa;
-        --card-bg: #f7f4ed;
-        --chip-bg: #f6f3eb;
+        --canvas: #e9e3d6;
+        --canvas-strong: #ded6c6;
+        --surface: #fbfaf5;
+        --surface-2: #f1eadc;
+        --ink: #1a1d28;
+        --muted: #5a6170;
+        --quiet: #7a8171;
+        --line: #ccc2ad;
+        --grid: rgba(78, 86, 103, 0.12);
+        --swim-line: rgba(78, 86, 103, 0.16);
+        --shadow: 0 18px 40px rgba(32, 28, 20, 0.12);
+        --github: #6152b9;
+        --package: #276b86;
+        --runtime: #257966;
+        --storage: #8c641e;
+        --signal: #a44164;
+        --decision: #7d642a;
+        --infra: #59636e;
+        --panel-bg: rgba(251, 250, 245, 0.88);
+        --panel-border: rgba(76, 68, 54, 0.18);
+        --button-hover-bg: rgba(26, 29, 40, 0.05);
+        --button-active-bg: #1a1d28;
+        --button-active-fg: #fbfaf5;
+        --card-bg: rgba(241, 234, 220, 0.78);
+        --chip-bg: rgba(241, 234, 220, 0.9);
+        --map-accent-a: rgba(97, 82, 185, 0.13);
+        --map-accent-b: rgba(37, 121, 102, 0.11);
+        --map-accent-c: rgba(140, 100, 30, 0.09);
       }
 
       * {
@@ -160,23 +169,73 @@
         position: relative;
         width: 100vw;
         height: 100vh;
-        background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 72%, var(--canvas)) 0%, var(--canvas) 100%);
+        display: flex;
+        flex-direction: column;
+        background:
+          radial-gradient(ellipse 42rem 28rem at 8% 6%, var(--map-accent-a), transparent 70%),
+          radial-gradient(ellipse 36rem 24rem at 92% 8%, var(--map-accent-b), transparent 68%),
+          radial-gradient(ellipse 28rem 20rem at 72% 88%, var(--map-accent-c), transparent 65%),
+          linear-gradient(180deg, var(--canvas) 0%, var(--canvas-strong) 48%, var(--canvas) 100%);
       }
 
       .topbar {
-        position: absolute;
-        inset: 14px 14px auto 14px;
+        position: relative;
         z-index: 20;
         display: grid;
-        grid-template-columns: minmax(220px, 0.9fr) minmax(360px, 1.5fr) auto;
+        grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
         gap: 12px;
         align-items: center;
-        border: 1px solid var(--panel-border);
-        border-radius: 8px;
-        background: var(--panel-bg);
-        box-shadow: 0 14px 34px rgba(34, 31, 24, 0.1);
-        padding: 10px 12px;
-        backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--panel-border);
+        background: color-mix(in srgb, var(--surface) 92%, transparent);
+        padding: 12px 16px;
+        backdrop-filter: blur(16px);
+      }
+
+      .focusbar {
+        position: relative;
+        z-index: 18;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        border-bottom: 1px solid var(--panel-border);
+        background: color-mix(in srgb, var(--surface) 78%, transparent);
+        padding: 12px 16px;
+        backdrop-filter: blur(12px);
+      }
+
+      .focus-copy {
+        min-width: 0;
+        max-width: 760px;
+      }
+
+      .focus-kicker {
+        margin: 0;
+        color: var(--runtime);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .focus-title {
+        margin: 2px 0 0;
+        color: var(--ink);
+        font-size: 0.95rem;
+        font-weight: 750;
+        letter-spacing: -0.01em;
+      }
+
+      .focus-summary {
+        margin: 4px 0 0;
+        color: var(--muted);
+        display: -webkit-box;
+        max-width: 72ch;
+        overflow: hidden;
+        font-size: 0.78rem;
+        line-height: 1.45;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
       }
 
       .brand {
@@ -206,58 +265,63 @@
 
       .toolbar-cluster {
         min-width: 0;
+        justify-self: center;
       }
 
       .toolbar-label {
-        color: var(--quiet);
-        display: block;
-        margin-bottom: 4px;
-        font-size: 0.64rem;
-        font-weight: 950;
-        letter-spacing: 0.13em;
-        text-transform: uppercase;
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
       }
 
       .mode-tabs,
       .view-actions {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         min-width: 0;
       }
 
       .mode-tabs {
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--canvas) 62%, transparent);
+        padding: 4px;
         flex-wrap: wrap;
       }
 
       .toolbar-button {
         border: 1px solid transparent;
-        border-radius: 6px;
+        border-radius: 8px;
         background: transparent;
         color: var(--ink);
         cursor: pointer;
-        min-height: 34px;
-        padding: 7px 10px;
-        font-size: 0.82rem;
+        min-height: 32px;
+        padding: 6px 11px;
+        font-size: 0.78rem;
         font-weight: 800;
         white-space: nowrap;
       }
 
       .toolbar-button:hover {
-        border-color: rgba(23, 23, 23, 0.14);
+        border-color: color-mix(in srgb, var(--ink) 12%, transparent);
         background: var(--button-hover-bg);
       }
 
       .toolbar-button.is-active {
-        border-color: rgba(23, 23, 23, 0.2);
+        border-color: color-mix(in srgb, var(--ink) 14%, transparent);
         background: var(--button-active-bg);
         color: var(--button-active-fg);
+        box-shadow: 0 1px 2px color-mix(in srgb, #000 14%, transparent);
       }
 
       .toolbar-button.is-icon {
         display: inline-grid;
         place-items: center;
-        width: 34px;
+        width: 32px;
         padding-inline: 0;
         line-height: 1;
       }
@@ -273,8 +337,14 @@
       .flow-wrap {
         position: relative;
         z-index: 4;
-        width: 100%;
-        height: 100%;
+        flex: 1 1 auto;
+        min-height: 0;
+        margin: 12px;
+        border: 1px solid var(--panel-border);
+        border-radius: 14px;
+        background: color-mix(in srgb, var(--surface) 45%, transparent);
+        box-shadow: 0 18px 40px color-mix(in srgb, #000 24%, transparent);
+        overflow: hidden;
       }
 
       .react-flow {
@@ -291,14 +361,14 @@
 
       .react-flow__controls {
         border: 1px solid var(--panel-border);
-        border-radius: 8px;
-        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.12);
+        border-radius: 10px;
+        box-shadow: 0 12px 30px color-mix(in srgb, #000 16%, transparent);
         overflow: hidden;
       }
 
       .react-flow__controls button {
-        background: color-mix(in srgb, var(--surface) 94%, transparent);
-        border-bottom-color: rgba(78, 74, 65, 0.12);
+        background: color-mix(in srgb, var(--surface) 92%, transparent);
+        border-bottom-color: color-mix(in srgb, var(--ink) 12%, transparent);
         color: var(--ink);
       }
 
@@ -313,42 +383,88 @@
       .lane-node {
         width: var(--lane-width, 300px);
         height: var(--lane-height, 2600px);
-        border-inline: 1px solid var(--swim-line);
-        border-top: 4px solid var(--accent);
+        border-radius: 14px;
         background: linear-gradient(
+            90deg,
+            transparent 0%,
+            color-mix(in srgb, var(--accent) 3%, transparent) 16%,
+            color-mix(in srgb, var(--accent) 6%, transparent) 50%,
+            color-mix(in srgb, var(--accent) 3%, transparent) 84%,
+            transparent 100%
+          ),
+          linear-gradient(
           180deg,
-          color-mix(in srgb, var(--accent) 8%, transparent) 0%,
-          color-mix(in srgb, var(--accent) 4%, transparent) 18%,
-          transparent 72%
+            color-mix(in srgb, var(--accent) 4%, transparent) 0%,
+            transparent 42%,
+            transparent 100%
         );
+        mask-image: linear-gradient(90deg, transparent 0%, black 12%, black 88%, transparent 100%);
         pointer-events: none;
       }
 
+      .lane-node::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 16px;
+        right: 16px;
+        height: 2px;
+        border-radius: 999px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--accent),
+          color-mix(in srgb, var(--accent) 24%, transparent),
+          transparent
+        );
+        opacity: 0.55;
+      }
+
+      .lane-node::after {
+        content: "";
+        position: absolute;
+        top: 64px;
+        bottom: 32px;
+        left: 50%;
+        width: 1px;
+        background: linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--accent) 14%, transparent),
+          color-mix(in srgb, var(--accent) 4%, transparent) 45%,
+          transparent 100%
+        );
+        opacity: 0.35;
+      }
+
       .lane-title {
-        padding: 14px 0 0 18px;
-        color: #37322c;
-        font-size: 0.74rem;
+        padding: 18px 16px 0;
+        color: var(--ink);
+        font-size: 0.68rem;
         font-weight: 950;
-        letter-spacing: 0.14em;
+        letter-spacing: 0.09em;
+        line-height: 1.15;
         text-transform: uppercase;
       }
 
       .lane-subtitle {
-        display: none;
+        display: block;
         max-width: 230px;
-        padding: 5px 0 0 18px;
+        padding: 5px 16px 0;
         color: var(--muted);
-        font-size: 0.82rem;
+        font-size: 0.64rem;
+        font-weight: 500;
+        line-height: 1.2;
+        opacity: 0.82;
       }
 
       .arch-node {
-        width: 220px;
-        min-height: 74px;
-        border: 1px solid color-mix(in srgb, var(--accent) 42%, #afa99d);
-        border-top: 5px solid var(--accent);
-        border-radius: 8px;
-        background: color-mix(in srgb, var(--soft) 38%, #fffefa);
-        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.1);
+        width: 320px;
+        min-height: 96px;
+        border: 1px solid color-mix(in srgb, var(--accent) 38%, var(--line));
+        border-left: 4px solid var(--accent);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+        box-shadow: 0 10px 28px color-mix(in srgb, #000 22%, transparent), 0 1px 0 color-mix(in srgb, #fff 4%, transparent) inset;
         color: var(--ink);
         overflow: hidden;
         transition:
@@ -362,13 +478,13 @@
       .arch-node.is-selected {
         border-color: var(--accent);
         box-shadow:
-          0 22px 52px rgba(34, 31, 24, 0.2),
-          0 0 0 4px color-mix(in srgb, var(--accent) 19%, transparent);
+          0 20px 44px color-mix(in srgb, #000 32%, transparent),
+          0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
       }
 
       .arch-node.is-related:not(.is-selected) {
         box-shadow:
-          0 16px 38px rgba(34, 31, 24, 0.13),
+          0 16px 36px color-mix(in srgb, #000 28%, transparent),
           0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
       }
 
@@ -381,12 +497,12 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
-        padding: 10px 12px 0;
+        gap: 8px;
+        padding: 9px 11px 0;
       }
 
       .node-domain {
-        color: color-mix(in srgb, var(--accent) 78%, #171717);
+        color: color-mix(in srgb, var(--accent) 82%, var(--ink));
         min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -398,35 +514,38 @@
       }
 
       .node-step {
-        display: none;
-        border-radius: 7px;
-        background: color-mix(in srgb, var(--accent) 86%, #171717);
-        color: #fffefa;
-        font-size: 0.7rem;
+        display: inline-flex;
+        align-items: center;
+        border-radius: 6px;
+        background: color-mix(in srgb, var(--accent) 18%, transparent);
+        border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+        color: color-mix(in srgb, var(--accent) 80%, var(--ink));
+        font-size: 0.64rem;
         font-weight: 900;
         letter-spacing: 0.04em;
-        padding: 4px 8px;
+        line-height: 1;
+        padding: 4px 7px;
       }
 
       .node-body {
-        padding: 8px 12px 12px;
+        padding: 7px 11px 12px;
       }
 
       .node-title {
         margin: 0;
-        font-size: 1.24rem;
-        font-weight: 950;
+        font-size: 0.98rem;
+        font-weight: 750;
         letter-spacing: -0.015em;
-        line-height: 1.12;
+        line-height: 1.18;
       }
 
       .node-start {
-        display: none;
+        display: inline-flex;
         margin-bottom: 6px;
         border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
         border-radius: 999px;
         background: color-mix(in srgb, var(--accent) 12%, transparent);
-        color: color-mix(in srgb, var(--accent) 78%, var(--ink));
+        color: color-mix(in srgb, var(--accent) 80%, var(--ink));
         padding: 2px 7px;
         font-size: 0.62rem;
         font-weight: 950;
@@ -435,11 +554,15 @@
       }
 
       .node-purpose {
-        display: none;
+        display: -webkit-box;
         margin: 6px 0 0;
-        color: #514d46;
-        font-size: 0.84rem;
-        line-height: 1.28;
+        color: var(--muted);
+        font-size: 0.72rem;
+        font-weight: 450;
+        line-height: 1.35;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
       }
 
       .node-chips {
@@ -486,14 +609,14 @@
 
       .edge-label {
         position: absolute;
-        border: 1px solid rgba(78, 74, 65, 0.13);
+        border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
         border-radius: 999px;
-        background: rgba(255, 254, 250, 0.9);
-        box-shadow: 0 8px 20px rgba(34, 31, 24, 0.09);
-        color: #4a453d;
-        font-size: 0.72rem;
+        background: color-mix(in srgb, var(--surface) 92%, transparent);
+        box-shadow: 0 4px 12px color-mix(in srgb, #000 18%, transparent);
+        color: var(--muted);
+        font-size: 0.64rem;
         font-weight: 850;
-        padding: 4px 8px;
+        padding: 3px 8px;
         pointer-events: none;
         white-space: nowrap;
       }
@@ -501,18 +624,19 @@
       .detail-drawer {
         position: absolute;
         z-index: 18;
-        top: 88px;
-        right: 14px;
-        width: min(520px, calc(100vw - 28px));
-        max-height: calc(100vh - 108px);
+        top: 76px;
+        right: 12px;
+        bottom: 12px;
+        width: min(360px, calc(100vw - 28px));
+        max-height: none;
         display: flex;
         flex-direction: column;
         border: 1px solid var(--panel-border);
-        border-radius: 8px;
-        background: color-mix(in srgb, var(--surface) 94%, transparent);
-        box-shadow: var(--shadow);
+        border-radius: 0 14px 14px 0;
+        background: color-mix(in srgb, var(--surface) 88%, transparent);
+        box-shadow: -14px 0 34px color-mix(in srgb, #000 16%, transparent);
         overflow: hidden;
-        backdrop-filter: blur(16px);
+        backdrop-filter: blur(12px);
         transition:
           opacity 160ms ease,
           transform 160ms ease,
@@ -530,13 +654,13 @@
 
       .select-hint {
         position: absolute;
-        right: 18px;
-        bottom: 118px;
+        right: 28px;
+        bottom: 28px;
         z-index: 12;
         border: 1px solid var(--panel-border);
-        border-radius: 8px;
+        border-radius: 10px;
         background: var(--panel-bg);
-        box-shadow: 0 12px 28px rgba(34, 31, 24, 0.1);
+        box-shadow: 0 12px 28px color-mix(in srgb, #000 14%, transparent);
         color: var(--muted);
         padding: 10px 12px;
         font-size: 0.86rem;
@@ -553,9 +677,9 @@
       }
 
       .drawer-head {
-        border-top: 5px solid var(--accent, var(--infra));
-        border-bottom: 1px solid rgba(78, 74, 65, 0.12);
-        padding: 17px 18px 15px;
+        border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+        padding: 18px;
+        box-shadow: inset 4px 0 0 var(--accent, var(--infra));
       }
 
       .drawer-head-top {
@@ -570,8 +694,8 @@
         place-items: center;
         width: 32px;
         height: 32px;
-        border: 1px solid rgba(78, 74, 65, 0.14);
-        border-radius: 6px;
+        border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+        border-radius: 8px;
         background: transparent;
         color: var(--muted);
         cursor: pointer;
@@ -585,7 +709,7 @@
       }
 
       .drawer-kicker {
-        color: color-mix(in srgb, var(--accent, var(--infra)) 78%, #171717);
+        color: color-mix(in srgb, var(--accent, var(--infra)) 78%, var(--ink));
         display: block;
         font-size: 0.68rem;
         font-weight: 950;
@@ -595,16 +719,17 @@
 
       .drawer-title {
         margin: 8px 0 0;
-        font-size: 1.5rem;
-        font-weight: 950;
-        letter-spacing: -0.035em;
-        line-height: 1.03;
+        font-size: 1.15rem;
+        font-weight: 850;
+        letter-spacing: -0.015em;
+        line-height: 1.12;
       }
 
       .drawer-purpose {
         margin: 9px 0 0;
-        color: #514d46;
-        font-size: 0.96rem;
+        color: var(--muted);
+        font-size: 0.88rem;
+        line-height: 1.45;
       }
 
       .drawer-body {
@@ -613,7 +738,7 @@
       }
 
       .detail-section {
-        border-bottom: 1px solid rgba(78, 74, 65, 0.12);
+        border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
         padding: 14px 0;
       }
 
@@ -653,9 +778,9 @@
       }
 
       .io-card {
-        border: 1px solid rgba(78, 74, 65, 0.12);
+        border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
         border-radius: 8px;
-        background: var(--card-bg);
+        background: color-mix(in srgb, var(--card-bg) 88%, transparent);
         padding: 12px;
       }
 
@@ -671,7 +796,7 @@
       }
 
       .source-chip {
-        border: 1px solid rgba(78, 74, 65, 0.13);
+        border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
         border-radius: 6px;
         background: var(--chip-bg);
         color: var(--ink);
@@ -688,7 +813,7 @@
       }
 
       .related-pill {
-        border: 1px solid rgba(78, 74, 65, 0.13);
+        border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
         border-radius: 999px;
         background: var(--chip-bg);
         color: var(--ink);
@@ -699,8 +824,8 @@
       }
 
       .related-pill:hover {
-        border-color: rgba(23, 23, 23, 0.24);
-        background: #fffefa;
+        border-color: color-mix(in srgb, var(--ink) 24%, transparent);
+        background: color-mix(in srgb, var(--surface) 96%, transparent);
       }
 
       .empty-detail {
@@ -718,24 +843,24 @@
       @media (prefers-color-scheme: dark) {
         :root {
           color-scheme: dark;
-          --canvas: #24231f;
-          --canvas-strong: #302e29;
-          --surface: #302f2a;
-          --surface-2: #3a3832;
-          --ink: #f3eee4;
-          --muted: #c8c0b1;
-          --quiet: #a89f91;
-          --line: #565247;
-          --grid: rgba(228, 220, 205, 0.08);
-          --swim-line: rgba(228, 220, 205, 0.13);
-          --shadow: 0 22px 64px rgba(0, 0, 0, 0.32);
-          --github: #9a8dff;
-          --package: #63a8ca;
-          --runtime: #4cc7aa;
-          --storage: #e1b85a;
-          --signal: #f08aa3;
-          --decision: #d0aa70;
-          --infra: #a8b0b8;
+          --canvas: #1a1d28;
+          --canvas-strong: #202434;
+          --surface: #252a39;
+          --surface-2: #2d3344;
+          --ink: #ecf2f8;
+          --muted: #9aa7b8;
+          --quiet: #79869a;
+          --line: #3c4558;
+          --grid: rgba(160, 174, 194, 0.13);
+          --swim-line: rgba(160, 174, 194, 0.18);
+          --shadow: 0 18px 40px rgba(4, 9, 18, 0.34);
+          --github: #9b8cff;
+          --package: #72b7dc;
+          --runtime: #59d2b4;
+          --storage: #e0bb63;
+          --signal: #ef8eac;
+          --decision: #cfaa70;
+          --infra: #a9b3c2;
         }
 
         body {
@@ -751,7 +876,7 @@
         .detail-drawer,
         .select-hint {
           border-color: rgba(243, 238, 228, 0.13);
-          background: rgba(48, 47, 42, 0.9);
+          background: var(--panel-bg);
           box-shadow: var(--shadow);
         }
 
@@ -774,7 +899,7 @@
         .toolbar-button.is-active {
           border-color: rgba(243, 238, 228, 0.3);
           background: var(--ink);
-          color: #24231f;
+          color: var(--canvas);
         }
 
         .react-flow__controls {
@@ -793,7 +918,7 @@
         }
 
         .arch-node {
-          border-color: color-mix(in srgb, var(--accent) 52%, #5f5a4f);
+          border-color: color-mix(in srgb, var(--accent) 52%, var(--line));
           background: color-mix(in srgb, var(--accent) 14%, var(--surface));
           box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
         }
@@ -811,8 +936,8 @@
         }
 
         .node-step {
-          background: color-mix(in srgb, var(--accent) 72%, #f3eee4);
-          color: #24231f;
+          background: color-mix(in srgb, var(--accent) 72%, var(--ink));
+          color: var(--canvas);
         }
 
         .node-purpose,
@@ -832,7 +957,7 @@
         .source-chip,
         .related-pill {
           border-color: rgba(243, 238, 228, 0.12);
-          background: #38362f;
+          background: var(--card-bg);
           color: var(--ink);
         }
 
@@ -849,7 +974,7 @@
         .drawer-close:hover,
         .related-pill:hover {
           border-color: rgba(243, 238, 228, 0.28);
-          background: #403e37;
+          background: var(--surface-2);
           color: var(--ink);
         }
       }
@@ -862,18 +987,20 @@
       :root[data-theme] .topbar,
       :root[data-theme] .select-hint {
         border-color: var(--panel-border);
-        background: var(--panel-bg);
-        box-shadow: var(--shadow);
+        background: color-mix(in srgb, var(--surface) 92%, transparent);
       }
 
       :root[data-theme] .detail-drawer {
         border-color: var(--panel-border);
-        background: color-mix(in srgb, var(--surface) 94%, transparent);
-        box-shadow: var(--shadow);
+        background: color-mix(in srgb, var(--surface) 88%, transparent);
       }
 
       :root[data-theme] .app-shell {
-        background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 72%, var(--canvas)) 0%, var(--canvas) 100%);
+        background:
+          radial-gradient(ellipse 42rem 28rem at 8% 6%, var(--map-accent-a), transparent 70%),
+          radial-gradient(ellipse 36rem 24rem at 92% 8%, var(--map-accent-b), transparent 68%),
+          radial-gradient(ellipse 28rem 20rem at 72% 88%, var(--map-accent-c), transparent 65%),
+          linear-gradient(180deg, var(--canvas) 0%, var(--canvas-strong) 48%, var(--canvas) 100%);
       }
 
       :root[data-theme] .toolbar-button {
@@ -938,6 +1065,12 @@
           align-items: stretch;
         }
 
+        .focusbar {
+          align-items: stretch;
+          flex-direction: column;
+          gap: 10px;
+        }
+
         .mode-tabs,
         .view-actions {
           overflow: auto;
@@ -951,6 +1084,7 @@
           left: 10px;
           width: auto;
           max-height: 52vh;
+          border-radius: 14px;
         }
 
         .select-hint {
@@ -982,7 +1116,7 @@
   <body>
     <div id="boot-fallback">
       <div class="fallback-card">
-        <h1>Visual Architecture</h1>
+        <h1>Architecture Map</h1>
         <p>This portable architecture board loads React Flow from a CDN. If you are offline or the CDN is blocked, the interactive canvas cannot start.</p><p>Replace the bundled model with source-backed architecture data from the target project.</p>
       </div>
     </div>
@@ -1066,26 +1200,6 @@
         );
       }
 
-      function Maximize2(props) {
-        return h(
-          IconSvg,
-          props,
-          h("path", { d: "M15 3h6v6" }),
-          h("path", { d: "m21 3-7 7" }),
-          h("path", { d: "M9 21H3v-6" }),
-          h("path", { d: "m3 21 7-7" })
-        );
-      }
-
-      function RotateCcw(props) {
-        return h(
-          IconSvg,
-          props,
-          h("path", { d: "M3 12a9 9 0 1 0 3-6.7" }),
-          h("path", { d: "M3 4v6h6" })
-        );
-      }
-
       function Sun(props) {
         return h(
           IconSvg,
@@ -1117,6 +1231,15 @@
       const GROUP_DETAILS = VISUAL_ARCH_DATA.groupDetails;
 
       const EDGE_HANDLES = Object.freeze(BOARD.edgeHandles || {});
+      const FALLBACK_DOMAIN = Object.freeze({
+        label: "Unknown domain",
+        accent: "#59636f",
+        soft: "#eceff2"
+      });
+      const FALLBACK_OWNER = Object.freeze({
+        label: "Unknown owner",
+        description: "No owner metadata was provided."
+      });
 
       const NODE_BY_ID = Object.fromEntries(BOARD.nodes.map(node => [node.id, node]));
       const INCOMING = new Map();
@@ -1171,8 +1294,20 @@
         decisions: { x: -250, y: 60, zoom: 0.66 }
       });
 
+      function fallbackDomain() {
+        return Object.values(DOMAINS)[0] || FALLBACK_DOMAIN;
+      }
+
+      function domainFor(domainKey) {
+        return DOMAINS[domainKey] || fallbackDomain();
+      }
+
+      function ownerFor(ownerKey) {
+        return OWNERS[ownerKey] || { ...FALLBACK_OWNER, label: ownerKey || FALLBACK_OWNER.label };
+      }
+
       function domainVars(domainKey) {
-        const domain = DOMAINS[domainKey] || DOMAINS.infra;
+        const domain = domainFor(domainKey);
         return {
           "--accent": domain.accent,
           "--soft": domain.soft
@@ -1227,9 +1362,9 @@
         return VIEW_EDGE_IDS[mode] || MAIN_EDGE_IDS;
       }
 
-      const NODE_SIZE = { width: 220, height: 100 };
+      const NODE_SIZE = { width: 320, height: 112 };
       const PANEL_RESERVE = 560;
-      const TOPBAR_RESERVE = 96;
+      const TOPBAR_RESERVE = 24;
 
       function boundsForIds(ids, options = {}) {
         const includeDetails = options.includeDetails ?? false;
@@ -1247,7 +1382,7 @@
         const bounds = boundsForIds(ids, options);
         const reservePanel = options.reservePanel ?? window.innerWidth >= 980;
         const availableWidth = Math.max(360, window.innerWidth - (reservePanel ? PANEL_RESERVE : 32) - 48);
-        const availableHeight = Math.max(300, window.innerHeight - TOPBAR_RESERVE - 30);
+        const availableHeight = Math.max(300, window.innerHeight - 128);
         const padding = options.padding ?? 0.28;
         const paddedWidth = Math.max(1, bounds.width * (1 + padding));
         const paddedHeight = Math.max(1, bounds.height * (1 + padding));
@@ -1300,8 +1435,8 @@
             position: node.position,
             data: {
               ...node,
-              domainLabel: DOMAINS[node.domain].label,
-              ownerLabel: OWNERS[node.owner]?.label || OWNERS.suite.label,
+              domainLabel: domainFor(node.domain).label,
+              ownerLabel: ownerFor(node.owner).label,
               starter: !INCOMING.has(node.id),
               selected: isSelected,
               related: isRelated && !isSelected,
@@ -1328,9 +1463,7 @@
           const id = `${source}->${target}`;
           const [sourceHandle, targetHandle] = EDGE_HANDLES[id] || ["out-right", "in-left"];
           const primary = MAIN_EDGE_IDS.has(id);
-          const color = selectedId
-            ? DOMAINS[NODE_BY_ID[selectedId]?.domain || "infra"].accent
-            : edgeColor(kind);
+          const color = selectedId ? domainFor(NODE_BY_ID[selectedId]?.domain).accent : edgeColor(kind);
           return {
             id,
             source,
@@ -1356,14 +1489,14 @@
       }
 
       function edgeColor(kind) {
-        if (kind === "artifact" || kind === "data") return (DOMAINS.storage || DOMAINS.data || DOMAINS.runtime).accent;
-        if (kind === "signal") return (DOMAINS.signal || DOMAINS.runtime).accent;
-        if (kind === "decision") return (DOMAINS.decision || DOMAINS.delivery || DOMAINS.runtime).accent;
-        if (kind === "dependency") return (DOMAINS.infra || DOMAINS.runtime).accent;
-        return (DOMAINS.runtime || DOMAINS.infra).accent;
+        if (kind === "artifact" || kind === "data") return (DOMAINS.storage || DOMAINS.data || fallbackDomain()).accent;
+        if (kind === "signal") return (DOMAINS.signal || fallbackDomain()).accent;
+        if (kind === "decision") return (DOMAINS.decision || DOMAINS.delivery || fallbackDomain()).accent;
+        if (kind === "dependency") return (DOMAINS.dependency || fallbackDomain()).accent;
+        return fallbackDomain().accent;
       }
 
-      function BmtNode(props) {
+      function ArchitectureNode(props) {
         const data = props.data;
         const className = [
           "arch-node",
@@ -1391,7 +1524,7 @@
           h(
             "div",
             { className: "node-head" },
-            h("span", { className: "node-domain" }, data.ownerLabel),
+            h("span", { className: "node-domain" }, data.domainLabel),
             h("span", { className: "node-step" }, data.step)
           ),
           h(
@@ -1470,12 +1603,12 @@
         );
       }
 
-      const nodeTypes = { arch: BmtNode, lane: LaneNode };
+      const nodeTypes = { arch: ArchitectureNode, lane: LaneNode };
       const edgeTypes = { contract: ContractEdge };
 
       function GroupDetailDrawer({ mode, onSelect }) {
         const group = GROUP_DETAILS[mode] || GROUP_DETAILS.overview;
-        const domain = DOMAINS[group.domain] || DOMAINS.runtime;
+        const domain = domainFor(group.domain);
         const focus = group.focus || [];
 
         return h(
@@ -1548,8 +1681,8 @@
           return mode === "overview" ? null : h(GroupDetailDrawer, { mode, onSelect });
         }
 
-        const domain = DOMAINS[node.domain];
-        const owner = OWNERS[node.owner] || OWNERS.suite;
+        const domain = domainFor(node.domain);
+        const owner = ownerFor(node.owner);
         const summary = node.details.summary || node.details.what?.[0] || node.purpose;
         const why = Array.isArray(node.details.why) ? node.details.why.join(" ") : node.details.why;
         const directRelated = directRelations(node.id);
@@ -1673,8 +1806,6 @@
         showDetails,
         theme,
         onModeChange,
-        onFitAll,
-        onResetLayout,
         onClearSelection,
         onDetailsToggle,
         onThemeToggle
@@ -1688,7 +1819,7 @@
             "div",
             { className: "brand" },
             h("span", { className: "brand-kicker" }, "Visual architecture"),
-            h("span", { className: "brand-title" }, "Project Architecture")
+            h("span", { className: "brand-title" }, GROUP_DETAILS.overview?.title || "Project Architecture")
           ),
           h(
             "div",
@@ -1715,16 +1846,6 @@
           h(
             "div",
             { className: "view-actions" },
-            h(
-              "button",
-              { type: "button", className: "toolbar-button is-icon", onClick: onFitAll, "aria-label": "Fit all", title: "Fit all" },
-              h(Maximize2, { "aria-hidden": true })
-            ),
-            h(
-              "button",
-              { type: "button", className: "toolbar-button is-icon", onClick: onResetLayout, "aria-label": "Reset view", title: "Reset view" },
-              h(RotateCcw, { "aria-hidden": true })
-            ),
             h(
               "button",
               {
@@ -1758,14 +1879,34 @@
         );
       }
 
+      function FocusBar({ mode, onResetLayout }) {
+        const group = GROUP_DETAILS[mode] || GROUP_DETAILS.overview;
+        return h(
+          "section",
+          { className: "focusbar", "aria-label": "Active architecture focus" },
+          h(
+            "div",
+            { className: "focus-copy" },
+            h("p", { className: "focus-kicker" }, "Active scenario"),
+            h("h2", { className: "focus-title" }, group.title),
+            h("p", { className: "focus-summary" }, group.summary || group.purpose)
+          ),
+          h(
+            "button",
+            { type: "button", className: "toolbar-button", onClick: onResetLayout },
+            "Reset view"
+          )
+        );
+      }
+
       function initialTheme() {
         try {
-          const saved = window.localStorage.getItem("visual-arch-theme");
+          const saved = window.localStorage.getItem("map-it-theme");
           if (saved === "light" || saved === "dark") return saved;
         } catch (_error) {
           // Ignore storage failures; the system preference is a fine fallback.
         }
-        return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        return "dark";
       }
 
       function replaceUrlHash(id) {
@@ -1841,10 +1982,6 @@
           [setViewportForIds]
         );
 
-        const fitAll = useCallback(() => {
-          focusMode("overview");
-        }, [focusMode]);
-
         const clearSelection = useCallback(() => {
           setSelectedId(null);
           replaceUrlHash(null);
@@ -1887,7 +2024,7 @@
         useEffect(() => {
           document.documentElement.dataset.theme = theme;
           try {
-            window.localStorage.setItem("visual-arch-theme", theme);
+            window.localStorage.setItem("map-it-theme", theme);
           } catch (_error) {
             // Storage is optional for a static document.
           }
@@ -1932,12 +2069,11 @@
             showDetails,
             theme,
             onModeChange: focusMode,
-            onFitAll: fitAll,
-            onResetLayout: resetLayout,
             onClearSelection: clearSelection,
             onDetailsToggle: toggleDetails,
             onThemeToggle: toggleTheme
           }),
+          h(FocusBar, { mode, onResetLayout: resetLayout }),
           h(
             "div",
             {

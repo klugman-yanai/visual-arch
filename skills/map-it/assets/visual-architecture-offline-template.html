@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Architecture Map</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #1f2433;
+        --panel: #242a3a;
+        --panel-2: #202636;
+        --line: rgba(226, 232, 240, 0.15);
+        --grid: rgba(226, 232, 240, 0.075);
+        --ink: #f3eee4;
+        --muted: #a9b2c3;
+        --quiet: #758195;
+        --accent: #62d7bd;
+        --shadow: rgba(0, 0, 0, 0.26);
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .app-shell {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto auto 1fr;
+      }
+
+      .topbar {
+        min-height: 68px;
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
+        align-items: center;
+        gap: 18px;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(36, 42, 58, 0.92);
+      }
+
+      .brand-kicker {
+        color: var(--quiet);
+        font-size: 0.66rem;
+        font-weight: 900;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+
+      .brand-title {
+        margin-top: 4px;
+        font-size: 1.05rem;
+        font-weight: 850;
+      }
+
+      .tabs {
+        display: inline-flex;
+        gap: 4px;
+        padding: 4px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #161b28;
+      }
+
+      .tab,
+      .ghost-button {
+        min-height: 34px;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+        font-size: 0.76rem;
+        font-weight: 800;
+        padding: 0 13px;
+      }
+
+      .tab.is-active,
+      .ghost-button:hover {
+        border-color: rgba(243, 238, 228, 0.18);
+        background: #f3eee4;
+        color: #171b26;
+      }
+
+      .top-actions {
+        justify-self: end;
+        display: flex;
+        gap: 8px;
+      }
+
+      .focusbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 18px;
+        align-items: center;
+        min-height: 96px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(32, 38, 54, 0.82);
+      }
+
+      .focusbar-label {
+        color: var(--accent);
+        font-size: 0.72rem;
+        font-weight: 950;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .focusbar-title {
+        margin-top: 4px;
+        font-weight: 850;
+      }
+
+      .focusbar-summary {
+        max-width: 760px;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 0.86rem;
+        line-height: 1.45;
+      }
+
+      .workspace {
+        position: relative;
+        min-height: 0;
+        overflow: hidden;
+        padding: 12px;
+      }
+
+      .map-frame {
+        position: relative;
+        height: calc(100vh - 188px);
+        min-height: 560px;
+        overflow: auto;
+        border: 1px solid rgba(226, 232, 240, 0.14);
+        border-radius: 12px;
+        background:
+          linear-gradient(var(--grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+          #202636;
+        background-size: 24px 24px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+      }
+
+      .board {
+        position: relative;
+        min-width: var(--board-width);
+        min-height: var(--board-height);
+        transform: scale(var(--zoom, 0.86));
+        transform-origin: 0 0;
+      }
+
+      .lane {
+        position: absolute;
+        border-top: 1px solid color-mix(in srgb, var(--accent) 44%, transparent);
+        background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 72%);
+        opacity: 0.78;
+        padding: 13px 12px;
+        pointer-events: none;
+      }
+
+      .lane-title {
+        color: var(--ink);
+        font-size: 0.66rem;
+        font-weight: 950;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+      }
+
+      .lane-subtitle {
+        max-width: 260px;
+        margin-top: 5px;
+        color: var(--quiet);
+        font-size: 0.62rem;
+        line-height: 1.3;
+      }
+
+      .edges {
+        position: absolute;
+        inset: 0;
+        width: var(--board-width);
+        height: var(--board-height);
+        pointer-events: none;
+      }
+
+      .edge-path {
+        fill: none;
+        stroke: var(--edge-color);
+        stroke-width: 2.2;
+        opacity: 0.78;
+      }
+
+      .edge-path.is-secondary {
+        stroke-dasharray: 8 7;
+        opacity: 0.48;
+      }
+
+      .edge-label {
+        fill: var(--muted);
+        font-size: 10px;
+        font-weight: 800;
+        paint-order: stroke;
+        stroke: #202636;
+        stroke-width: 4px;
+      }
+
+      .arch-node {
+        position: absolute;
+        width: 320px;
+        min-height: 96px;
+        border: 1px solid color-mix(in srgb, var(--accent) 52%, var(--line));
+        border-left: 4px solid var(--accent);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--accent) 14%, var(--panel));
+        box-shadow: 0 14px 32px var(--shadow);
+        color: var(--ink);
+        cursor: pointer;
+        padding: 9px 11px 12px;
+      }
+
+      .arch-node.is-dimmed {
+        filter: saturate(0.7);
+        opacity: 0.34;
+      }
+
+      .arch-node.is-selected {
+        box-shadow:
+          0 20px 44px rgba(0, 0, 0, 0.34),
+          0 0 0 3px color-mix(in srgb, var(--accent) 24%, transparent);
+      }
+
+      .node-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .node-domain {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: color-mix(in srgb, var(--accent) 80%, #f3eee4);
+        font-size: 0.62rem;
+        font-weight: 950;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .node-step {
+        border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+        border-radius: 6px;
+        background: color-mix(in srgb, var(--accent) 18%, transparent);
+        color: color-mix(in srgb, var(--accent) 82%, #f3eee4);
+        font-size: 0.64rem;
+        font-weight: 900;
+        line-height: 1;
+        padding: 4px 7px;
+      }
+
+      .node-start {
+        display: inline-flex;
+        margin-top: 8px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--accent) 18%, transparent);
+        color: color-mix(in srgb, var(--accent) 82%, #f3eee4);
+        padding: 2px 7px;
+        font-size: 0.6rem;
+        font-weight: 950;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .node-title {
+        margin: 8px 0 0;
+        font-size: 0.98rem;
+        line-height: 1.18;
+      }
+
+      .node-purpose {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 0.72rem;
+        line-height: 1.35;
+      }
+
+      .detail-drawer {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        bottom: 12px;
+        width: min(390px, calc(100vw - 36px));
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(36, 42, 58, 0.97);
+        box-shadow: -14px 0 34px rgba(0, 0, 0, 0.22);
+        transform: translateX(calc(100% + 24px));
+        transition: transform 180ms ease;
+      }
+
+      .detail-drawer.is-open {
+        transform: translateX(0);
+      }
+
+      .drawer-head {
+        border-bottom: 1px solid var(--line);
+        border-left: 4px solid var(--accent);
+        padding: 16px;
+      }
+
+      .drawer-kicker {
+        color: color-mix(in srgb, var(--accent) 80%, #f3eee4);
+        font-size: 0.66rem;
+        font-weight: 950;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .drawer-title {
+        margin: 6px 0 0;
+        font-size: 1.08rem;
+      }
+
+      .drawer-purpose {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.45;
+      }
+
+      .drawer-body {
+        display: grid;
+        gap: 12px;
+        padding: 14px 16px 18px;
+      }
+
+      .detail-section {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(31, 36, 51, 0.7);
+        padding: 12px;
+      }
+
+      .detail-section h3 {
+        margin: 0 0 8px;
+        font-size: 0.74rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .detail-section p,
+      .detail-section li {
+        color: var(--muted);
+        font-size: 0.8rem;
+        line-height: 1.45;
+      }
+
+      .detail-section p {
+        margin: 0;
+      }
+
+      .detail-section ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .sources {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .source-chip {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 0.7rem;
+        max-width: 100%;
+        overflow: hidden;
+        padding: 4px 8px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .close-drawer {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+      }
+
+      @media (max-width: 760px) {
+        .topbar {
+          grid-template-columns: 1fr;
+        }
+
+        .tabs {
+          justify-self: start;
+          max-width: 100%;
+          overflow: auto;
+        }
+
+        .top-actions {
+          justify-self: start;
+        }
+
+        .focusbar {
+          grid-template-columns: 1fr;
+        }
+
+        .map-frame {
+          height: calc(100vh - 250px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <div class="brand-kicker">Architecture Map</div>
+          <div class="brand-title">Project Architecture</div>
+        </div>
+        <nav class="tabs" aria-label="Architecture views"></nav>
+        <div class="top-actions">
+          <button class="ghost-button" type="button" data-action="zoom-out">-</button>
+          <button class="ghost-button" type="button" data-action="zoom-in">+</button>
+          <button class="ghost-button" type="button" data-action="reset">Reset</button>
+        </div>
+      </header>
+      <section class="focusbar" aria-label="Active architecture focus">
+        <div>
+          <div class="focusbar-label">Active Scenario</div>
+          <div class="focusbar-title"></div>
+          <div class="focusbar-summary"></div>
+        </div>
+        <button class="ghost-button" type="button" data-action="details">Details</button>
+      </section>
+      <main class="workspace">
+        <div class="map-frame">
+          <div class="board">
+            <svg class="edges" aria-hidden="true"></svg>
+          </div>
+        </div>
+        <aside class="detail-drawer" aria-label="Node details"></aside>
+      </main>
+    </div>
+    <script>
+      const VISUAL_ARCH_DATA = __VISUAL_ARCH_DATA__;
+      const DOMAINS = VISUAL_ARCH_DATA.domains;
+      const OWNERS = VISUAL_ARCH_DATA.owners;
+      const BOARD = VISUAL_ARCH_DATA.board;
+      const GROUP_DETAILS = VISUAL_ARCH_DATA.groupDetails;
+
+      const NODE_SIZE = { width: 320, height: 112 };
+      const state = { mode: "overview", selectedId: null, zoom: 0.86 };
+      const nodeById = Object.fromEntries(BOARD.nodes.map((node) => [node.id, node]));
+      const incoming = new Set(BOARD.edges.map((edge) => edge[1]));
+
+      const els = {
+        title: document.querySelector(".brand-title"),
+        tabs: document.querySelector(".tabs"),
+        focusTitle: document.querySelector(".focusbar-title"),
+        focusSummary: document.querySelector(".focusbar-summary"),
+        board: document.querySelector(".board"),
+        edges: document.querySelector(".edges"),
+        drawer: document.querySelector(".detail-drawer"),
+      };
+
+      function domainFor(key) {
+        return DOMAINS[key] || Object.values(DOMAINS)[0] || { label: "Domain", accent: "#62d7bd" };
+      }
+
+      function ownerFor(key) {
+        return OWNERS[key] || { label: key || "Owner" };
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[char]);
+      }
+
+      function list(items) {
+        const values = Array.isArray(items) ? items : [items].filter(Boolean);
+        if (!values.length) return "<p>Not documented.</p>";
+        return `<ul>${values.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+      }
+
+      function visibleIds() {
+        const view = BOARD.views[state.mode] || BOARD.views.overview;
+        return new Set(view.focus || BOARD.nodes.map((node) => node.id));
+      }
+
+      function relatedIds(id) {
+        if (!id) return new Set();
+        const related = new Set([id]);
+        BOARD.edges.forEach(([source, target]) => {
+          if (source === id) related.add(target);
+          if (target === id) related.add(source);
+        });
+        (nodeById[id]?.details?.related || []).forEach((relatedId) => related.add(relatedId));
+        return related;
+      }
+
+      function bounds() {
+        const xs = [];
+        const ys = [];
+        BOARD.lanes.forEach((lane) => {
+          xs.push(lane.position.x + (lane.width || 340));
+          ys.push(lane.position.y + (lane.height || 900));
+        });
+        BOARD.nodes.forEach((node) => {
+          xs.push(node.position.x + NODE_SIZE.width + 120);
+          ys.push(node.position.y + NODE_SIZE.height + 120);
+        });
+        return { width: Math.max(1200, ...xs), height: Math.max(760, ...ys) };
+      }
+
+      function pointFor(node, handle) {
+        const x = node.position.x;
+        const y = node.position.y;
+        if (handle?.includes("right")) return { x: x + NODE_SIZE.width, y: y + NODE_SIZE.height / 2 };
+        if (handle?.includes("left")) return { x, y: y + NODE_SIZE.height / 2 };
+        if (handle?.includes("top")) return { x: x + NODE_SIZE.width / 2, y };
+        return { x: x + NODE_SIZE.width / 2, y: y + NODE_SIZE.height };
+      }
+
+      function edgePath(source, target, sourceHandle, targetHandle) {
+        const a = pointFor(source, sourceHandle);
+        const b = pointFor(target, targetHandle);
+        const dx = Math.max(48, Math.abs(b.x - a.x) * 0.45);
+        const dy = Math.max(48, Math.abs(b.y - a.y) * 0.35);
+        const horizontal = sourceHandle?.includes("right") || sourceHandle?.includes("left");
+        const c1 = horizontal ? { x: a.x + (b.x >= a.x ? dx : -dx), y: a.y } : { x: a.x, y: a.y + (b.y >= a.y ? dy : -dy) };
+        const c2 = horizontal ? { x: b.x - (b.x >= a.x ? dx : -dx), y: b.y } : { x: b.x, y: b.y - (b.y >= a.y ? dy : -dy) };
+        return { d: `M ${a.x} ${a.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${b.x} ${b.y}`, label: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 - 8 } };
+      }
+
+      function setThemeVars(element, domainKey) {
+        element.style.setProperty("--accent", domainFor(domainKey).accent);
+      }
+
+      function renderTabs() {
+        els.tabs.innerHTML = Object.entries(BOARD.views).map(([key, view]) => (
+          `<button class="tab ${key === state.mode ? "is-active" : ""}" type="button" data-view="${escapeHtml(key)}">${escapeHtml(view.label)}</button>`
+        )).join("");
+      }
+
+      function renderFocus() {
+        const group = GROUP_DETAILS[state.mode] || GROUP_DETAILS.overview;
+        els.title.textContent = GROUP_DETAILS.overview?.title || "Project Architecture";
+        els.focusTitle.textContent = group.title || BOARD.views[state.mode]?.label || "Overview";
+        els.focusSummary.textContent = group.summary || "";
+      }
+
+      function renderBoard() {
+        const boardBounds = bounds();
+        els.board.style.setProperty("--board-width", `${boardBounds.width}px`);
+        els.board.style.setProperty("--board-height", `${boardBounds.height}px`);
+        els.board.style.setProperty("--zoom", state.zoom);
+        els.board.querySelectorAll(".lane,.arch-node").forEach((el) => el.remove());
+        const visible = visibleIds();
+        const related = relatedIds(state.selectedId);
+
+        BOARD.lanes.forEach((lane) => {
+          const el = document.createElement("section");
+          el.className = "lane";
+          setThemeVars(el, lane.domain);
+          el.style.left = `${lane.position.x}px`;
+          el.style.top = `${lane.position.y}px`;
+          el.style.width = `${lane.width || 340}px`;
+          el.style.height = `${lane.height || 900}px`;
+          el.innerHTML = `<div class="lane-title">${escapeHtml(lane.title)}</div><div class="lane-subtitle">${escapeHtml(lane.subtitle || "")}</div>`;
+          els.board.appendChild(el);
+        });
+
+        BOARD.nodes.forEach((node) => {
+          if (!visible.has(node.id) && !state.selectedId) return;
+          const el = document.createElement("button");
+          el.type = "button";
+          el.className = "arch-node";
+          if (state.selectedId && !related.has(node.id)) el.classList.add("is-dimmed");
+          if (state.selectedId === node.id) el.classList.add("is-selected");
+          el.dataset.id = node.id;
+          setThemeVars(el, node.domain);
+          el.style.left = `${node.position.x}px`;
+          el.style.top = `${node.position.y}px`;
+          el.innerHTML = `
+            <div class="node-head">
+              <span class="node-domain">${escapeHtml(domainFor(node.domain).label)}</span>
+              <span class="node-step">${escapeHtml(node.step || "")}</span>
+            </div>
+            ${incoming.has(node.id) ? "" : '<span class="node-start">Starts here</span>'}
+            <h2 class="node-title">${escapeHtml(node.title)}</h2>
+            <p class="node-purpose">${escapeHtml(node.purpose)}</p>
+          `;
+          el.addEventListener("click", () => selectNode(node.id));
+          els.board.appendChild(el);
+        });
+
+        renderEdges(visible);
+      }
+
+      function renderEdges(visible) {
+        const boardBounds = bounds();
+        els.edges.setAttribute("viewBox", `0 0 ${boardBounds.width} ${boardBounds.height}`);
+        els.edges.innerHTML = "";
+        BOARD.edges.forEach(([sourceId, targetId, label, kind = "control"]) => {
+          if (!visible.has(sourceId) || !visible.has(targetId)) return;
+          const source = nodeById[sourceId];
+          const target = nodeById[targetId];
+          const handles = BOARD.edgeHandles?.[`${sourceId}->${targetId}`] || ["out-right", "in-left"];
+          const path = edgePath(source, target, handles[0], handles[1]);
+          const color = domainFor(source.domain).accent;
+          const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          pathEl.setAttribute("class", `edge-path ${kind === "control" || kind === "signal" ? "" : "is-secondary"}`);
+          pathEl.setAttribute("d", path.d);
+          pathEl.style.setProperty("--edge-color", color);
+          els.edges.appendChild(pathEl);
+          const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          text.setAttribute("class", "edge-label");
+          text.setAttribute("x", path.label.x);
+          text.setAttribute("y", path.label.y);
+          text.textContent = label;
+          els.edges.appendChild(text);
+        });
+      }
+
+      function selectNode(id) {
+        state.selectedId = id;
+        renderBoard();
+        renderDrawer();
+      }
+
+      function renderDrawer() {
+        const node = nodeById[state.selectedId] || BOARD.nodes[0];
+        if (!node) return;
+        setThemeVars(els.drawer, node.domain);
+        const details = node.details || {};
+        els.drawer.classList.add("is-open");
+        els.drawer.innerHTML = `
+          <button class="close-drawer" type="button" aria-label="Close details">x</button>
+          <div class="drawer-head">
+            <div class="drawer-kicker">${escapeHtml(domainFor(node.domain).label)} / ${escapeHtml(ownerFor(node.owner).label)}</div>
+            <h2 class="drawer-title">${escapeHtml(node.title)}</h2>
+            <p class="drawer-purpose">${escapeHtml(details.summary || node.purpose)}</p>
+          </div>
+          <div class="drawer-body">
+            <section class="detail-section"><h3>Why</h3>${list(details.why)}</section>
+            <section class="detail-section"><h3>Inputs</h3>${list(details.inputs)}</section>
+            <section class="detail-section"><h3>Outputs</h3>${list(details.outputs)}</section>
+            <section class="detail-section"><h3>Failures</h3>${list(details.failures)}</section>
+            <section class="detail-section"><h3>Sources</h3><div class="sources">${(details.source || []).map((source) => `<span class="source-chip">${escapeHtml(source)}</span>`).join("")}</div></section>
+          </div>
+        `;
+        els.drawer.querySelector(".close-drawer").addEventListener("click", () => {
+          state.selectedId = null;
+          els.drawer.classList.remove("is-open");
+          renderBoard();
+        });
+      }
+
+      function render() {
+        renderTabs();
+        renderFocus();
+        renderBoard();
+      }
+
+      els.tabs.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-view]");
+        if (!button) return;
+        state.mode = button.dataset.view;
+        state.selectedId = null;
+        render();
+      });
+
+      document.querySelector('[data-action="zoom-in"]').addEventListener("click", () => {
+        state.zoom = Math.min(1.25, state.zoom + 0.08);
+        renderBoard();
+      });
+      document.querySelector('[data-action="zoom-out"]').addEventListener("click", () => {
+        state.zoom = Math.max(0.44, state.zoom - 0.08);
+        renderBoard();
+      });
+      document.querySelector('[data-action="reset"]').addEventListener("click", () => {
+        state.zoom = 0.86;
+        document.querySelector(".map-frame").scrollTo({ left: 0, top: 0, behavior: "smooth" });
+        renderBoard();
+      });
+      document.querySelector('[data-action="details"]').addEventListener("click", () => renderDrawer());
+
+      render();
+      document.body.classList.add("app-ready");
+    </script>
+  </body>
+</html>

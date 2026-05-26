@@ -3,394 +3,264 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Visual Architecture</title>
-    <link rel="stylesheet" href="https://unpkg.com/@xyflow/react@12.10.2/dist/style.css" />
+    <title>Architecture Map</title>
     <style>
       :root {
-        color-scheme: light;
-        --canvas: #f7f6f2;
-        --canvas-strong: #ece9df;
-        --surface: #fffefa;
-        --surface-2: #f2f0e8;
-        --ink: #171717;
-        --muted: #65625c;
-        --quiet: #918d84;
-        --line: #d8d4c8;
-        --grid: rgba(93, 88, 76, 0.09);
-        --swim-line: rgba(93, 88, 76, 0.16);
-        --shadow: 0 22px 60px rgba(34, 31, 24, 0.13);
-        --github: #5c5fb8;
-        --package: #2f6f91;
-        --runtime: #0f8b72;
-        --storage: #b77b1b;
-        --signal: #bf3b5f;
-        --decision: #7a5a25;
-        --infra: #59636f;
-        --panel-bg: rgba(255, 254, 250, 0.9);
-        --panel-border: rgba(78, 74, 65, 0.16);
-        --button-hover-bg: rgba(23, 23, 23, 0.04);
-        --button-active-bg: #171717;
-        --button-active-fg: #fffefa;
-        --card-bg: #f7f4ed;
-        --chip-bg: #f6f3eb;
-      }
-
-      :root[data-theme="dark"] {
         color-scheme: dark;
-        --canvas: #24231f;
-        --canvas-strong: #302e29;
-        --surface: #302f2a;
-        --surface-2: #3a3832;
+        --bg: #1f2433;
+        --panel: #242a3a;
+        --panel-2: #202636;
+        --line: rgba(226, 232, 240, 0.15);
+        --grid: rgba(226, 232, 240, 0.075);
         --ink: #f3eee4;
-        --muted: #c8c0b1;
-        --quiet: #a89f91;
-        --line: #565247;
-        --grid: rgba(228, 220, 205, 0.08);
-        --swim-line: rgba(228, 220, 205, 0.13);
-        --shadow: 0 22px 64px rgba(0, 0, 0, 0.32);
-        --github: #9a8dff;
-        --package: #63a8ca;
-        --runtime: #4cc7aa;
-        --storage: #e1b85a;
-        --signal: #f08aa3;
-        --decision: #d0aa70;
-        --infra: #a8b0b8;
-        --panel-bg: rgba(48, 47, 42, 0.9);
-        --panel-border: rgba(243, 238, 228, 0.13);
-        --button-hover-bg: rgba(243, 238, 228, 0.07);
-        --button-active-bg: #f3eee4;
-        --button-active-fg: #24231f;
-        --card-bg: #38362f;
-        --chip-bg: #38362f;
-      }
-
-      :root[data-theme="light"] {
-        color-scheme: light;
-        --canvas: #f7f6f2;
-        --canvas-strong: #ece9df;
-        --surface: #fffefa;
-        --surface-2: #f2f0e8;
-        --ink: #171717;
-        --muted: #65625c;
-        --quiet: #918d84;
-        --line: #d8d4c8;
-        --grid: rgba(93, 88, 76, 0.09);
-        --swim-line: rgba(93, 88, 76, 0.16);
-        --shadow: 0 22px 60px rgba(34, 31, 24, 0.13);
-        --github: #5c5fb8;
-        --package: #2f6f91;
-        --runtime: #0f8b72;
-        --storage: #b77b1b;
-        --signal: #bf3b5f;
-        --decision: #7a5a25;
-        --infra: #59636f;
-        --panel-bg: rgba(255, 254, 250, 0.9);
-        --panel-border: rgba(78, 74, 65, 0.16);
-        --button-hover-bg: rgba(23, 23, 23, 0.04);
-        --button-active-bg: #171717;
-        --button-active-fg: #fffefa;
-        --card-bg: #f7f4ed;
-        --chip-bg: #f6f3eb;
+        --muted: #a9b2c3;
+        --quiet: #758195;
+        --accent: #62d7bd;
+        --shadow: rgba(0, 0, 0, 0.26);
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
       }
 
       * {
         box-sizing: border-box;
       }
 
-      html,
       body {
-        width: 100%;
-        height: 100%;
         margin: 0;
-        overflow: hidden;
-        background: var(--canvas);
+        min-height: 100vh;
+        background: var(--bg);
         color: var(--ink);
-        font:
-          14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-          "Segoe UI", sans-serif;
       }
 
       button {
         font: inherit;
       }
 
-      #root {
-        width: 100vw;
-        height: 100vh;
-      }
-
-      #boot-fallback {
-        position: fixed;
-        inset: 0;
-        display: grid;
-        place-items: center;
-        padding: 28px;
-        background: var(--canvas);
-        color: var(--ink);
-        z-index: 50;
-      }
-
-      body.app-ready #boot-fallback {
-        display: none;
-      }
-
-      .fallback-card {
-        max-width: 720px;
-        border: 1px solid var(--panel-border);
-        border-radius: 8px;
-        background: var(--panel-bg);
-        box-shadow: var(--shadow);
-        padding: 28px;
-      }
-
-      .fallback-card h1 {
-        margin: 0 0 12px;
-        font-size: clamp(2rem, 5vw, 3.4rem);
-        line-height: 0.98;
-        letter-spacing: -0.04em;
-      }
-
-      .fallback-card p {
-        margin: 10px 0 0;
-        color: var(--muted);
-        font-size: 1rem;
-      }
-
       .app-shell {
-        position: relative;
-        width: 100vw;
-        height: 100vh;
-        background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 72%, var(--canvas)) 0%, var(--canvas) 100%);
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto auto 1fr;
       }
 
       .topbar {
-        position: absolute;
-        inset: 14px 14px auto 14px;
-        z-index: 20;
+        min-height: 68px;
         display: grid;
-        grid-template-columns: minmax(220px, 0.9fr) minmax(360px, 1.5fr) auto;
-        gap: 12px;
+        grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
         align-items: center;
-        border: 1px solid var(--panel-border);
-        border-radius: 8px;
-        background: var(--panel-bg);
-        box-shadow: 0 14px 34px rgba(34, 31, 24, 0.1);
-        padding: 10px 12px;
-        backdrop-filter: blur(14px);
-      }
-
-      .brand {
-        min-width: 0;
+        gap: 18px;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(36, 42, 58, 0.92);
       }
 
       .brand-kicker {
         color: var(--quiet);
-        display: block;
-        font-size: 0.68rem;
-        font-weight: 850;
-        letter-spacing: 0.15em;
-        line-height: 1;
+        font-size: 0.66rem;
+        font-weight: 900;
+        letter-spacing: 0.22em;
         text-transform: uppercase;
       }
 
       .brand-title {
-        display: block;
-        margin-top: 5px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        margin-top: 4px;
         font-size: 1.05rem;
-        font-weight: 900;
-        letter-spacing: -0.01em;
+        font-weight: 850;
       }
 
-      .toolbar-cluster {
-        min-width: 0;
+      .tabs {
+        display: inline-flex;
+        gap: 4px;
+        padding: 4px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #161b28;
       }
 
-      .toolbar-label {
-        color: var(--quiet);
-        display: block;
-        margin-bottom: 4px;
-        font-size: 0.64rem;
-        font-weight: 950;
-        letter-spacing: 0.13em;
-        text-transform: uppercase;
-      }
-
-      .mode-tabs,
-      .view-actions {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        min-width: 0;
-      }
-
-      .mode-tabs {
-        flex-wrap: wrap;
-      }
-
-      .toolbar-button {
+      .tab,
+      .ghost-button {
+        min-height: 34px;
         border: 1px solid transparent;
-        border-radius: 6px;
+        border-radius: 7px;
         background: transparent;
         color: var(--ink);
         cursor: pointer;
-        min-height: 34px;
-        padding: 7px 10px;
-        font-size: 0.82rem;
+        font-size: 0.76rem;
         font-weight: 800;
-        white-space: nowrap;
+        padding: 0 13px;
       }
 
-      .toolbar-button:hover {
-        border-color: rgba(23, 23, 23, 0.14);
-        background: var(--button-hover-bg);
+      .tab.is-active,
+      .ghost-button:hover {
+        border-color: rgba(243, 238, 228, 0.18);
+        background: #f3eee4;
+        color: #171b26;
       }
 
-      .toolbar-button.is-active {
-        border-color: rgba(23, 23, 23, 0.2);
-        background: var(--button-active-bg);
-        color: var(--button-active-fg);
+      .top-actions {
+        justify-self: end;
+        display: flex;
+        gap: 8px;
       }
 
-      .toolbar-button.is-icon {
-        display: inline-grid;
-        place-items: center;
-        width: 34px;
-        padding-inline: 0;
-        line-height: 1;
+      .focusbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 18px;
+        align-items: center;
+        min-height: 96px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(32, 38, 54, 0.82);
       }
 
-      .toolbar-button svg,
-      .drawer-close svg {
-        display: block;
-        width: 16px;
-        height: 16px;
-        stroke-width: 2.25;
+      .focusbar-label {
+        color: var(--accent);
+        font-size: 0.72rem;
+        font-weight: 950;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
       }
 
-      .flow-wrap {
+      .focusbar-title {
+        margin-top: 4px;
+        font-weight: 850;
+      }
+
+      .focusbar-summary {
+        max-width: 760px;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 0.86rem;
+        line-height: 1.45;
+      }
+
+      .workspace {
         position: relative;
-        z-index: 4;
-        width: 100%;
-        height: 100%;
-      }
-
-      .react-flow {
-        background: transparent;
-      }
-
-      .react-flow__pane {
-        cursor: grab;
-      }
-
-      .react-flow__pane:active {
-        cursor: grabbing;
-      }
-
-      .react-flow__controls {
-        border: 1px solid var(--panel-border);
-        border-radius: 8px;
-        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.12);
+        min-height: 0;
         overflow: hidden;
+        padding: 12px;
       }
 
-      .react-flow__controls button {
-        background: color-mix(in srgb, var(--surface) 94%, transparent);
-        border-bottom-color: rgba(78, 74, 65, 0.12);
-        color: var(--ink);
+      .map-frame {
+        position: relative;
+        height: calc(100vh - 188px);
+        min-height: 560px;
+        overflow: auto;
+        border: 1px solid rgba(226, 232, 240, 0.14);
+        border-radius: 12px;
+        background:
+          linear-gradient(var(--grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+          #202636;
+        background-size: 24px 24px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
       }
 
-      .react-flow__minimap {
-        border: 1px solid var(--panel-border);
-        border-radius: 8px;
-        background: var(--panel-bg);
-        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.1);
-        overflow: hidden;
+      .board {
+        position: relative;
+        min-width: var(--board-width);
+        min-height: var(--board-height);
+        transform: scale(var(--zoom, 0.86));
+        transform-origin: 0 0;
       }
 
-      .lane-node {
-        width: var(--lane-width, 300px);
-        height: var(--lane-height, 2600px);
-        border-inline: 1px solid var(--swim-line);
-        border-top: 4px solid var(--accent);
-        background: linear-gradient(
-          180deg,
-          color-mix(in srgb, var(--accent) 8%, transparent) 0%,
-          color-mix(in srgb, var(--accent) 4%, transparent) 18%,
-          transparent 72%
-        );
+      .lane {
+        position: absolute;
+        border-top: 1px solid color-mix(in srgb, var(--accent) 44%, transparent);
+        background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 72%);
+        opacity: 0.78;
+        padding: 13px 12px;
         pointer-events: none;
       }
 
       .lane-title {
-        padding: 14px 0 0 18px;
-        color: #37322c;
-        font-size: 0.74rem;
+        color: var(--ink);
+        font-size: 0.66rem;
         font-weight: 950;
-        letter-spacing: 0.14em;
+        letter-spacing: 0.09em;
         text-transform: uppercase;
       }
 
       .lane-subtitle {
-        display: none;
-        max-width: 230px;
-        padding: 5px 0 0 18px;
-        color: var(--muted);
-        font-size: 0.82rem;
+        max-width: 260px;
+        margin-top: 5px;
+        color: var(--quiet);
+        font-size: 0.62rem;
+        line-height: 1.3;
+      }
+
+      .edges {
+        position: absolute;
+        inset: 0;
+        width: var(--board-width);
+        height: var(--board-height);
+        pointer-events: none;
+      }
+
+      .edge-path {
+        fill: none;
+        stroke: var(--edge-color);
+        stroke-width: 2.2;
+        opacity: 0.78;
+      }
+
+      .edge-path.is-secondary {
+        stroke-dasharray: 8 7;
+        opacity: 0.48;
+      }
+
+      .edge-label {
+        fill: var(--muted);
+        font-size: 10px;
+        font-weight: 800;
+        paint-order: stroke;
+        stroke: #202636;
+        stroke-width: 4px;
       }
 
       .arch-node {
-        width: 220px;
-        min-height: 74px;
-        border: 1px solid color-mix(in srgb, var(--accent) 42%, #afa99d);
-        border-top: 5px solid var(--accent);
-        border-radius: 8px;
-        background: color-mix(in srgb, var(--soft) 38%, #fffefa);
-        box-shadow: 0 12px 30px rgba(34, 31, 24, 0.1);
+        position: absolute;
+        width: 320px;
+        min-height: 96px;
+        border: 1px solid color-mix(in srgb, var(--accent) 52%, var(--line));
+        border-left: 4px solid var(--accent);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--accent) 14%, var(--panel));
+        box-shadow: 0 14px 32px var(--shadow);
         color: var(--ink);
-        overflow: hidden;
-        transition:
-          opacity 160ms ease,
-          filter 160ms ease,
-          box-shadow 160ms ease,
-          transform 160ms ease,
-          border-color 160ms ease;
-      }
-
-      .arch-node.is-selected {
-        border-color: var(--accent);
-        box-shadow:
-          0 22px 52px rgba(34, 31, 24, 0.2),
-          0 0 0 4px color-mix(in srgb, var(--accent) 19%, transparent);
-      }
-
-      .arch-node.is-related:not(.is-selected) {
-        box-shadow:
-          0 16px 38px rgba(34, 31, 24, 0.13),
-          0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+        cursor: pointer;
+        padding: 9px 11px 12px;
       }
 
       .arch-node.is-dimmed {
-        filter: saturate(0.68);
+        filter: saturate(0.7);
         opacity: 0.34;
+      }
+
+      .arch-node.is-selected {
+        box-shadow:
+          0 20px 44px rgba(0, 0, 0, 0.34),
+          0 0 0 3px color-mix(in srgb, var(--accent) 24%, transparent);
       }
 
       .node-head {
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        gap: 10px;
-        padding: 10px 12px 0;
+        gap: 8px;
+        align-items: center;
       }
 
       .node-domain {
-        color: color-mix(in srgb, var(--accent) 78%, #171717);
         min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        color: color-mix(in srgb, var(--accent) 80%, #f3eee4);
         font-size: 0.62rem;
         font-weight: 950;
         letter-spacing: 0.08em;
@@ -398,718 +268,209 @@
       }
 
       .node-step {
-        display: none;
-        border-radius: 7px;
-        background: color-mix(in srgb, var(--accent) 86%, #171717);
-        color: #fffefa;
-        font-size: 0.7rem;
+        border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+        border-radius: 6px;
+        background: color-mix(in srgb, var(--accent) 18%, transparent);
+        color: color-mix(in srgb, var(--accent) 82%, #f3eee4);
+        font-size: 0.64rem;
         font-weight: 900;
-        letter-spacing: 0.04em;
-        padding: 4px 8px;
-      }
-
-      .node-body {
-        padding: 8px 12px 12px;
-      }
-
-      .node-title {
-        margin: 0;
-        font-size: 1.24rem;
-        font-weight: 950;
-        letter-spacing: -0.015em;
-        line-height: 1.12;
+        line-height: 1;
+        padding: 4px 7px;
       }
 
       .node-start {
-        display: none;
-        margin-bottom: 6px;
-        border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+        display: inline-flex;
+        margin-top: 8px;
         border-radius: 999px;
-        background: color-mix(in srgb, var(--accent) 12%, transparent);
-        color: color-mix(in srgb, var(--accent) 78%, var(--ink));
+        background: color-mix(in srgb, var(--accent) 18%, transparent);
+        color: color-mix(in srgb, var(--accent) 82%, #f3eee4);
         padding: 2px 7px;
-        font-size: 0.62rem;
+        font-size: 0.6rem;
         font-weight: 950;
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
 
+      .node-title {
+        margin: 8px 0 0;
+        font-size: 0.98rem;
+        line-height: 1.18;
+      }
+
       .node-purpose {
-        display: none;
         margin: 6px 0 0;
-        color: #514d46;
-        font-size: 0.84rem;
-        line-height: 1.28;
-      }
-
-      .node-chips {
-        display: none;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 12px;
-      }
-
-      .chip {
-        max-width: 100%;
-        border: 1px solid rgba(78, 74, 65, 0.13);
-        border-radius: 999px;
-        background: rgba(255, 254, 250, 0.66);
-        color: #444039;
-        overflow: hidden;
-        padding: 5px 8px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-size: 0.74rem;
-        font-weight: 800;
-      }
-
-      .react-flow__handle {
-        width: 10px;
-        height: 10px;
-        border: 2px solid rgba(255, 254, 250, 0.96);
-        background: var(--accent);
-        opacity: 0.28;
-        pointer-events: none;
-      }
-
-      .arch-node:hover .react-flow__handle,
-      .arch-node.is-selected .react-flow__handle {
-        opacity: 0.9;
-      }
-
-      .contract-edge {
-        transition:
-          opacity 160ms ease,
-          stroke 160ms ease,
-          stroke-width 160ms ease;
-      }
-
-      .edge-label {
-        position: absolute;
-        border: 1px solid rgba(78, 74, 65, 0.13);
-        border-radius: 999px;
-        background: rgba(255, 254, 250, 0.9);
-        box-shadow: 0 8px 20px rgba(34, 31, 24, 0.09);
-        color: #4a453d;
+        color: var(--muted);
         font-size: 0.72rem;
-        font-weight: 850;
-        padding: 4px 8px;
-        pointer-events: none;
-        white-space: nowrap;
+        line-height: 1.35;
       }
 
       .detail-drawer {
         position: absolute;
-        z-index: 18;
-        top: 88px;
-        right: 14px;
-        width: min(520px, calc(100vw - 28px));
-        max-height: calc(100vh - 108px);
-        display: flex;
-        flex-direction: column;
-        border: 1px solid var(--panel-border);
-        border-radius: 8px;
-        background: color-mix(in srgb, var(--surface) 94%, transparent);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-        backdrop-filter: blur(16px);
-        transition:
-          opacity 160ms ease,
-          transform 160ms ease,
-          filter 160ms ease,
-          z-index 0ms linear 120ms;
+        top: 12px;
+        right: 12px;
+        bottom: 12px;
+        width: min(390px, calc(100vw - 36px));
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(36, 42, 58, 0.97);
+        box-shadow: -14px 0 34px rgba(0, 0, 0, 0.22);
+        transform: translateX(calc(100% + 24px));
+        transition: transform 180ms ease;
       }
 
-      .app-shell.is-navigating .detail-drawer {
-        z-index: 1;
-        opacity: 0.08;
-        pointer-events: none;
-        transform: translateX(18px) scale(0.99);
-        filter: saturate(0.65);
-      }
-
-      .select-hint {
-        position: absolute;
-        right: 18px;
-        bottom: 118px;
-        z-index: 12;
-        border: 1px solid var(--panel-border);
-        border-radius: 8px;
-        background: var(--panel-bg);
-        box-shadow: 0 12px 28px rgba(34, 31, 24, 0.1);
-        color: var(--muted);
-        padding: 10px 12px;
-        font-size: 0.86rem;
-        font-weight: 800;
-        backdrop-filter: blur(12px);
-        transition:
-          opacity 160ms ease,
-          transform 160ms ease;
-      }
-
-      .app-shell.is-navigating .select-hint {
-        opacity: 0;
-        transform: translateY(8px);
+      .detail-drawer.is-open {
+        transform: translateX(0);
       }
 
       .drawer-head {
-        border-top: 5px solid var(--accent, var(--infra));
-        border-bottom: 1px solid rgba(78, 74, 65, 0.12);
-        padding: 17px 18px 15px;
-      }
-
-      .drawer-head-top {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
-      }
-
-      .drawer-close {
-        display: inline-grid;
-        place-items: center;
-        width: 32px;
-        height: 32px;
-        border: 1px solid rgba(78, 74, 65, 0.14);
-        border-radius: 6px;
-        background: transparent;
-        color: var(--muted);
-        cursor: pointer;
-        line-height: 1;
-        padding: 0;
-      }
-
-      .drawer-close:hover {
-        border-color: rgba(23, 23, 23, 0.24);
-        color: var(--ink);
+        border-bottom: 1px solid var(--line);
+        border-left: 4px solid var(--accent);
+        padding: 16px;
       }
 
       .drawer-kicker {
-        color: color-mix(in srgb, var(--accent, var(--infra)) 78%, #171717);
-        display: block;
-        font-size: 0.68rem;
+        color: color-mix(in srgb, var(--accent) 80%, #f3eee4);
+        font-size: 0.66rem;
         font-weight: 950;
-        letter-spacing: 0.15em;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
       }
 
       .drawer-title {
-        margin: 8px 0 0;
-        font-size: 1.5rem;
-        font-weight: 950;
-        letter-spacing: -0.035em;
-        line-height: 1.03;
+        margin: 6px 0 0;
+        font-size: 1.08rem;
       }
 
       .drawer-purpose {
-        margin: 9px 0 0;
-        color: #514d46;
-        font-size: 0.96rem;
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.45;
       }
 
       .drawer-body {
-        overflow: auto;
-        padding: 6px 18px 18px;
+        display: grid;
+        gap: 12px;
+        padding: 14px 16px 18px;
       }
 
       .detail-section {
-        border-bottom: 1px solid rgba(78, 74, 65, 0.12);
-        padding: 14px 0;
-      }
-
-      .detail-section:last-child {
-        border-bottom: 0;
-      }
-
-      .detail-section h3 {
-        margin: 0;
-        color: var(--quiet);
-        font-size: 0.72rem;
-        font-weight: 950;
-        letter-spacing: 0.13em;
-        text-transform: uppercase;
-      }
-
-      .detail-section ul {
-        list-style: none;
-        margin: 10px 0 0;
-        padding: 0;
-      }
-
-      .detail-section li {
-        color: var(--muted);
-        margin-top: 8px;
-      }
-
-      .detail-section p {
-        margin: 9px 0 0;
-        color: var(--muted);
-      }
-
-      .io-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-      }
-
-      .io-card {
-        border: 1px solid rgba(78, 74, 65, 0.12);
+        border: 1px solid var(--line);
         border-radius: 8px;
-        background: var(--card-bg);
+        background: rgba(31, 36, 51, 0.7);
         padding: 12px;
       }
 
-      .io-card ul {
-        margin-top: 8px;
+      .detail-section h3 {
+        margin: 0 0 8px;
+        font-size: 0.74rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
 
-      .source-list {
+      .detail-section p,
+      .detail-section li {
+        color: var(--muted);
+        font-size: 0.8rem;
+        line-height: 1.45;
+      }
+
+      .detail-section p {
+        margin: 0;
+      }
+
+      .detail-section ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .sources {
         display: flex;
         flex-wrap: wrap;
-        gap: 7px;
-        margin-top: 10px;
+        gap: 6px;
       }
 
       .source-chip {
-        border: 1px solid rgba(78, 74, 65, 0.13);
-        border-radius: 6px;
-        background: var(--chip-bg);
-        color: var(--ink);
-        padding: 6px 8px;
-        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-        font-size: 0.74rem;
-      }
-
-      .related-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 7px;
-        margin-top: 11px;
-      }
-
-      .related-pill {
-        border: 1px solid rgba(78, 74, 65, 0.13);
+        border: 1px solid var(--line);
         border-radius: 999px;
-        background: var(--chip-bg);
+        color: var(--muted);
+        font-size: 0.7rem;
+        max-width: 100%;
+        overflow: hidden;
+        padding: 4px 8px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .close-drawer {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: transparent;
         color: var(--ink);
         cursor: pointer;
-        padding: 6px 9px;
-        font-size: 0.78rem;
-        font-weight: 850;
-      }
-
-      .related-pill:hover {
-        border-color: rgba(23, 23, 23, 0.24);
-        background: #fffefa;
-      }
-
-      .empty-detail {
-        color: var(--muted);
-        padding: 18px;
-      }
-
-      .empty-detail strong {
-        display: block;
-        margin-bottom: 6px;
-        color: var(--ink);
-        font-size: 1.1rem;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        :root {
-          color-scheme: dark;
-          --canvas: #24231f;
-          --canvas-strong: #302e29;
-          --surface: #302f2a;
-          --surface-2: #3a3832;
-          --ink: #f3eee4;
-          --muted: #c8c0b1;
-          --quiet: #a89f91;
-          --line: #565247;
-          --grid: rgba(228, 220, 205, 0.08);
-          --swim-line: rgba(228, 220, 205, 0.13);
-          --shadow: 0 22px 64px rgba(0, 0, 0, 0.32);
-          --github: #9a8dff;
-          --package: #63a8ca;
-          --runtime: #4cc7aa;
-          --storage: #e1b85a;
-          --signal: #f08aa3;
-          --decision: #d0aa70;
-          --infra: #a8b0b8;
-        }
-
-        body {
-          background: var(--canvas);
-        }
-
-        #boot-fallback {
-          background: var(--canvas);
-        }
-
-        .fallback-card,
-        .topbar,
-        .detail-drawer,
-        .select-hint {
-          border-color: rgba(243, 238, 228, 0.13);
-          background: rgba(48, 47, 42, 0.9);
-          box-shadow: var(--shadow);
-        }
-
-        .app-shell {
-          background:
-            radial-gradient(circle at 8% 8%, rgba(154, 141, 255, 0.1), transparent 28rem),
-            radial-gradient(circle at 88% 12%, rgba(76, 199, 170, 0.08), transparent 30rem),
-            linear-gradient(180deg, #292823 0%, var(--canvas) 100%);
-        }
-
-        .toolbar-button {
-          color: var(--ink);
-        }
-
-        .toolbar-button:hover {
-          border-color: rgba(243, 238, 228, 0.18);
-          background: rgba(243, 238, 228, 0.07);
-        }
-
-        .toolbar-button.is-active {
-          border-color: rgba(243, 238, 228, 0.3);
-          background: var(--ink);
-          color: #24231f;
-        }
-
-        .react-flow__controls {
-          border-color: rgba(243, 238, 228, 0.13);
-        }
-
-        .react-flow__controls button {
-          background: rgba(48, 47, 42, 0.94);
-          border-bottom-color: rgba(243, 238, 228, 0.11);
-          color: var(--ink);
-        }
-
-        .lane-title,
-        .brand-title {
-          color: var(--ink);
-        }
-
-        .arch-node {
-          border-color: color-mix(in srgb, var(--accent) 52%, #5f5a4f);
-          background: color-mix(in srgb, var(--accent) 14%, var(--surface));
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
-        }
-
-        .arch-node.is-selected {
-          box-shadow:
-            0 22px 52px rgba(0, 0, 0, 0.35),
-            0 0 0 4px color-mix(in srgb, var(--accent) 24%, transparent);
-        }
-
-        .node-domain,
-        .drawer-kicker,
-        .node-start {
-          color: color-mix(in srgb, var(--accent) 78%, #f3eee4);
-        }
-
-        .node-step {
-          background: color-mix(in srgb, var(--accent) 72%, #f3eee4);
-          color: #24231f;
-        }
-
-        .node-purpose,
-        .drawer-purpose,
-        .detail-section li,
-        .detail-section p,
-        .lane-subtitle {
-          color: var(--muted);
-        }
-
-        .react-flow__handle {
-          border-color: rgba(36, 35, 31, 0.96);
-        }
-
-        .edge-label,
-        .io-card,
-        .source-chip,
-        .related-pill {
-          border-color: rgba(243, 238, 228, 0.12);
-          background: #38362f;
-          color: var(--ink);
-        }
-
-        .drawer-head,
-        .detail-section {
-          border-bottom-color: rgba(243, 238, 228, 0.12);
-        }
-
-        .drawer-close {
-          border-color: rgba(243, 238, 228, 0.14);
-          color: var(--muted);
-        }
-
-        .drawer-close:hover,
-        .related-pill:hover {
-          border-color: rgba(243, 238, 228, 0.28);
-          background: #403e37;
-          color: var(--ink);
-        }
-      }
-
-      :root[data-theme] body {
-        background: var(--canvas);
-      }
-
-      :root[data-theme] .fallback-card,
-      :root[data-theme] .topbar,
-      :root[data-theme] .select-hint {
-        border-color: var(--panel-border);
-        background: var(--panel-bg);
-        box-shadow: var(--shadow);
-      }
-
-      :root[data-theme] .detail-drawer {
-        border-color: var(--panel-border);
-        background: color-mix(in srgb, var(--surface) 94%, transparent);
-        box-shadow: var(--shadow);
-      }
-
-      :root[data-theme] .app-shell {
-        background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 72%, var(--canvas)) 0%, var(--canvas) 100%);
-      }
-
-      :root[data-theme] .toolbar-button {
-        color: var(--ink);
-      }
-
-      :root[data-theme] .toolbar-button:hover {
-        border-color: color-mix(in srgb, var(--ink) 18%, transparent);
-        background: var(--button-hover-bg);
-      }
-
-      :root[data-theme] .toolbar-button.is-active {
-        border-color: color-mix(in srgb, var(--ink) 28%, transparent);
-        background: var(--button-active-bg);
-        color: var(--button-active-fg);
-      }
-
-      :root[data-theme] .react-flow__controls {
-        border-color: var(--panel-border);
-      }
-
-      :root[data-theme] .react-flow__controls button {
-        background: color-mix(in srgb, var(--surface) 94%, transparent);
-        color: var(--ink);
-      }
-
-      :root[data-theme] .lane-title,
-      :root[data-theme] .brand-title {
-        color: var(--ink);
-      }
-
-      :root[data-theme] .arch-node {
-        background: color-mix(in srgb, var(--accent) 14%, var(--surface));
-        box-shadow: 0 12px 30px color-mix(in srgb, #000 18%, transparent);
-      }
-
-      :root[data-theme] .node-purpose,
-      :root[data-theme] .drawer-purpose,
-      :root[data-theme] .detail-section li,
-      :root[data-theme] .detail-section p,
-      :root[data-theme] .lane-subtitle {
-        color: var(--muted);
-      }
-
-      :root[data-theme] .edge-label,
-      :root[data-theme] .io-card,
-      :root[data-theme] .source-chip,
-      :root[data-theme] .related-pill {
-        border-color: color-mix(in srgb, var(--ink) 12%, transparent);
-        background: var(--card-bg);
-        color: var(--ink);
-      }
-
-      :root[data-theme] .drawer-head,
-      :root[data-theme] .detail-section {
-        border-bottom-color: color-mix(in srgb, var(--ink) 12%, transparent);
       }
 
       @media (max-width: 760px) {
         .topbar {
           grid-template-columns: 1fr;
-          align-items: stretch;
         }
 
-        .mode-tabs,
-        .view-actions {
+        .tabs {
+          justify-self: start;
+          max-width: 100%;
           overflow: auto;
-          padding-bottom: 2px;
         }
 
-        .detail-drawer {
-          top: auto;
-          right: 10px;
-          bottom: 10px;
-          left: 10px;
-          width: auto;
-          max-height: 52vh;
+        .top-actions {
+          justify-self: start;
         }
 
-        .select-hint {
-          right: 10px;
-          bottom: 74px;
-          left: 10px;
-          text-align: center;
-        }
-      }
-
-      @media (max-width: 620px) {
-        .topbar {
-          inset: 8px 8px auto 8px;
-          padding: 9px;
+        .focusbar {
+          grid-template-columns: 1fr;
         }
 
-        .toolbar-button {
-          min-height: 32px;
-          padding: 6px 9px;
-          font-size: 0.78rem;
-        }
-
-        .brand-title {
-          font-size: 0.98rem;
+        .map-frame {
+          height: calc(100vh - 250px);
         }
       }
     </style>
   </head>
   <body>
-    <div id="boot-fallback">
-      <div class="fallback-card">
-        <h1>Visual Architecture</h1>
-        <p>This portable architecture board loads React Flow from a CDN. If you are offline or the CDN is blocked, the interactive canvas cannot start.</p><p>Replace the bundled model with source-backed architecture data from the target project.</p>
-      </div>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <div class="brand-kicker">Architecture Map</div>
+          <div class="brand-title">Project Architecture</div>
+        </div>
+        <nav class="tabs" aria-label="Architecture views"></nav>
+        <div class="top-actions">
+          <button class="ghost-button" type="button" data-action="zoom-out">-</button>
+          <button class="ghost-button" type="button" data-action="zoom-in">+</button>
+          <button class="ghost-button" type="button" data-action="reset">Reset</button>
+        </div>
+      </header>
+      <section class="focusbar" aria-label="Active architecture focus">
+        <div>
+          <div class="focusbar-label">Active Scenario</div>
+          <div class="focusbar-title"></div>
+          <div class="focusbar-summary"></div>
+        </div>
+        <button class="ghost-button" type="button" data-action="details">Details</button>
+      </section>
+      <main class="workspace">
+        <div class="map-frame">
+          <div class="board">
+            <svg class="edges" aria-hidden="true"></svg>
+          </div>
+        </div>
+        <aside class="detail-drawer" aria-label="Node details"></aside>
+      </main>
     </div>
-    <div id="root"></div>
-
     <script>
-      function showBootError(error) {
-        document.body.classList.remove("app-ready");
-        const fallback = document.querySelector("#boot-fallback .fallback-card");
-        if (!fallback || fallback.dataset.enhanced) return;
-        fallback.dataset.enhanced = "true";
-        const message = error?.reason?.message || error?.message || String(error || "The interactive module failed to load.");
-        const detail = document.createElement("p");
-        detail.textContent = `Load error: ${message}`;
-        fallback.append(detail);
-      }
-
-      window.addEventListener("error", showBootError);
-      window.addEventListener("unhandledrejection", showBootError);
-      window.setTimeout(() => {
-        if (!document.body.classList.contains("app-ready")) {
-          showBootError(new Error("React Flow did not finish loading. Check CDN/network access."));
-        }
-      }, 12000);
-    </script>
-    <script type="module">
-      async function importFirst(label, urls) {
-        const errors = [];
-        for (const url of urls) {
-          try {
-            return await import(url);
-          } catch (error) {
-            errors.push(`${url}: ${error?.message || error}`);
-          }
-        }
-        throw new Error(`${label} failed to load from all CDNs. ${errors.join(" | ")}`);
-      }
-
-      const React = await importFirst("React", [
-        "https://esm.sh/react@18.3.1",
-        "https://cdn.jsdelivr.net/npm/react@18.3.1/+esm"
-      ]);
-      const { createRoot } = await importFirst("React DOM", [
-        "https://esm.sh/react-dom@18.3.1/client",
-        "https://cdn.jsdelivr.net/npm/react-dom@18.3.1/client/+esm"
-      ]);
-      const {
-        Background,
-        BaseEdge,
-        Controls,
-        EdgeLabelRenderer,
-        Handle,
-        MarkerType,
-        Position,
-        ReactFlow,
-        ReactFlowProvider,
-        getSmoothStepPath,
-        useReactFlow
-      } = await importFirst("React Flow", [
-        "https://esm.sh/@xyflow/react@12.10.2?deps=react@18.3.1,react-dom@18.3.1",
-        "https://cdn.jsdelivr.net/npm/@xyflow/react@12.10.2/+esm"
-      ]);
-
-      const { useCallback, useEffect, useMemo, useRef, useState } = React;
-      const h = React.createElement;
-
-      function IconSvg({ children, ...props }) {
-        return h(
-          "svg",
-          {
-            viewBox: "0 0 24 24",
-            fill: "none",
-            stroke: "currentColor",
-            strokeWidth: 2.25,
-            strokeLinecap: "round",
-            strokeLinejoin: "round",
-            focusable: "false",
-            ...props
-          },
-          children
-        );
-      }
-
-      function Maximize2(props) {
-        return h(
-          IconSvg,
-          props,
-          h("path", { d: "M15 3h6v6" }),
-          h("path", { d: "m21 3-7 7" }),
-          h("path", { d: "M9 21H3v-6" }),
-          h("path", { d: "m3 21 7-7" })
-        );
-      }
-
-      function RotateCcw(props) {
-        return h(
-          IconSvg,
-          props,
-          h("path", { d: "M3 12a9 9 0 1 0 3-6.7" }),
-          h("path", { d: "M3 4v6h6" })
-        );
-      }
-
-      function Sun(props) {
-        return h(
-          IconSvg,
-          props,
-          h("circle", { cx: "12", cy: "12", r: "4" }),
-          h("path", { d: "M12 2v2" }),
-          h("path", { d: "M12 20v2" }),
-          h("path", { d: "m4.93 4.93 1.41 1.41" }),
-          h("path", { d: "m17.66 17.66 1.41 1.41" }),
-          h("path", { d: "M2 12h2" }),
-          h("path", { d: "M20 12h2" }),
-          h("path", { d: "m6.34 17.66-1.41 1.41" }),
-          h("path", { d: "m19.07 4.93-1.41 1.41" })
-        );
-      }
-
-      function Moon(props) {
-        return h(IconSvg, props, h("path", { d: "M20.6 14.5A8.5 8.5 0 0 1 9.5 3.4 7 7 0 1 0 20.6 14.5Z" }));
-      }
-
-      function X(props) {
-        return h(IconSvg, props, h("path", { d: "M18 6 6 18" }), h("path", { d: "m6 6 12 12" }));
-      }
-
       const VISUAL_ARCH_DATA = {
         "domains": {
                 "interface": {
@@ -1185,7 +546,7 @@
                                         "x": 40,
                                         "y": 150
                                 },
-                                "width": 270,
+                                "width": 340,
                                 "height": 1320
                         },
                         {
@@ -1194,10 +555,10 @@
                                 "subtitle": "TTY driver, process groups, signal queues, and scheduling.",
                                 "domain": "runtime",
                                 "position": {
-                                        "x": 340,
+                                        "x": 410,
                                         "y": 150
                                 },
-                                "width": 270,
+                                "width": 340,
                                 "height": 1320
                         },
                         {
@@ -1206,10 +567,10 @@
                                 "subtitle": "Handlers, masks, language runtimes, and child processes.",
                                 "domain": "signal",
                                 "position": {
-                                        "x": 640,
+                                        "x": 780,
                                         "y": 150
                                 },
-                                "width": 270,
+                                "width": 340,
                                 "height": 1320
                         },
                         {
@@ -1218,10 +579,10 @@
                                 "subtitle": "Cleanup, exit status, shells, and debugging evidence.",
                                 "domain": "delivery",
                                 "position": {
-                                        "x": 940,
+                                        "x": 1150,
                                         "y": 150
                                 },
-                                "width": 270,
+                                "width": 340,
                                 "height": 1320
                         }
                 ],
@@ -1238,7 +599,7 @@
                                         "session"
                                 ],
                                 "position": {
-                                        "x": 90,
+                                        "x": 70,
                                         "y": 245
                                 },
                                 "details": {
@@ -1283,7 +644,7 @@
                                         "VINTR"
                                 ],
                                 "position": {
-                                        "x": 90,
+                                        "x": 70,
                                         "y": 395
                                 },
                                 "details": {
@@ -1328,7 +689,7 @@
                                         "line discipline"
                                 ],
                                 "position": {
-                                        "x": 390,
+                                        "x": 440,
                                         "y": 395
                                 },
                                 "details": {
@@ -1372,7 +733,7 @@
                                         "job control"
                                 ],
                                 "position": {
-                                        "x": 390,
+                                        "x": 440,
                                         "y": 545
                                 },
                                 "details": {
@@ -1417,7 +778,7 @@
                                         "pending"
                                 ],
                                 "position": {
-                                        "x": 690,
+                                        "x": 810,
                                         "y": 545
                                 },
                                 "details": {
@@ -1464,7 +825,7 @@
                                         "terminate"
                                 ],
                                 "position": {
-                                        "x": 990,
+                                        "x": 1180,
                                         "y": 545
                                 },
                                 "details": {
@@ -1508,7 +869,7 @@
                                         "cancel"
                                 ],
                                 "position": {
-                                        "x": 690,
+                                        "x": 810,
                                         "y": 695
                                 },
                                 "details": {
@@ -1556,7 +917,7 @@
                                         "event loop"
                                 ],
                                 "position": {
-                                        "x": 390,
+                                        "x": 440,
                                         "y": 845
                                 },
                                 "details": {
@@ -1600,7 +961,7 @@
                                         "subprocess"
                                 ],
                                 "position": {
-                                        "x": 690,
+                                        "x": 810,
                                         "y": 845
                                 },
                                 "details": {
@@ -1645,7 +1006,7 @@
                                         "defer"
                                 ],
                                 "position": {
-                                        "x": 990,
+                                        "x": 1180,
                                         "y": 845
                                 },
                                 "details": {
@@ -1692,7 +1053,7 @@
                                         "status"
                                 ],
                                 "position": {
-                                        "x": 90,
+                                        "x": 70,
                                         "y": 1045
                                 },
                                 "details": {
@@ -1739,7 +1100,7 @@
                                         "logs"
                                 ],
                                 "position": {
-                                        "x": 690,
+                                        "x": 810,
                                         "y": 1045
                                 },
                                 "details": {
@@ -2062,893 +1423,250 @@
       const BOARD = VISUAL_ARCH_DATA.board;
       const GROUP_DETAILS = VISUAL_ARCH_DATA.groupDetails;
 
-      const EDGE_HANDLES = Object.freeze(BOARD.edgeHandles || {});
+      const NODE_SIZE = { width: 320, height: 112 };
+      const state = { mode: "overview", selectedId: null, zoom: 0.86 };
+      const nodeById = Object.fromEntries(BOARD.nodes.map((node) => [node.id, node]));
+      const incoming = new Set(BOARD.edges.map((edge) => edge[1]));
 
-      const NODE_BY_ID = Object.fromEntries(BOARD.nodes.map(node => [node.id, node]));
-      const INCOMING = new Map();
-      const OUTGOING = new Map();
-      BOARD.edges.forEach(([source, target]) => {
-        if (!OUTGOING.has(source)) OUTGOING.set(source, []);
-        if (!INCOMING.has(target)) INCOMING.set(target, []);
-        OUTGOING.get(source).push(target);
-        INCOMING.get(target).push(source);
-      });
-
-      function edgeSet(edges) {
-        return new Set(edges.map(([source, target]) => `${source}->${target}`));
-      }
-
-      const MAIN_EDGE_IDS = edgeSet(BOARD.edges);
-      const VIEW_EDGE_IDS = Object.fromEntries(
-        Object.entries(BOARD.views).map(([viewKey, view]) => {
-          const focus = new Set(view.focus || []);
-          return [
-            viewKey,
-            new Set(
-              BOARD.edges
-                .filter(([source, target]) => focus.has(source) && focus.has(target))
-                .map(([source, target]) => `${source}->${target}`)
-            )
-          ];
-        })
-      );
-
-      const VIEWPORTS = {
-        overview: { x: 38, y: 160, zoom: 0.7 },
-        runtime: { x: -1220, y: 160, zoom: 0.76 },
-        artifacts: { x: -2660, y: 160, zoom: 0.76 },
-        signal: { x: -3440, y: 160, zoom: 0.76 },
-        decisions: { x: -920, y: 108, zoom: 0.68 }
+      const els = {
+        title: document.querySelector(".brand-title"),
+        tabs: document.querySelector(".tabs"),
+        focusTitle: document.querySelector(".focusbar-title"),
+        focusSummary: document.querySelector(".focusbar-summary"),
+        board: document.querySelector(".board"),
+        edges: document.querySelector(".edges"),
+        drawer: document.querySelector(".detail-drawer"),
       };
 
-      Object.assign(VIEWPORTS, {
-        overview: { x: 18, y: 86, zoom: 0.76 },
-        runtime: { x: -805, y: -640, zoom: 0.82 },
-        artifacts: { x: -820, y: -1280, zoom: 0.82 },
-        signal: { x: 18, y: -1960, zoom: 0.84 },
-        decisions: { x: -470, y: 74, zoom: 0.74 }
-      });
-
-      Object.assign(VIEWPORTS, {
-        overview: { x: 10, y: 78, zoom: 0.56 },
-        runtime: { x: -560, y: -280, zoom: 0.78 },
-        artifacts: { x: -360, y: -560, zoom: 0.78 },
-        signal: { x: 8, y: -700, zoom: 0.78 },
-        decisions: { x: -250, y: 60, zoom: 0.66 }
-      });
-
-      function domainVars(domainKey) {
-        const domain = DOMAINS[domainKey] || DOMAINS.infra;
-        return {
-          "--accent": domain.accent,
-          "--soft": domain.soft
-        };
+      function domainFor(key) {
+        return DOMAINS[key] || Object.values(DOMAINS)[0] || { label: "Domain", accent: "#62d7bd" };
       }
 
-      function selectionContext(selectedId) {
-        if (!selectedId || !NODE_BY_ID[selectedId]) {
-          return { related: new Set(), upstream: new Set(), downstream: new Set(), activeEdges: new Set() };
-        }
-        const upstream = new Set(INCOMING.get(selectedId) || []);
-        const downstream = new Set(OUTGOING.get(selectedId) || []);
-        const explicit = new Set((NODE_BY_ID[selectedId]?.details.related || []).filter(id => NODE_BY_ID[id]));
-        const related = new Set([selectedId, ...upstream, ...downstream, ...explicit]);
-        const activeEdges = new Set();
+      function ownerFor(key) {
+        return OWNERS[key] || { label: key || "Owner" };
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[char]);
+      }
+
+      function list(items) {
+        const values = Array.isArray(items) ? items : [items].filter(Boolean);
+        if (!values.length) return "<p>Not documented.</p>";
+        return `<ul>${values.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+      }
+
+      function visibleIds() {
+        const view = BOARD.views[state.mode] || BOARD.views.overview;
+        return new Set(view.focus || BOARD.nodes.map((node) => node.id));
+      }
+
+      function relatedIds(id) {
+        if (!id) return new Set();
+        const related = new Set([id]);
         BOARD.edges.forEach(([source, target]) => {
-          if (source === selectedId || target === selectedId) activeEdges.add(`${source}->${target}`);
+          if (source === id) related.add(target);
+          if (target === id) related.add(source);
         });
-        return { related, upstream, downstream, activeEdges };
+        (nodeById[id]?.details?.related || []).forEach((relatedId) => related.add(relatedId));
+        return related;
       }
 
-      function modeFocus(mode) {
-        return new Set(BOARD.views[mode]?.focus || []);
+      function bounds() {
+        const xs = [];
+        const ys = [];
+        BOARD.lanes.forEach((lane) => {
+          xs.push(lane.position.x + (lane.width || 340));
+          ys.push(lane.position.y + (lane.height || 900));
+        });
+        BOARD.nodes.forEach((node) => {
+          xs.push(node.position.x + NODE_SIZE.width + 120);
+          ys.push(node.position.y + NODE_SIZE.height + 120);
+        });
+        return { width: Math.max(1200, ...xs), height: Math.max(760, ...ys) };
       }
 
-      function isDetailNode(node) {
-        return node.hidden === true || node.tier === "detail";
+      function pointFor(node, handle) {
+        const x = node.position.x;
+        const y = node.position.y;
+        if (handle?.includes("right")) return { x: x + NODE_SIZE.width, y: y + NODE_SIZE.height / 2 };
+        if (handle?.includes("left")) return { x, y: y + NODE_SIZE.height / 2 };
+        if (handle?.includes("top")) return { x: x + NODE_SIZE.width / 2, y };
+        return { x: x + NODE_SIZE.width / 2, y: y + NODE_SIZE.height };
       }
 
-      function shouldShowNode(node, mode, selectedId, showDetails, context) {
-        if (!isDetailNode(node)) return true;
-        if (showDetails) return true;
-        const focus = modeFocus(mode);
-        if (mode !== "overview" && focus.has(node.id)) return true;
-        if (!selectedId) return false;
-        if (context.related.has(node.id)) return true;
-        return (node.revealFor || []).includes(selectedId);
+      function edgePath(source, target, sourceHandle, targetHandle) {
+        const a = pointFor(source, sourceHandle);
+        const b = pointFor(target, targetHandle);
+        const dx = Math.max(48, Math.abs(b.x - a.x) * 0.45);
+        const dy = Math.max(48, Math.abs(b.y - a.y) * 0.35);
+        const horizontal = sourceHandle?.includes("right") || sourceHandle?.includes("left");
+        const c1 = horizontal ? { x: a.x + (b.x >= a.x ? dx : -dx), y: a.y } : { x: a.x, y: a.y + (b.y >= a.y ? dy : -dy) };
+        const c2 = horizontal ? { x: b.x - (b.x >= a.x ? dx : -dx), y: b.y } : { x: b.x, y: b.y - (b.y >= a.y ? dy : -dy) };
+        return { d: `M ${a.x} ${a.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${b.x} ${b.y}`, label: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 - 8 } };
       }
 
-      function visibleNodeIds(mode, selectedId, showDetails) {
-        const context = selectionContext(selectedId);
-        return new Set(
-          BOARD.nodes
-            .filter(node => shouldShowNode(node, mode, selectedId, showDetails, context))
-            .map(node => node.id)
-        );
+      function setThemeVars(element, domainKey) {
+        element.style.setProperty("--accent", domainFor(domainKey).accent);
       }
 
-      function visibleEdgeIds(mode, selectedId, showDetails, context) {
-        if (selectedId) return context.activeEdges;
-        if (showDetails) return MAIN_EDGE_IDS;
-        return VIEW_EDGE_IDS[mode] || MAIN_EDGE_IDS;
+      function renderTabs() {
+        els.tabs.innerHTML = Object.entries(BOARD.views).map(([key, view]) => (
+          `<button class="tab ${key === state.mode ? "is-active" : ""}" type="button" data-view="${escapeHtml(key)}">${escapeHtml(view.label)}</button>`
+        )).join("");
       }
 
-      const NODE_SIZE = { width: 220, height: 100 };
-      const PANEL_RESERVE = 560;
-      const TOPBAR_RESERVE = 96;
-
-      function boundsForIds(ids, options = {}) {
-        const includeDetails = options.includeDetails ?? false;
-        const selected = ids.map(id => NODE_BY_ID[id]).filter(node => node && (includeDetails || !isDetailNode(node)));
-        const fallbackNodes = BOARD.nodes.filter(node => includeDetails || !isDetailNode(node));
-        const nodes = selected.length ? selected : fallbackNodes;
-        const minX = Math.min(...nodes.map(node => node.position.x));
-        const minY = Math.min(...nodes.map(node => node.position.y));
-        const maxX = Math.max(...nodes.map(node => node.position.x + NODE_SIZE.width));
-        const maxY = Math.max(...nodes.map(node => node.position.y + NODE_SIZE.height));
-        return { minX, minY, width: maxX - minX, height: maxY - minY };
+      function renderFocus() {
+        const group = GROUP_DETAILS[state.mode] || GROUP_DETAILS.overview;
+        els.title.textContent = GROUP_DETAILS.overview?.title || "Project Architecture";
+        els.focusTitle.textContent = group.title || BOARD.views[state.mode]?.label || "Overview";
+        els.focusSummary.textContent = group.summary || "";
       }
 
-      function viewportForIds(ids, options = {}) {
-        const bounds = boundsForIds(ids, options);
-        const reservePanel = options.reservePanel ?? window.innerWidth >= 980;
-        const availableWidth = Math.max(360, window.innerWidth - (reservePanel ? PANEL_RESERVE : 32) - 48);
-        const availableHeight = Math.max(300, window.innerHeight - TOPBAR_RESERVE - 30);
-        const padding = options.padding ?? 0.28;
-        const paddedWidth = Math.max(1, bounds.width * (1 + padding));
-        const paddedHeight = Math.max(1, bounds.height * (1 + padding));
-        const zoom = Math.max(
-          options.minZoom ?? 0.26,
-          Math.min(options.maxZoom ?? 1.08, availableWidth / paddedWidth, availableHeight / paddedHeight)
-        );
-        const left = 24;
-        const top = TOPBAR_RESERVE;
-        return {
-          x: left + (availableWidth - bounds.width * zoom) / 2 - bounds.minX * zoom,
-          y: top + (availableHeight - bounds.height * zoom) / 2 - bounds.minY * zoom,
-          zoom
-        };
-      }
+      function renderBoard() {
+        const boardBounds = bounds();
+        els.board.style.setProperty("--board-width", `${boardBounds.width}px`);
+        els.board.style.setProperty("--board-height", `${boardBounds.height}px`);
+        els.board.style.setProperty("--zoom", state.zoom);
+        els.board.querySelectorAll(".lane,.arch-node").forEach((el) => el.remove());
+        const visible = visibleIds();
+        const related = relatedIds(state.selectedId);
 
-      function buildNodes(mode, selectedId, showDetails) {
-        const context = selectionContext(selectedId);
-        const focus = modeFocus(mode);
-        const visibleIds = visibleNodeIds(mode, selectedId, showDetails);
-        const hasModeFocus = focus.size > 0;
-        const hasSelection = Boolean(selectedId);
-
-        const lanes = BOARD.lanes.map(lane => ({
-          id: lane.id,
-          type: "lane",
-          position: lane.position,
-          data: {
-            title: lane.title,
-            subtitle: lane.subtitle,
-            domain: lane.domain,
-            width: lane.width,
-            height: lane.height,
-            dimmed: hasSelection
-          },
-          draggable: false,
-          selectable: false,
-          focusable: false,
-          zIndex: -2
-        }));
-
-        const nodes = BOARD.nodes.filter(node => visibleIds.has(node.id)).map(node => {
-          const isSelected = node.id === selectedId;
-          const isRelated = context.related.has(node.id);
-          const modeDimmed = hasModeFocus && !focus.has(node.id);
-          const selectionDimmed = hasSelection && !isSelected && !isRelated;
-          return {
-            id: node.id,
-            type: "arch",
-            position: node.position,
-            data: {
-              ...node,
-              domainLabel: DOMAINS[node.domain].label,
-              ownerLabel: OWNERS[node.owner]?.label || OWNERS.suite.label,
-              starter: !INCOMING.has(node.id),
-              selected: isSelected,
-              related: isRelated && !isSelected,
-              dimmed: selectionDimmed || (!hasSelection && modeDimmed),
-              modeDimmed
-            },
-            draggable: false,
-            selectable: true,
-            connectable: false,
-            zIndex: isSelected ? 8 : isRelated ? 6 : 2
-          };
+        BOARD.lanes.forEach((lane) => {
+          const el = document.createElement("section");
+          el.className = "lane";
+          setThemeVars(el, lane.domain);
+          el.style.left = `${lane.position.x}px`;
+          el.style.top = `${lane.position.y}px`;
+          el.style.width = `${lane.width || 340}px`;
+          el.style.height = `${lane.height || 900}px`;
+          el.innerHTML = `<div class="lane-title">${escapeHtml(lane.title)}</div><div class="lane-subtitle">${escapeHtml(lane.subtitle || "")}</div>`;
+          els.board.appendChild(el);
         });
 
-        return [...lanes, ...nodes];
+        BOARD.nodes.forEach((node) => {
+          if (!visible.has(node.id) && !state.selectedId) return;
+          const el = document.createElement("button");
+          el.type = "button";
+          el.className = "arch-node";
+          if (state.selectedId && !related.has(node.id)) el.classList.add("is-dimmed");
+          if (state.selectedId === node.id) el.classList.add("is-selected");
+          el.dataset.id = node.id;
+          setThemeVars(el, node.domain);
+          el.style.left = `${node.position.x}px`;
+          el.style.top = `${node.position.y}px`;
+          el.innerHTML = `
+            <div class="node-head">
+              <span class="node-domain">${escapeHtml(domainFor(node.domain).label)}</span>
+              <span class="node-step">${escapeHtml(node.step || "")}</span>
+            </div>
+            ${incoming.has(node.id) ? "" : '<span class="node-start">Starts here</span>'}
+            <h2 class="node-title">${escapeHtml(node.title)}</h2>
+            <p class="node-purpose">${escapeHtml(node.purpose)}</p>
+          `;
+          el.addEventListener("click", () => selectNode(node.id));
+          els.board.appendChild(el);
+        });
+
+        renderEdges(visible);
       }
 
-      function buildEdges(mode, selectedId, showDetails) {
-        const context = selectionContext(selectedId);
-        const hasSelection = Boolean(selectedId);
-        const visible = visibleEdgeIds(mode, selectedId, showDetails, context);
-        const nodeIds = visibleNodeIds(mode, selectedId, showDetails);
-
-        return BOARD.edges.filter(([source, target]) => visible.has(`${source}->${target}`) && nodeIds.has(source) && nodeIds.has(target)).map(([source, target, label, kind]) => {
-          const id = `${source}->${target}`;
-          const [sourceHandle, targetHandle] = EDGE_HANDLES[id] || ["out-right", "in-left"];
-          const primary = MAIN_EDGE_IDS.has(id);
-          const color = selectedId
-            ? DOMAINS[NODE_BY_ID[selectedId]?.domain || "infra"].accent
-            : edgeColor(kind);
-          return {
-            id,
-            source,
-            target,
-            sourceHandle,
-            targetHandle,
-            type: "contract",
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-              color
-            },
-            data: {
-              label,
-              kind,
-              showLabel: hasSelection || mode !== "overview",
-              dimmed: false,
-              active: true,
-              primary,
-              color
-            }
-          };
+      function renderEdges(visible) {
+        const boardBounds = bounds();
+        els.edges.setAttribute("viewBox", `0 0 ${boardBounds.width} ${boardBounds.height}`);
+        els.edges.innerHTML = "";
+        BOARD.edges.forEach(([sourceId, targetId, label, kind = "control"]) => {
+          if (!visible.has(sourceId) || !visible.has(targetId)) return;
+          const source = nodeById[sourceId];
+          const target = nodeById[targetId];
+          const handles = BOARD.edgeHandles?.[`${sourceId}->${targetId}`] || ["out-right", "in-left"];
+          const path = edgePath(source, target, handles[0], handles[1]);
+          const color = domainFor(source.domain).accent;
+          const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          pathEl.setAttribute("class", `edge-path ${kind === "control" || kind === "signal" ? "" : "is-secondary"}`);
+          pathEl.setAttribute("d", path.d);
+          pathEl.style.setProperty("--edge-color", color);
+          els.edges.appendChild(pathEl);
+          const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          text.setAttribute("class", "edge-label");
+          text.setAttribute("x", path.label.x);
+          text.setAttribute("y", path.label.y);
+          text.textContent = label;
+          els.edges.appendChild(text);
         });
       }
 
-      function edgeColor(kind) {
-        if (kind === "artifact" || kind === "data") return (DOMAINS.storage || DOMAINS.data || DOMAINS.runtime).accent;
-        if (kind === "signal") return (DOMAINS.signal || DOMAINS.runtime).accent;
-        if (kind === "decision") return (DOMAINS.decision || DOMAINS.delivery || DOMAINS.runtime).accent;
-        if (kind === "dependency") return (DOMAINS.infra || DOMAINS.runtime).accent;
-        return (DOMAINS.runtime || DOMAINS.infra).accent;
+      function selectNode(id) {
+        state.selectedId = id;
+        renderBoard();
+        renderDrawer();
       }
 
-      function BmtNode(props) {
-        const data = props.data;
-        const className = [
-          "arch-node",
-          data.selected ? "is-selected" : "",
-          data.related ? "is-related" : "",
-          data.dimmed ? "is-dimmed" : ""
-        ]
-          .filter(Boolean)
-          .join(" ");
-
-        return h(
-          "div",
-          {
-            className,
-            style: domainVars(data.domain)
-          },
-          h(Handle, { id: "in-left", type: "target", position: Position.Left }),
-          h(Handle, { id: "out-left", type: "source", position: Position.Left }),
-          h(Handle, { id: "in-right", type: "target", position: Position.Right }),
-          h(Handle, { id: "out-right", type: "source", position: Position.Right }),
-          h(Handle, { id: "in-top", type: "target", position: Position.Top }),
-          h(Handle, { id: "out-top", type: "source", position: Position.Top }),
-          h(Handle, { id: "in-bottom", type: "target", position: Position.Bottom }),
-          h(Handle, { id: "out-bottom", type: "source", position: Position.Bottom }),
-          h(
-            "div",
-            { className: "node-head" },
-            h("span", { className: "node-domain" }, data.ownerLabel),
-            h("span", { className: "node-step" }, data.step)
-          ),
-          h(
-            "div",
-            { className: "node-body" },
-            data.starter ? h("span", { className: "node-start" }, "starts here") : null,
-            h("h2", { className: "node-title" }, data.title),
-            h("p", { className: "node-purpose" }, data.purpose)
-          )
-        );
-      }
-
-      function LaneNode(props) {
-        const data = props.data;
-        return h(
-          "div",
-          {
-            className: "lane-node",
-            style: {
-              ...domainVars(data.domain),
-              "--lane-width": data.width ? `${data.width}px` : undefined,
-              "--lane-height": data.height ? `${data.height}px` : undefined,
-              opacity: data.dimmed ? 0.45 : 1
-            }
-          },
-          h("div", { className: "lane-title" }, data.title),
-          h("div", { className: "lane-subtitle" }, data.subtitle)
-        );
-      }
-
-      function ContractEdge(props) {
-        const [edgePath, labelX, labelY] = getSmoothStepPath({
-          ...props,
-          borderRadius: 18,
-          offset: 28
+      function renderDrawer() {
+        const node = nodeById[state.selectedId] || BOARD.nodes[0];
+        if (!node) return;
+        setThemeVars(els.drawer, node.domain);
+        const details = node.details || {};
+        els.drawer.classList.add("is-open");
+        els.drawer.innerHTML = `
+          <button class="close-drawer" type="button" aria-label="Close details">x</button>
+          <div class="drawer-head">
+            <div class="drawer-kicker">${escapeHtml(domainFor(node.domain).label)} / ${escapeHtml(ownerFor(node.owner).label)}</div>
+            <h2 class="drawer-title">${escapeHtml(node.title)}</h2>
+            <p class="drawer-purpose">${escapeHtml(details.summary || node.purpose)}</p>
+          </div>
+          <div class="drawer-body">
+            <section class="detail-section"><h3>Why</h3>${list(details.why)}</section>
+            <section class="detail-section"><h3>Inputs</h3>${list(details.inputs)}</section>
+            <section class="detail-section"><h3>Outputs</h3>${list(details.outputs)}</section>
+            <section class="detail-section"><h3>Failures</h3>${list(details.failures)}</section>
+            <section class="detail-section"><h3>Sources</h3><div class="sources">${(details.source || []).map((source) => `<span class="source-chip">${escapeHtml(source)}</span>`).join("")}</div></section>
+          </div>
+        `;
+        els.drawer.querySelector(".close-drawer").addEventListener("click", () => {
+          state.selectedId = null;
+          els.drawer.classList.remove("is-open");
+          renderBoard();
         });
-        const dimmed = props.data?.dimmed;
-        const active = props.data?.active;
-        const kind = props.data?.kind;
-        const color = props.data?.color || "#9b9589";
-        const label = props.data?.showLabel ? props.data?.label : null;
-        const style = {
-          stroke: color,
-          strokeWidth: active ? 2.8 : 1.8,
-          strokeDasharray: kind === "control" || kind === "signal" ? undefined : "7 7",
-          opacity: dimmed ? 0.18 : kind === "control" || kind === "signal" ? 0.82 : 0.48
-        };
-
-        return h(
-          React.Fragment,
-          null,
-          h(BaseEdge, {
-            id: props.id,
-            path: edgePath,
-            markerEnd: props.markerEnd,
-            className: "contract-edge",
-            style
-          }),
-          label
-            ? h(
-                EdgeLabelRenderer,
-                null,
-                h(
-                  "div",
-                  {
-                    className: "edge-label",
-                    style: {
-                      opacity: dimmed ? 0 : 1,
-                      transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`
-                    }
-                  },
-                  label
-                )
-              )
-            : null
-        );
       }
 
-      const nodeTypes = { arch: BmtNode, lane: LaneNode };
-      const edgeTypes = { contract: ContractEdge };
-
-      function GroupDetailDrawer({ mode, onSelect }) {
-        const group = GROUP_DETAILS[mode] || GROUP_DETAILS.overview;
-        const domain = DOMAINS[group.domain] || DOMAINS.runtime;
-        const focus = group.focus || [];
-
-        return h(
-          "aside",
-          {
-            className: "detail-drawer",
-            "aria-live": "polite",
-            style: domainVars(group.domain)
-          },
-          h(
-            "div",
-            { className: "drawer-head" },
-            h("span", { className: "drawer-kicker" }, `Group overview / ${domain.label}`),
-            h("h2", { className: "drawer-title" }, group.title),
-            h("p", { className: "drawer-purpose" }, group.purpose)
-          ),
-          h(
-            "div",
-            { className: "drawer-body" },
-            h(
-              "section",
-              { className: "detail-section" },
-              h("h3", null, "What this shows"),
-              h("p", null, group.summary)
-            ),
-            h(
-              "section",
-              { className: "detail-section" },
-              h("h3", null, "Why it matters"),
-              h("p", null, group.why)
-            ),
-            h(
-              "section",
-              { className: "detail-section" },
-              h("h3", null, "Good to know"),
-              h("ul", null, group.points.map(item => h("li", { key: item }, item)))
-            ),
-            mode === "overview"
-              ? null
-              : h(
-                  "section",
-                  { className: "detail-section" },
-                  h("h3", null, "Highlighted nodes"),
-                  h(
-                    "div",
-                    { className: "related-list" },
-                    focus
-                      .filter(id => NODE_BY_ID[id])
-                      .map(id =>
-                        h(
-                          "button",
-                          {
-                            key: id,
-                            type: "button",
-                            className: "related-pill",
-                            onClick: () => onSelect(id)
-                          },
-                          NODE_BY_ID[id].title
-                        )
-                      )
-                  )
-                )
-          )
-        );
+      function render() {
+        renderTabs();
+        renderFocus();
+        renderBoard();
       }
 
-      function DetailDrawer({ mode, selectedId, onSelect, onClose }) {
-        const node = selectedId ? NODE_BY_ID[selectedId] : null;
-        if (!node) {
-          return mode === "overview" ? null : h(GroupDetailDrawer, { mode, onSelect });
-        }
+      els.tabs.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-view]");
+        if (!button) return;
+        state.mode = button.dataset.view;
+        state.selectedId = null;
+        render();
+      });
 
-        const domain = DOMAINS[node.domain];
-        const owner = OWNERS[node.owner] || OWNERS.suite;
-        const summary = node.details.summary || node.details.what?.[0] || node.purpose;
-        const why = Array.isArray(node.details.why) ? node.details.why.join(" ") : node.details.why;
-        const directRelated = directRelations(node.id);
+      document.querySelector('[data-action="zoom-in"]').addEventListener("click", () => {
+        state.zoom = Math.min(1.25, state.zoom + 0.08);
+        renderBoard();
+      });
+      document.querySelector('[data-action="zoom-out"]').addEventListener("click", () => {
+        state.zoom = Math.max(0.44, state.zoom - 0.08);
+        renderBoard();
+      });
+      document.querySelector('[data-action="reset"]').addEventListener("click", () => {
+        state.zoom = 0.86;
+        document.querySelector(".map-frame").scrollTo({ left: 0, top: 0, behavior: "smooth" });
+        renderBoard();
+      });
+      document.querySelector('[data-action="details"]').addEventListener("click", () => renderDrawer());
 
-        return h(
-          "aside",
-          {
-            className: "detail-drawer",
-            "aria-live": "polite",
-            style: domainVars(node.domain)
-          },
-          h(
-            "div",
-            { className: "drawer-head" },
-            h(
-              "div",
-              { className: "drawer-head-top" },
-              h("span", { className: "drawer-kicker" }, `${owner.label} / ${domain.label}`),
-              h(
-                "button",
-                { type: "button", className: "drawer-close", onClick: onClose, "aria-label": "Close details", title: "Close details" },
-                h(X, { "aria-hidden": true })
-              )
-            ),
-            h("h2", { className: "drawer-title" }, node.title),
-            h("p", { className: "drawer-purpose" }, node.purpose)
-          ),
-          h(
-            "div",
-            { className: "drawer-body" },
-            h(
-              "section",
-              { className: "detail-section" },
-              h("h3", null, "What it does"),
-              h("p", null, summary)
-            ),
-            h(
-              "section",
-              { className: "detail-section" },
-              h("h3", null, "Owned by"),
-              h("p", null, owner.description)
-            ),
-            h(
-              "section",
-              { className: "detail-section" },
-              h("h3", null, "Source confidence"),
-              h("p", null, node.details.source_confidence || "unknown")
-            ),
-            h(
-              "section",
-              { className: "detail-section io-grid" },
-              h(
-                "div",
-                { className: "io-card" },
-                h("h3", null, "Reads"),
-                h("ul", null, node.details.inputs.map(item => h("li", { key: item }, item)))
-              ),
-              h(
-                "div",
-                { className: "io-card" },
-                h("h3", null, "Writes"),
-                h("ul", null, node.details.outputs.map(item => h("li", { key: item }, item)))
-              )
-            ),
-            h(
-              "section",
-              { className: "detail-section" },
-              h("h3", null, "Why it exists"),
-              h("p", null, why)
-            ),
-            h(
-              "section",
-              { className: "detail-section" },
-              h("h3", null, "Check first if it fails"),
-              h("ul", null, node.details.failures.map(item => h("li", { key: item }, item)))
-            ),
-            h(
-              "section",
-              { className: "detail-section" },
-              h("h3", null, "Where to look"),
-              h(
-                "div",
-                { className: "source-list" },
-                node.details.source.map(item => h("span", { key: item, className: "source-chip" }, item))
-              )
-            ),
-            h(
-              "section",
-              { className: "detail-section" },
-              h("h3", null, "Connected steps"),
-              h(
-                "div",
-                { className: "related-list" },
-                directRelated.map(id =>
-                  h(
-                    "button",
-                    {
-                      key: id,
-                      type: "button",
-                      className: "related-pill",
-                      onClick: () => onSelect(id)
-                    },
-                    NODE_BY_ID[id].title
-                  )
-                )
-              )
-            )
-          )
-        );
-      }
-
-      function directRelations(id) {
-        return [...new Set([...(INCOMING.get(id) || []), ...(OUTGOING.get(id) || []), ...(NODE_BY_ID[id]?.details.related || [])])].filter(
-          relatedId => NODE_BY_ID[relatedId]
-        );
-      }
-
-      function Toolbar({
-        mode,
-        selectedId,
-        showDetails,
-        theme,
-        onModeChange,
-        onFitAll,
-        onResetLayout,
-        onClearSelection,
-        onDetailsToggle,
-        onThemeToggle
-      }) {
-        const modes = Object.entries(BOARD.views);
-
-        return h(
-          "div",
-          { className: "topbar" },
-          h(
-            "div",
-            { className: "brand" },
-            h("span", { className: "brand-kicker" }, "Visual architecture"),
-            h("span", { className: "brand-title" }, "Project Architecture")
-          ),
-          h(
-            "div",
-            { className: "toolbar-cluster" },
-            h("span", { className: "toolbar-label" }, "View"),
-            h(
-              "div",
-              { className: "mode-tabs", role: "group", "aria-label": "Choose architecture view" },
-              modes.map(([key, value]) =>
-                h(
-                  "button",
-                  {
-                    key,
-                    type: "button",
-                    className: `toolbar-button ${mode === key && !selectedId ? "is-active" : ""}`,
-                    "aria-pressed": String(mode === key && !selectedId),
-                    onClick: () => onModeChange(key)
-                  },
-                  value.label
-                )
-              )
-            )
-          ),
-          h(
-            "div",
-            { className: "view-actions" },
-            h(
-              "button",
-              { type: "button", className: "toolbar-button is-icon", onClick: onFitAll, "aria-label": "Fit all", title: "Fit all" },
-              h(Maximize2, { "aria-hidden": true })
-            ),
-            h(
-              "button",
-              { type: "button", className: "toolbar-button is-icon", onClick: onResetLayout, "aria-label": "Reset view", title: "Reset view" },
-              h(RotateCcw, { "aria-hidden": true })
-            ),
-            h(
-              "button",
-              {
-                type: "button",
-                className: `toolbar-button ${showDetails ? "is-active" : ""}`,
-                onClick: onDetailsToggle,
-                "aria-pressed": String(showDetails),
-                title: showDetails ? "Hide detail nodes" : "Show detail nodes"
-              },
-              "Details"
-            ),
-            h(
-              "button",
-              {
-                type: "button",
-                className: "toolbar-button is-icon",
-                onClick: onThemeToggle,
-                "aria-label": theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
-                title: theme === "dark" ? "Light mode" : "Dark mode"
-              },
-              theme === "dark" ? h(Sun, { "aria-hidden": true }) : h(Moon, { "aria-hidden": true })
-            ),
-            selectedId
-              ? h(
-                  "button",
-                  { type: "button", className: "toolbar-button is-icon", onClick: onClearSelection, "aria-label": "Clear selection", title: "Clear selection" },
-                  h(X, { "aria-hidden": true })
-                )
-              : null
-          )
-        );
-      }
-
-      function initialTheme() {
-        try {
-          const saved = window.localStorage.getItem("visual-arch-theme");
-          if (saved === "light" || saved === "dark") return saved;
-        } catch (_error) {
-          // Ignore storage failures; the system preference is a fine fallback.
-        }
-        return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      }
-
-      function replaceUrlHash(id) {
-        try {
-          if (!window.history?.replaceState) return;
-          const baseUrl = window.location.href.replace(/#.*$/, "");
-          const nextUrl = id ? `${baseUrl}#${encodeURIComponent(id)}` : baseUrl;
-          window.history.replaceState(null, "", nextUrl);
-        } catch (_error) {
-          // Some browsers block history mutation for local files. The board works without URL state.
-        }
-      }
-
-      function hashSelectionId() {
-        try {
-          const id = decodeURIComponent(window.location.hash.replace(/^#/, ""));
-          return NODE_BY_ID[id] ? id : null;
-        } catch (_error) {
-          return null;
-        }
-      }
-
-      function FlowBoard() {
-        const [mode, setMode] = useState("overview");
-        const [selectedId, setSelectedId] = useState(null);
-        const [showDetails, setShowDetails] = useState(false);
-        const [resetNonce, setResetNonce] = useState(0);
-        const [theme, setTheme] = useState(initialTheme);
-        const [isNavigating, setIsNavigating] = useState(false);
-        const navigationTimer = useRef(null);
-        const didInitialFit = useRef(false);
-        const reactFlow = useReactFlow();
-
-        const nodes = useMemo(() => buildNodes(mode, selectedId, showDetails), [mode, selectedId, showDetails, resetNonce]);
-        const edges = useMemo(() => buildEdges(mode, selectedId, showDetails), [mode, selectedId, showDetails]);
-
-        const setViewportForIds = useCallback(
-          (ids, options = {}) => {
-            requestAnimationFrame(() => {
-              reactFlow.setViewport(viewportForIds(ids, options), { duration: options.duration ?? 450 });
-            });
-          },
-          [reactFlow]
-        );
-
-        const centerNode = useCallback(id => {
-          if (!NODE_BY_ID[id]) return;
-          setViewportForIds([id], { padding: 0.95, maxZoom: 1.05, duration: 420, includeDetails: true });
-        }, [setViewportForIds]);
-
-        const selectNode = useCallback(
-          id => {
-            if (!NODE_BY_ID[id]) return;
-            setSelectedId(id);
-            replaceUrlHash(id);
-            centerNode(id);
-          },
-          [centerNode]
-        );
-
-        const focusMode = useCallback(
-          nextMode => {
-            const view = BOARD.views[nextMode] || BOARD.views.overview;
-            setMode(nextMode);
-            setSelectedId(null);
-            replaceUrlHash(null);
-            if (nextMode === "overview") {
-              setViewportForIds(view.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false });
-            } else {
-              setViewportForIds(view.focus, { padding: 0.34, maxZoom: 1.05, includeDetails: true });
-            }
-          },
-          [setViewportForIds]
-        );
-
-        const fitAll = useCallback(() => {
-          focusMode("overview");
-        }, [focusMode]);
-
-        const clearSelection = useCallback(() => {
-          setSelectedId(null);
-          replaceUrlHash(null);
-          if (mode === "overview") {
-            setViewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false });
-          } else {
-            setViewportForIds((BOARD.views[mode] || BOARD.views.overview).focus, { padding: 0.34, maxZoom: 1.05, includeDetails: true });
-          }
-        }, [mode, setViewportForIds]);
-
-        const resetLayout = useCallback(() => {
-          setResetNonce(value => value + 1);
-          focusMode("overview");
-        }, [focusMode]);
-
-        const toggleTheme = useCallback(() => {
-          setTheme(value => (value === "dark" ? "light" : "dark"));
-        }, []);
-
-        const toggleDetails = useCallback(() => {
-          setShowDetails(value => !value);
-        }, []);
-
-        const beginCanvasNavigation = useCallback(event => {
-          if (event?.target?.closest?.(".react-flow__controls")) return;
-          if (navigationTimer.current) window.clearTimeout(navigationTimer.current);
-          setIsNavigating(true);
-        }, []);
-
-        const endCanvasNavigation = useCallback(() => {
-          if (navigationTimer.current) window.clearTimeout(navigationTimer.current);
-          navigationTimer.current = window.setTimeout(() => setIsNavigating(false), 180);
-        }, []);
-
-        useEffect(() => {
-          document.body.classList.add("app-ready");
-          return () => document.body.classList.remove("app-ready");
-        }, []);
-
-        useEffect(() => {
-          document.documentElement.dataset.theme = theme;
-          try {
-            window.localStorage.setItem("visual-arch-theme", theme);
-          } catch (_error) {
-            // Storage is optional for a static document.
-          }
-        }, [theme]);
-
-        useEffect(() => {
-          return () => {
-            if (navigationTimer.current) window.clearTimeout(navigationTimer.current);
-          };
-        }, []);
-
-        useEffect(() => {
-          const onHashChange = () => {
-            const id = hashSelectionId();
-            if (NODE_BY_ID[id]) {
-              setSelectedId(id);
-              centerNode(id);
-            } else {
-              setSelectedId(null);
-            }
-          };
-          window.addEventListener("hashchange", onHashChange);
-          return () => window.removeEventListener("hashchange", onHashChange);
-        }, [centerNode]);
-
-        useEffect(() => {
-          if (didInitialFit.current) return;
-          didInitialFit.current = true;
-          replaceUrlHash(null);
-          window.setTimeout(
-            () => setViewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false, duration: 0 }),
-            0
-          );
-        }, [setViewportForIds]);
-
-        return h(
-          "div",
-          { className: `app-shell ${isNavigating ? "is-navigating" : ""}` },
-          h(Toolbar, {
-            mode,
-            selectedId,
-            showDetails,
-            theme,
-            onModeChange: focusMode,
-            onFitAll: fitAll,
-            onResetLayout: resetLayout,
-            onClearSelection: clearSelection,
-            onDetailsToggle: toggleDetails,
-            onThemeToggle: toggleTheme
-          }),
-          h(
-            "div",
-            {
-              className: "flow-wrap",
-              onPointerDown: beginCanvasNavigation,
-              onPointerUp: endCanvasNavigation,
-              onPointerLeave: endCanvasNavigation,
-              onPointerCancel: endCanvasNavigation
-            },
-            h(
-              ReactFlow,
-              {
-                nodes,
-                edges,
-                nodeTypes,
-                edgeTypes,
-                defaultViewport: viewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false }),
-                minZoom: 0.28,
-                maxZoom: 1.45,
-                nodesDraggable: false,
-                nodesConnectable: false,
-                nodesFocusable: true,
-                edgesFocusable: false,
-                elementsSelectable: true,
-                panOnDrag: true,
-                panOnScroll: false,
-                zoomOnScroll: true,
-                zoomOnPinch: true,
-                zoomOnDoubleClick: false,
-                preventScrolling: true,
-                selectionOnDrag: false,
-                deleteKeyCode: null,
-                connectOnClick: false,
-                onNodeClick: (_event, node) => {
-                  if (NODE_BY_ID[node.id]) selectNode(node.id);
-                },
-                onInit: instance => {
-                  window.setTimeout(() => {
-                    instance.setViewport(
-                      viewportForIds(BOARD.views.overview.focus, { padding: 0.18, maxZoom: 0.95, reservePanel: false }),
-                      { duration: 0 }
-                    );
-                  }, 0);
-                },
-                onPaneClick: clearSelection,
-                onMoveEnd: endCanvasNavigation,
-                defaultEdgeOptions: {
-                  type: "contract",
-                  markerEnd: { type: MarkerType.ArrowClosed }
-                },
-                proOptions: { hideAttribution: true }
-              },
-              h(Background, { variant: "lines", gap: 34, size: 0.75, color: "var(--grid)" }),
-              h(Controls, { position: "bottom-left", showInteractive: false })
-            )
-          ),
-          h(DetailDrawer, { mode, selectedId, onSelect: selectNode, onClose: clearSelection })
-        );
-      }
-
-      function App() {
-        return h(ReactFlowProvider, null, h(FlowBoard));
-      }
-
-      createRoot(document.getElementById("root")).render(h(App));
+      render();
+      document.body.classList.add("app-ready");
     </script>
   </body>
 </html>
